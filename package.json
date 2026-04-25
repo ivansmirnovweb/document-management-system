@@ -1,0 +1,20 @@
+{
+  "name": "document-flow",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm build:shared && concurrently -n web,api -c auto \"pnpm dev:web\" \"pnpm dev:api\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm build:shared && pnpm --filter api build && pnpm --filter web build",
+    "build:shared": "pnpm --filter @document-flow/shared build",
+    "shared:dev": "pnpm --filter @document-flow/shared dev",
+    "lint": "pnpm --filter api lint && pnpm --filter web lint",
+    "db:generate": "pnpm --filter api db:generate",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:push": "pnpm --filter api db:push",
+    "db:studio": "pnpm --filter api db:studio"
+  },
+  "devDependencies": {
+    "concurrently": "latest"
+  }
+}

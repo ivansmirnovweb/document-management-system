@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "shared"
+allowBuilds:
+  '@nestjs/core': true
+  bcrypt: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

@@ -1,0 +1,54 @@
+services:
+    postgres:
+        image: postgres:16-alpine
+        container_name: document-flow-postgres-prod
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: document_flow
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        volumes:
+            - document_flow_postgres_prod_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d document_flow"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    api:
+        container_name: document-flow-api-prod
+        build:
+            context: .
+            dockerfile: apps/api/Dockerfile
+        restart: unless-stopped
+        environment:
+            NODE_ENV: production
+            PORT: 4000
+            WEB_ORIGIN: http://localhost:3000
+            DATABASE_URL: postgres://postgres:postgres@postgres:5432/document_flow
+            JWT_SECRET: change-me-in-production
+        ports:
+            - "4000:4000"
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    web:
+        container_name: document-flow-web-prod
+        build:
+            context: .
+            dockerfile: apps/web/Dockerfile
+            args:
+                NEXT_PUBLIC_API_URL: http://localhost:4000
+        restart: unless-stopped
+        environment:
+            NODE_ENV: production
+            PORT: 3000
+            NEXT_PUBLIC_API_URL: http://localhost:4000
+        ports:
+            - "3000:3000"
+        depends_on:
+            - api
+
+volumes:
+    document_flow_postgres_prod_data:
