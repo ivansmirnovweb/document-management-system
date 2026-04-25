@@ -11,15 +11,15 @@ The project is built as a monorepo:
 - `apps/web` — Next.js frontend
 - `apps/api` — NestJS backend
 - `shared` — shared types, enums, schemas, and API contracts
-- `tasks` — detailed development tasks
+- `AGENTS/tasks` — detailed development tasks
 
 ## Required reading before work
 
 Before making changes, always read:
 
-1. `PROJECT.md`
-2. `TASKS.md`
-3. The current task file from `tasks/`
+1. `AGENTS/SPEC.md`
+2. `AGENTS/TASKS.md`
+3. The current task file from `AGENTS/tasks/`
 4. The local `AGENTS.md` file if working inside `apps/web`, `apps/api`, or `shared`
 
 ## Global stack
@@ -51,10 +51,10 @@ Before making changes, always read:
 
 ## Development workflow
 
-1. Pick a task from `TASKS.md`.
-2. Open the corresponding task file from `tasks/`.
+1. Pick a task from `AGENTS/TASKS.md`.
+2. Open the corresponding task file from `AGENTS/tasks/` (if it does not exist yet, create it first using the required task file sections from this document).
 3. Implement only the requested scope.
-4. Update the task status in `TASKS.md`.
+4. Update the task status in `AGENTS/TASKS.md`.
 5. Add a short implementation result to the task file.
 6. Run relevant checks when possible.
 
