@@ -8,6 +8,13 @@
       "when": 1777120717718,
       "tag": "0000_outgoing_norman_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777127367234,
+      "tag": "0001_bright_mimic",
+      "breakpoints": true
     }
   ]
 }

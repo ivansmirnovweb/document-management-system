@@ -1,0 +1,45 @@
+import {
+  pgEnum,
+  pgTable,
+  serial,
+  timestamp,
+  varchar,
+  integer,
+  boolean,
+  text,
+} from 'drizzle-orm/pg-core';
+import { employers } from './employers';
+import { users } from './users';
+
+export const documentStatusEnum = pgEnum('document_status', [
+  'NOT_DONE',
+  'DONE',
+]);
+
+export const documents = pgTable('documents', {
+  id: serial('id').primaryKey(),
+  registrationNumber: varchar('registration_number', { length: 100 })
+    .notNull()
+    .unique(),
+  registrationDate: timestamp('registration_date').notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  incomingNumber: varchar('incoming_number', { length: 100 }),
+  outgoingNumber: varchar('outgoing_number', { length: 100 }),
+  employerId: integer('employer_id').references(() => employers.id, {
+    onDelete: 'set null',
+  }),
+  ownerId: integer('owner_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'restrict' }),
+  executorId: integer('executor_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'restrict' }),
+  status: documentStatusEnum('status').notNull().default('NOT_DONE'),
+  dueDate: timestamp('due_date').notNull(),
+  completedAt: timestamp('completed_at'),
+  isControl: boolean('is_control').notNull().default(false),
+  deletedAt: timestamp('deleted_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
