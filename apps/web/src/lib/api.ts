@@ -65,12 +65,8 @@ export type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
 };
 
-export async function apiRequest<T extends z.ZodTypeAny>(
-  path: string,
-  options: ApiRequestOptions,
-  dataSchema: T,
-): Promise<z.infer<T>> {
-  const response = await fetch(getApiUrl(path), {
+export async function apiFetch(path: string, options: ApiRequestOptions = {}): Promise<Response> {
+  return fetch(getApiUrl(path), {
     ...options,
     credentials: "include",
     headers: {
@@ -79,6 +75,14 @@ export async function apiRequest<T extends z.ZodTypeAny>(
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+}
+
+export async function apiRequest<T extends z.ZodTypeAny>(
+  path: string,
+  options: ApiRequestOptions,
+  dataSchema: T,
+): Promise<z.infer<T>> {
+  const response = await apiFetch(path, options);
 
   const payload = await readBody(response);
 
