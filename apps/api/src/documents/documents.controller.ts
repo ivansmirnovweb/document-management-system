@@ -16,6 +16,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { ListDocumentsQueryDto } from './dto/list-documents-query.dto';
+import { SearchDocumentsQueryDto } from './dto/search-documents-query.dto';
 import { ReassignDocumentDto } from './dto/reassign-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { UpdateDocumentStatusDto } from './dto/update-document-status.dto';
@@ -40,6 +41,14 @@ export class DocumentsController {
   @Get()
   list(@Query() query: ListDocumentsQueryDto) {
     return this.documentsService.list(query);
+  }
+
+  @Get('search')
+  search(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: SearchDocumentsQueryDto,
+  ) {
+    return this.documentsService.search(user, query);
   }
 
   @Get('completed')

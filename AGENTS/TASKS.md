@@ -4,6 +4,8 @@
 
 ## Done
 
+- [x] 041 — Phase 8 search, filters, reports, and export
+
 - [x] 026 — Phase 6 documents backend core
 - [x] 013 — Phase 4 authentication and users
 

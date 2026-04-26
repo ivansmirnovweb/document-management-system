@@ -3,7 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, isNotNull } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  isNull,
+  isNotNull,
+  or,
+  sql,
+} from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   DocumentDeadlineState,
@@ -18,6 +28,7 @@ import { employers } from '../db/schema/employers';
 import { users } from '../db/schema/users';
 import type { CreateDocumentDto } from './dto/create-document.dto';
 import type { ListDocumentsQueryDto } from './dto/list-documents-query.dto';
+import type { SearchDocumentsQueryDto } from './dto/search-documents-query.dto';
 import type { ReassignDocumentDto } from './dto/reassign-document.dto';
 import type { UpdateDocumentDto } from './dto/update-document.dto';
 import {
@@ -99,6 +110,70 @@ export class DocumentsService {
         desc(documents.deletedAt),
         desc(documents.updatedAt),
         desc(documents.id),
+      );
+
+    return rows.map((row) => this.toDocumentListItem(row));
+  }
+
+  async search(
+    actor: DocumentActor,
+    query: SearchDocumentsQueryDto,
+  ): Promise<DocumentListItem[]> {
+    const searchText = query.q?.trim();
+    const searchConditions = searchText
+      ? [
+          ilike(documents.registrationNumber, `%${searchText}%`),
+          ilike(documents.title, `%${searchText}%`),
+          ilike(documents.incomingNumber, `%${searchText}%`),
+          ilike(documents.outgoingNumber, `%${searchText}%`),
+          ilike(sql`${documents.registrationDate}::text`, `%${searchText}%`),
+          ilike(sql`${documents.dueDate}::text`, `%${searchText}%`),
+          ilike(ownerUsers.username, `%${searchText}%`),
+          ilike(executorUsers.username, `%${searchText}%`),
+        ]
+      : [];
+
+    const conditions = [
+      actor?.role !== UserRole.ROOT ? isNull(documents.deletedAt) : undefined,
+      query.status ? eq(documents.status, query.status) : undefined,
+    ].filter(
+      (condition): condition is NonNullable<typeof condition> =>
+        condition !== undefined,
+    );
+
+    if (searchConditions.length > 0) {
+      const searchClause = or(...searchConditions);
+      if (searchClause) {
+        conditions.push(searchClause);
+      }
+    }
+
+    const rows = await this.db.db
+      .select({
+        id: documents.id,
+        registrationNumber: documents.registrationNumber,
+        registrationDate: documents.registrationDate,
+        title: documents.title,
+        status: documents.status,
+        ownerId: documents.ownerId,
+        executorId: documents.executorId,
+        employerId: documents.employerId,
+        dueDate: documents.dueDate,
+        completedAt: documents.completedAt,
+        isControl: documents.isControl,
+        deletedAt: documents.deletedAt,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt,
+      })
+      .from(documents)
+      .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
+      .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .where(and(...conditions))
+      .orderBy(
+        desc(documents.isControl),
+        asc(documents.dueDate),
+        asc(documents.registrationDate),
+        asc(documents.id),
       );
 
     return rows.map((row) => this.toDocumentListItem(row));
