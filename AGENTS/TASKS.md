@@ -4,6 +4,7 @@
 
 ## Done
 
+- [x] 046 — Phase 9 frontend foundation
 - [x] 041 — Phase 8 search, filters, reports, and export
 
 - [x] 026 — Phase 6 documents backend core
