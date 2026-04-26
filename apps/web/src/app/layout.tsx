@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Document Flow",
-  description: "Frontend foundation for the document management system.",
+  description: "Frontend documents UI for the document management system.",
 };
 
 export default function RootLayout({
@@ -25,10 +25,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full bg-zinc-50 text-zinc-950">
         <Providers>{children}</Providers>
       </body>

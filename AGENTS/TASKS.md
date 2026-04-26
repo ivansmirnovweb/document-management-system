@@ -4,6 +4,7 @@
 
 ## Done
 
+- [x] 052 — Phase 10 frontend documents UI
 - [x] 046 — Phase 9 frontend foundation
 - [x] 041 — Phase 8 search, filters, reports, and export
 
