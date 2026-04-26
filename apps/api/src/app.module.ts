@@ -10,9 +10,16 @@ import { JwtCookieAuthGuard } from './auth/auth.guard';
 import { AppConfigModule } from './config/app-config.module';
 import { DbModule } from './db/db.module';
 import { HealthModule } from './health/health.module';
+import { EmployersModule } from './employers/employers.module';
 
 @Module({
-  imports: [AppConfigModule, DbModule, HealthModule, AuthModule],
+  imports: [
+    AppConfigModule,
+    DbModule,
+    HealthModule,
+    AuthModule,
+    EmployersModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
