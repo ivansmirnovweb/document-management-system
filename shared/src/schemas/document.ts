@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DocumentDeadlineState } from "../enums/document-deadline-state";
 import { DocumentStatus } from "../enums/document-status";
 import { employerSchema } from "./employer";
 import { isoDateStringSchema } from "./common";
@@ -17,6 +18,7 @@ export const documentListItemSchema = z
     dueDate: isoDateStringSchema,
     completedAt: isoDateStringSchema.nullable().optional(),
     isControl: z.boolean(),
+    deadlineState: z.nativeEnum(DocumentDeadlineState),
     deletedAt: isoDateStringSchema.nullable().optional(),
     createdAt: isoDateStringSchema,
     updatedAt: isoDateStringSchema,
@@ -63,7 +65,6 @@ export const updateDocumentInputSchema = z
     executorId: z.number().int().positive().optional(),
     dueDate: isoDateStringSchema.optional(),
     status: z.nativeEnum(DocumentStatus).optional(),
-    completedAt: isoDateStringSchema.nullable().optional(),
     isControl: z.boolean().optional(),
   })
   .strict();

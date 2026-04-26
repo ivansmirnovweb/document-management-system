@@ -1,3 +1,4 @@
+import type { DocumentDeadlineState } from "../enums/document-deadline-state";
 import type { DocumentStatus } from "../enums/document-status";
 import type { IsoDateString } from "./common";
 import type { Employer } from "./employer";
@@ -15,6 +16,7 @@ export type DocumentListItem = {
   dueDate: IsoDateString;
   completedAt?: IsoDateString | null;
   isControl: boolean;
+  deadlineState: DocumentDeadlineState;
   deletedAt?: IsoDateString | null;
   createdAt: IsoDateString;
   updatedAt: IsoDateString;
@@ -55,6 +57,5 @@ export type UpdateDocumentInput = {
   executorId?: number;
   dueDate?: IsoDateString;
   status?: DocumentStatus;
-  completedAt?: IsoDateString | null;
   isControl?: boolean;
 };
