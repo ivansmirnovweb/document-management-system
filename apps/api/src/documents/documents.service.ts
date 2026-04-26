@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, isNotNull } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   DocumentDeadlineState,
   DocumentStatus,
   type DocumentDetails,
   type DocumentListItem,
-  type UserRole,
+  UserRole,
 } from '@document-flow/shared';
 import { DbService } from '../db/db.service';
 import { documents } from '../db/schema/documents';
@@ -18,7 +18,12 @@ import { employers } from '../db/schema/employers';
 import { users } from '../db/schema/users';
 import type { CreateDocumentDto } from './dto/create-document.dto';
 import type { ListDocumentsQueryDto } from './dto/list-documents-query.dto';
+import type { ReassignDocumentDto } from './dto/reassign-document.dto';
 import type { UpdateDocumentDto } from './dto/update-document.dto';
+import {
+  DocumentPermissionsService,
+  type DocumentActor,
+} from './document-permissions.service';
 
 const ownerUsers = alias(users, 'document_owner_users');
 const executorUsers = alias(users, 'document_executor_users');
@@ -26,27 +31,33 @@ const DUE_SOON_MS = 3 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class DocumentsService {
-  constructor(private readonly db: DbService) {}
+  constructor(
+    private readonly db: DbService,
+    private readonly permissions: DocumentPermissionsService,
+  ) {}
 
   async list(query: ListDocumentsQueryDto): Promise<DocumentListItem[]> {
-    return this.listByStatus(query.status ?? DocumentStatus.NOT_DONE);
+    if (query.status === DocumentStatus.DONE) {
+      return this.listCompleted();
+    }
+
+    return this.listActive();
+  }
+
+  async listPublic(): Promise<DocumentListItem[]> {
+    return this.listActive();
   }
 
   async listActive(): Promise<DocumentListItem[]> {
-    return this.listByStatus(DocumentStatus.NOT_DONE);
-  }
-
-  async listCompleted(): Promise<DocumentListItem[]> {
-    return this.listByStatus(DocumentStatus.DONE);
-  }
-
-  private async listByStatus(
-    status: DocumentStatus,
-  ): Promise<DocumentListItem[]> {
     const rows = await this.db.db
       .select()
       .from(documents)
-      .where(this.activeDocumentsFilter(status))
+      .where(
+        and(
+          eq(documents.status, DocumentStatus.NOT_DONE),
+          isNull(documents.deletedAt),
+        ),
+      )
       .orderBy(
         desc(documents.isControl),
         asc(documents.dueDate),
@@ -57,16 +68,69 @@ export class DocumentsService {
     return rows.map((row) => this.toDocumentListItem(row));
   }
 
-  async getById(id: number): Promise<DocumentDetails> {
-    const document = await this.findDocumentDetailsById(id);
+  async listCompleted(): Promise<DocumentListItem[]> {
+    const rows = await this.db.db
+      .select()
+      .from(documents)
+      .where(
+        and(
+          eq(documents.status, DocumentStatus.DONE),
+          isNull(documents.deletedAt),
+        ),
+      )
+      .orderBy(
+        desc(documents.isControl),
+        asc(documents.dueDate),
+        asc(documents.registrationDate),
+        asc(documents.id),
+      );
+
+    return rows.map((row) => this.toDocumentListItem(row));
+  }
+
+  async listDeleted(actor: DocumentActor): Promise<DocumentListItem[]> {
+    this.permissions.assertCanListDeletedDocuments(actor);
+
+    const rows = await this.db.db
+      .select()
+      .from(documents)
+      .where(isNotNull(documents.deletedAt))
+      .orderBy(
+        desc(documents.deletedAt),
+        desc(documents.updatedAt),
+        desc(documents.id),
+      );
+
+    return rows.map((row) => this.toDocumentListItem(row));
+  }
+
+  async getById(id: number, actor: DocumentActor): Promise<DocumentDetails> {
+    const document = await this.findDocumentDetailsById(id, true);
     if (!document) {
       throw new NotFoundException('Document not found');
     }
 
+    this.permissions.assertCanReadDocument(actor, document);
+
     return document;
   }
 
-  async create(dto: CreateDocumentDto): Promise<DocumentDetails> {
+  async getPublicById(id: number): Promise<DocumentDetails> {
+    const document = await this.findDocumentDetailsById(id, false);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanReadPublicDocument(document);
+    return document;
+  }
+
+  async create(
+    actor: DocumentActor,
+    dto: CreateDocumentDto,
+  ): Promise<DocumentDetails> {
+    this.permissions.assertCanCreateDocument(actor, dto.ownerId);
+
     const now = new Date();
     const [created] = await this.db.db
       .insert(documents)
@@ -78,7 +142,7 @@ export class DocumentsService {
         incomingNumber: dto.incomingNumber ?? null,
         outgoingNumber: dto.outgoingNumber ?? null,
         employerId: dto.employerId ?? null,
-        ownerId: dto.ownerId,
+        ownerId: actor?.role === UserRole.ROOT ? dto.ownerId : actor!.id,
         executorId: dto.executorId,
         dueDate: new Date(dto.dueDate),
         status: DocumentStatus.NOT_DONE,
@@ -93,7 +157,7 @@ export class DocumentsService {
       throw new BadRequestException('Failed to create document');
     }
 
-    const document = await this.findDocumentDetailsById(created.id);
+    const document = await this.findDocumentDetailsById(created.id, true);
     if (!document) {
       throw new BadRequestException('Failed to load created document');
     }
@@ -101,8 +165,37 @@ export class DocumentsService {
     return document;
   }
 
-  async update(id: number, dto: UpdateDocumentDto): Promise<DocumentDetails> {
-    await this.ensureDocumentExists(id);
+  async update(
+    id: number,
+    actor: DocumentActor,
+    dto: UpdateDocumentDto,
+  ): Promise<DocumentDetails> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanUpdateDocument(
+      actor,
+      document,
+      dto as Record<string, unknown>,
+    );
+
+    if (
+      dto.ownerId !== undefined &&
+      actor?.role !== UserRole.ROOT &&
+      dto.ownerId !== document.ownerId
+    ) {
+      throw new BadRequestException(
+        'Use root reassign endpoint to change owner',
+      );
+    }
+
+    if (dto.status !== undefined) {
+      throw new BadRequestException(
+        'Use status endpoint to change document status',
+      );
+    }
 
     const now = new Date();
     const values: Record<string, unknown> = {
@@ -142,38 +235,101 @@ export class DocumentsService {
     if (dto.isControl !== undefined) {
       values.isControl = dto.isControl;
     }
-    if (dto.status !== undefined) {
-      values.status = dto.status;
-      values.completedAt = dto.status === DocumentStatus.DONE ? now : null;
-    }
 
     const [updated] = await this.db.db
       .update(documents)
       .set(values)
-      .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
+      .where(eq(documents.id, id))
       .returning({ id: documents.id });
 
     if (!updated) {
       throw new NotFoundException('Document not found');
     }
 
-    const document = await this.findDocumentDetailsById(id);
-    if (!document) {
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
       throw new BadRequestException('Failed to load updated document');
     }
 
-    return document;
+    return updatedDocument;
+  }
+
+  async reassignOwner(
+    id: number,
+    actor: DocumentActor,
+    dto: ReassignDocumentDto,
+  ): Promise<DocumentDetails> {
+    this.permissions.assertCanReassignOwner(actor);
+
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const now = new Date();
+    const [updated] = await this.db.db
+      .update(documents)
+      .set({
+        ownerId: dto.ownerId,
+        updatedAt: now,
+      })
+      .where(eq(documents.id, id))
+      .returning({ id: documents.id });
+
+    if (!updated) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load reassigned document');
+    }
+
+    return updatedDocument;
   }
 
   async changeStatus(
     id: number,
+    actor: DocumentActor,
     status: DocumentStatus,
   ): Promise<DocumentDetails> {
-    return this.update(id, { status });
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanChangeStatus(actor, document);
+
+    const now = new Date();
+    const [updated] = await this.db.db
+      .update(documents)
+      .set({
+        status,
+        completedAt: status === DocumentStatus.DONE ? now : null,
+        updatedAt: now,
+      })
+      .where(eq(documents.id, id))
+      .returning({ id: documents.id });
+
+    if (!updated) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load updated document');
+    }
+
+    return updatedDocument;
   }
 
-  async remove(id: number): Promise<void> {
-    await this.ensureDocumentExists(id);
+  async remove(id: number, actor: DocumentActor): Promise<void> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanSoftDelete(actor, document);
 
     const now = new Date();
     const [updated] = await this.db.db
@@ -190,26 +346,91 @@ export class DocumentsService {
     }
   }
 
-  private async ensureDocumentExists(id: number): Promise<void> {
-    const exists = await this.findActiveDocumentById(id);
-    if (!exists) {
+  async restore(id: number, actor: DocumentActor): Promise<DocumentDetails> {
+    this.permissions.assertCanRestoreDocument(actor);
+
+    const document = await this.findDocumentDetailsById(id, true);
+    if (!document || !document.deletedAt) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const now = new Date();
+    const [updated] = await this.db.db
+      .update(documents)
+      .set({
+        deletedAt: null,
+        updatedAt: now,
+      })
+      .where(and(eq(documents.id, id), isNotNull(documents.deletedAt)))
+      .returning({ id: documents.id });
+
+    if (!updated) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const restoredDocument = await this.findDocumentDetailsById(id, true);
+    if (!restoredDocument) {
+      throw new BadRequestException('Failed to load restored document');
+    }
+
+    return restoredDocument;
+  }
+
+  async hardDelete(id: number, actor: DocumentActor): Promise<void> {
+    this.permissions.assertCanHardDeleteDocument(actor);
+
+    const [deleted] = await this.db.db
+      .delete(documents)
+      .where(and(eq(documents.id, id), isNotNull(documents.deletedAt)))
+      .returning({ id: documents.id });
+
+    if (!deleted) {
       throw new NotFoundException('Document not found');
     }
   }
 
-  private async findActiveDocumentById(id: number) {
+  private async findDocumentById(
+    id: number,
+    includeDeleted: boolean,
+  ): Promise<{
+    ownerId: number;
+    executorId: number;
+    status: DocumentStatus;
+    deletedAt: Date | null;
+  } | null> {
+    const whereClause = includeDeleted
+      ? eq(documents.id, id)
+      : and(eq(documents.id, id), isNull(documents.deletedAt));
+
     const [document] = await this.db.db
-      .select({ id: documents.id })
+      .select({
+        ownerId: documents.ownerId,
+        executorId: documents.executorId,
+        status: documents.status,
+        deletedAt: documents.deletedAt,
+      })
       .from(documents)
-      .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
+      .where(whereClause)
       .limit(1);
 
-    return document ?? null;
+    if (!document) {
+      return null;
+    }
+
+    return {
+      ...document,
+      status: document.status as DocumentStatus,
+    };
   }
 
   private async findDocumentDetailsById(
     id: number,
+    includeDeleted: boolean,
   ): Promise<DocumentDetails | null> {
+    const whereClause = includeDeleted
+      ? eq(documents.id, id)
+      : and(eq(documents.id, id), isNull(documents.deletedAt));
+
     const [row] = await this.db.db
       .select({
         id: documents.id,
@@ -256,7 +477,7 @@ export class DocumentsService {
       .leftJoin(employers, eq(documents.employerId, employers.id))
       .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
-      .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
+      .where(whereClause)
       .limit(1);
 
     if (!row) {
@@ -382,9 +603,5 @@ export class DocumentsService {
     }
 
     return DocumentDeadlineState.ON_TIME;
-  }
-
-  private activeDocumentsFilter(status: DocumentStatus): SQL<unknown> {
-    return and(eq(documents.status, status), isNull(documents.deletedAt))!;
   }
 }
