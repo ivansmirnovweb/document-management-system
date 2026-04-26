@@ -8,8 +8,8 @@ import { Button } from "@/shared/ui/button";
 import { cn } from "@/lib/cn";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/", label: "Public docs" },
+  { href: "/dashboard", label: "Workspace" },
   { href: "/login", label: "Login" },
 ];
 
@@ -22,7 +22,7 @@ export function MainNavigation() {
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">Document Flow</p>
-          <p className="text-lg font-semibold text-zinc-950">Frontend foundation</p>
+          <p className="text-lg font-semibold text-zinc-950">Phase 10 documents UI</p>
         </div>
 
         <nav className="flex flex-wrap items-center gap-2">
