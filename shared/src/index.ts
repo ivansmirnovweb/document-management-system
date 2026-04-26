@@ -1,5 +1,6 @@
 export * from "./enums/user-role";
 export * from "./enums/document-status";
+export * from "./enums/document-deadline-state";
 
 export * from "./types/common";
 export * from "./types/employer";

@@ -11,6 +11,7 @@ import { AppConfigModule } from './config/app-config.module';
 import { DbModule } from './db/db.module';
 import { HealthModule } from './health/health.module';
 import { EmployersModule } from './employers/employers.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { EmployersModule } from './employers/employers.module';
     HealthModule,
     AuthModule,
     EmployersModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [

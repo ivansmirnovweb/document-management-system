@@ -1,0 +1,66 @@
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
+import { DocumentStatus } from '@document-flow/shared';
+
+export class UpdateDocumentDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  registrationNumber?: string;
+
+  @IsOptional()
+  @IsDateString()
+  registrationDate?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string | null;
+
+  @IsOptional()
+  @IsString()
+  incomingNumber?: string | null;
+
+  @IsOptional()
+  @IsString()
+  outgoingNumber?: string | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  employerId?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  ownerId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  executorId?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dueDate?: string;
+
+  @IsOptional()
+  @IsEnum(DocumentStatus)
+  status?: DocumentStatus;
+
+  @IsOptional()
+  @IsBoolean()
+  isControl?: boolean;
+}

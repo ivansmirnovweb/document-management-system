@@ -4,6 +4,7 @@
 
 ## Done
 
+- [x] 026 — Phase 6 documents backend core
 - [x] 013 — Phase 4 authentication and users
 
 - [x] 001 — Init project
