@@ -8,6 +8,11 @@
 - [x] 046 — Phase 9 frontend foundation
 - [x] 041 — Phase 8 search, filters, reports, and export
 
+- [x] 077 — Phase 13 final build check
+- [x] 076 — Phase 13 demo script
+- [x] 075 — Phase 13 feature checklist
+- [x] 074 — Phase 13 demo seed data
+- [x] 073 — Phase 13 README and delivery docs
 - [x] 026 — Phase 6 documents backend core
 - [x] 013 — Phase 4 authentication and users
 
