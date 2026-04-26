@@ -1,0 +1,4 @@
+export const AUTH_COOKIE_NAME = 'auth_token';
+export const PASSWORD_EXPIRATION_DAYS = 90;
+export const PASSWORD_EXPIRATION_MS =
+  PASSWORD_EXPIRATION_DAYS * 24 * 60 * 60 * 1000;

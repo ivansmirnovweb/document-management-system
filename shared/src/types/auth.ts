@@ -5,6 +5,15 @@ export type LoginRequest = {
   password: string;
 };
 
+export type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 export type LoginResponse = {
+  user: User;
+};
+
+export type ChangePasswordResponse = {
   user: User;
 };

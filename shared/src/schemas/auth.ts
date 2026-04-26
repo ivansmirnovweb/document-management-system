@@ -8,7 +8,20 @@ export const loginRequestSchema = z
   })
   .strict();
 
+export const changePasswordRequestSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8),
+  })
+  .strict();
+
 export const loginResponseSchema = z
+  .object({
+    user: userSchema,
+  })
+  .strict();
+
+export const changePasswordResponseSchema = z
   .object({
     user: userSchema,
   })
