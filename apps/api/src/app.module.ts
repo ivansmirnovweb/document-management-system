@@ -37,7 +37,7 @@ import { ReportsModule } from './reports/reports.module';
     },
     {
       provide: APP_GUARD,
-      useClass: JwtCookieAuthGuard,
+      useExisting: JwtCookieAuthGuard,
     },
     {
       provide: APP_GUARD,
