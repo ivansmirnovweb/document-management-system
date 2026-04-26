@@ -42,6 +42,10 @@ export const documentsApi = {
     );
   },
 
+  listDeleted(): Promise<DocumentListItem[]> {
+    return apiRequest("/documents/deleted", { method: "GET" }, documentListSchema);
+  },
+
   search(params: { q?: string; status?: DocumentStatus }): Promise<DocumentListItem[]> {
     return apiRequest(
       `/documents/search${buildQuery({ q: params.q?.trim(), status: params.status })}`,
@@ -68,6 +72,14 @@ export const documentsApi = {
     return apiRequest(`/documents/${id}`, { method: "PATCH", body: payload }, documentDetailsSchema);
   },
 
+  reassignOwner(id: number, ownerId: number): Promise<DocumentDetails> {
+    return apiRequest(`/documents/${id}/reassign`, { method: "PATCH", body: { ownerId } }, documentDetailsSchema);
+  },
+
+  restore(id: number): Promise<DocumentDetails> {
+    return apiRequest(`/documents/${id}/restore`, { method: "PATCH" }, documentDetailsSchema);
+  },
+
   changeStatus(id: number, status: DocumentStatus): Promise<DocumentDetails> {
     return apiRequest(
       `/documents/${id}/status`,
@@ -78,5 +90,9 @@ export const documentsApi = {
 
   remove(id: number): Promise<null> {
     return apiRequest(`/documents/${id}`, { method: "DELETE" }, apiNoContent());
+  },
+
+  hardDelete(id: number): Promise<null> {
+    return apiRequest(`/documents/${id}/hard`, { method: "DELETE" }, apiNoContent());
   },
 };
