@@ -12,6 +12,7 @@ import { DbModule } from './db/db.module';
 import { HealthModule } from './health/health.module';
 import { EmployersModule } from './employers/employers.module';
 import { DocumentsModule } from './documents/documents.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DocumentsModule } from './documents/documents.module';
     AuthModule,
     EmployersModule,
     DocumentsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [
