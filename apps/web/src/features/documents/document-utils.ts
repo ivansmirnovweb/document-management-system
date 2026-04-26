@@ -85,5 +85,9 @@ export function canReopenDocument(
   user: { id: number; role: UserRole } | null,
   doc: DocumentListItem | DocumentDetails,
 ): boolean {
-  return canCompleteDocument(user, doc) || (user?.role === UserRole.ROOT && doc.status === DocumentStatus.DONE);
+  if (!user) {
+    return false;
+  }
+
+  return user.role === UserRole.ROOT || doc.ownerId === user.id;
 }

@@ -4,6 +4,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "
 import type { DocumentListItem, UserRole } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { StateCard } from "@/shared/ui/state-card";
 import { cn } from "@/lib/cn";
 import { canCompleteDocument, canDeleteDocument, canEditDocument, deadlineLabel, deadlineTone, formatDate, statusLabel } from "../document-utils";
 
@@ -14,6 +15,11 @@ type DocumentsTableProps = {
   selectedDocumentId: number | null;
   currentUser: { id: number; role: UserRole } | null;
   publicView?: boolean;
+  emptyStateTitle: string;
+  emptyStateDescription: string;
+  emptyStateIcon?: string;
+  emptyStateActionLabel?: string;
+  onEmptyAction?: () => void;
   onSelect: (document: DocumentListItem) => void;
   onEdit?: (document: DocumentListItem) => void;
   onToggleStatus?: (document: DocumentListItem) => void;
@@ -25,6 +31,11 @@ export function DocumentsTable({
   selectedDocumentId,
   currentUser,
   publicView = false,
+  emptyStateTitle,
+  emptyStateDescription,
+  emptyStateIcon,
+  emptyStateActionLabel,
+  onEmptyAction,
   onSelect,
   onEdit,
   onToggleStatus,
@@ -159,6 +170,18 @@ export function DocumentsTable({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (documents.length === 0) {
+    return (
+      <StateCard
+        title={emptyStateTitle}
+        description={emptyStateDescription}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyAction}
+        icon={emptyStateIcon}
+      />
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
       <table className="w-full border-collapse text-left text-sm">
@@ -174,13 +197,6 @@ export function DocumentsTable({
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td className="px-4 py-10 text-center text-zinc-500" colSpan={columns.length}>
-                No documents found.
-              </td>
-            </tr>
-          ) : null}
           {table.getRowModel().rows.map((row) => {
             const document = row.original;
             const selected = selectedDocumentId === document.id;

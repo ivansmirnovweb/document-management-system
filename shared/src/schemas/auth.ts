@@ -1,17 +1,18 @@
 import { z } from "zod";
 import { userSchema } from "./user";
+import { requiredText } from "./common";
 
 export const loginRequestSchema = z
   .object({
-    username: z.string().min(1),
-    password: z.string().min(1),
+    username: requiredText("Username"),
+    password: z.string().min(1, "Password is required"),
   })
   .strict();
 
 export const changePasswordRequestSchema = z
   .object({
-    currentPassword: z.string().min(1),
-    newPassword: z.string().min(8),
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
   })
   .strict();
 

@@ -81,6 +81,15 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
     variant,
   ]);
 
+  const listError =
+    variant === "public"
+      ? publicListQuery.error
+      : appliedSearch.length > 0
+        ? searchQuery.error
+        : tab === DocumentStatus.DONE
+          ? completedListQuery.error
+          : activeListQuery.error;
+
   const selectedDocumentId = useMemo(() => {
     if (selectedId !== null && list.some((document) => document.id === selectedId)) {
       return selectedId;
@@ -156,6 +165,36 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
           ? completedListQuery.isPending
           : activeListQuery.isPending;
 
+  const actionError = createMutation.error ?? updateMutation.error ?? statusMutation.error ?? deleteMutation.error;
+
+  const emptyState = (() => {
+    if (variant === "public") {
+      return {
+        title: "No active documents",
+        description: "There are no public workflow items available right now.",
+      };
+    }
+
+    if (appliedSearch.length > 0) {
+      return {
+        title: "No matches",
+        description: `No documents matched "${appliedSearch}" in ${statusLabel(tab).toLowerCase()} documents.`,
+      };
+    }
+
+    if (tab === DocumentStatus.DONE) {
+      return {
+        title: "No completed documents",
+        description: "Completed records will appear here once work is finished.",
+      };
+    }
+
+    return {
+      title: "No active documents",
+      description: "Active records will appear here once they are registered.",
+    };
+  })();
+
   const panel = (() => {
     if (mode === "create") {
       if (variant !== "private" || !currentUser) {
@@ -183,6 +222,10 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
         return <StateCard title="Unavailable" description="Edit is only available in the protected area." icon="🔒" />;
       }
 
+      if (selectedDocumentQuery.error instanceof Error) {
+        return <StateCard title="Could not load document" description={selectedDocumentQuery.error.message} icon="⚠️" />;
+      }
+
       if (!selectedDocument) {
         return <StateCard title="Loading document" description="Waiting for the selected document to load." icon="⏳" />;
       }
@@ -204,6 +247,10 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
           }}
         />
       );
+    }
+
+    if (selectedDocumentQuery.error instanceof Error) {
+      return <StateCard title="Could not load document" description={selectedDocumentQuery.error.message} icon="⚠️" />;
     }
 
     if (selectedDocumentId !== null && selectedDocumentQuery.isPending && !selectedDocument) {
@@ -228,6 +275,75 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
           variant === "private" && selectedDocument
             ? async () => {
                 await deleteMutation.mutateAsync(selectedDocument.id);
+              }
+            : undefined
+        }
+      />
+    );
+  })();
+
+  const listState = (() => {
+    if (listError instanceof Error) {
+      return <StateCard title="Could not load documents" description={listError.message} icon="⚠️" />;
+    }
+
+    if (!isLoading && list.length === 0) {
+      return (
+        <DocumentsTable
+          documents={list}
+          selectedDocumentId={selectedDocumentId}
+          currentUser={currentUser}
+          publicView={variant === "public"}
+          emptyStateTitle={emptyState.title}
+          emptyStateDescription={emptyState.description}
+          emptyStateActionLabel={variant === "private" ? "Create document" : undefined}
+          onEmptyAction={variant === "private" ? () => setMode("create") : undefined}
+          onSelect={(document) => {
+            setSelectedId(document.id);
+            setMode("details");
+          }}
+        />
+      );
+    }
+
+    return (
+      <DocumentsTable
+        documents={list}
+        selectedDocumentId={selectedId}
+        currentUser={currentUser}
+        publicView={variant === "public"}
+        emptyStateTitle={emptyState.title}
+        emptyStateDescription={emptyState.description}
+        emptyStateActionLabel={variant === "private" ? "Create document" : undefined}
+        onEmptyAction={variant === "private" ? () => setMode("create") : undefined}
+        onSelect={(document) => {
+          setSelectedId(document.id);
+          setMode("details");
+        }}
+        onEdit={
+          variant === "private"
+            ? (document) => {
+                setSelectedId(document.id);
+                setMode("edit");
+              }
+            : undefined
+        }
+        onToggleStatus={
+          variant === "private"
+            ? (document) => {
+                setSelectedId(document.id);
+                void statusMutation.mutateAsync({
+                  id: document.id,
+                  status: document.status === DocumentStatus.DONE ? DocumentStatus.NOT_DONE : DocumentStatus.DONE,
+                });
+              }
+            : undefined
+        }
+        onDelete={
+          variant === "private"
+            ? (document) => {
+                setSelectedId(document.id);
+                void deleteMutation.mutateAsync(document.id);
               }
             : undefined
         }
@@ -321,6 +437,12 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
 
       {isLoading ? <StateCard title="Loading documents" description="Fetching the latest records." icon="⏳" /> : null}
 
+      {actionError instanceof Error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {actionError.message}
+        </div>
+      ) : null}
+
       {variant === "private" && appliedSearch ? (
         <div className="text-sm text-zinc-600">
           Search results for <span className="font-medium text-zinc-950">{appliedSearch}</span> in {statusLabel(tab).toLowerCase()} documents.
@@ -328,45 +450,7 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-4">
-          <DocumentsTable
-            documents={list}
-            selectedDocumentId={selectedId}
-            currentUser={currentUser}
-            publicView={variant === "public"}
-            onSelect={(document) => {
-              setSelectedId(document.id);
-              setMode("details");
-            }}
-            onEdit={
-              variant === "private"
-                ? (document) => {
-                    setSelectedId(document.id);
-                    setMode("edit");
-                  }
-                : undefined
-            }
-            onToggleStatus={
-              variant === "private"
-                ? (document) => {
-                    setSelectedId(document.id);
-                    void statusMutation.mutateAsync({
-                      id: document.id,
-                      status: document.status === DocumentStatus.DONE ? DocumentStatus.NOT_DONE : DocumentStatus.DONE,
-                    });
-                  }
-                : undefined
-            }
-            onDelete={
-              variant === "private"
-                ? (document) => {
-                    setSelectedId(document.id);
-                    void deleteMutation.mutateAsync(document.id);
-                  }
-                : undefined
-            }
-          />
-        </div>
+        <div className="space-y-4">{listState}</div>
 
         <div className="space-y-4">{panel}</div>
       </div>
