@@ -4,6 +4,8 @@
 
 ## Done
 
+- [x] 013 — Phase 4 authentication and users
+
 - [x] 001 — Init project
 - [x] 001 — Check monorepo setup
 - [x] 002 — Check shared package
