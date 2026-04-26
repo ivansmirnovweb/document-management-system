@@ -4,6 +4,7 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "
 import type { DocumentListItem } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import { StateCard } from "@/shared/ui/state-card";
 import { cn } from "@/lib/cn";
 import { deadlineLabel, deadlineTone, formatDate, statusLabel } from "@/features/documents/document-utils";
 
@@ -89,6 +90,10 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (documents.length === 0) {
+    return <StateCard title="No deleted records" description="Deleted documents will appear here for root users." icon="🗂️" />;
+  }
+
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
       <table className="w-full border-collapse text-left text-sm">
@@ -104,13 +109,6 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td className="px-4 py-10 text-center text-zinc-500" colSpan={columns.length}>
-                No deleted records found.
-              </td>
-            </tr>
-          ) : null}
           {table.getRowModel().rows.map((row) => {
             const document = row.original;
             const selected = selectedDocumentId === document.id;

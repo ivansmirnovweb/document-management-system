@@ -78,8 +78,12 @@ export function ReportsPage() {
 
   const submit = form.handleSubmit((values) => setAppliedFilter(values));
 
-  if (auth.user?.role !== "ROOT" && !auth.user) {
-    return null;
+  if (!auth.user) {
+    return <StateCard title="Sign in required" description="Open reports after logging in." actionLabel="Go to login" actionHref="/login" icon="🔐" />;
+  }
+
+  if (auth.user.role !== "ROOT") {
+    return <StateCard title="Root access required" description="Reports are visible only to the root user." icon="🛡️" />;
   }
 
   return (

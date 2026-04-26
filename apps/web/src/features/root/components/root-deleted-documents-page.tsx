@@ -68,6 +68,8 @@ export function RootDeletedDocumentsPage() {
     },
   });
 
+  const actionError = restoreMutation.error ?? reassignMutation.error ?? hardDeleteMutation.error;
+
   if (auth.user?.role !== UserRole.ROOT) {
     return (
       <StateCard
@@ -105,6 +107,11 @@ export function RootDeletedDocumentsPage() {
       {isLoading ? <StateCard title="Loading deleted records" description="Fetching root queue." icon="⏳" /> : null}
       {deletedDocumentsQuery.error instanceof Error ? (
         <StateCard title="Could not load deleted records" description={deletedDocumentsQuery.error.message} icon="⚠️" />
+      ) : null}
+      {actionError instanceof Error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {actionError.message}
+        </div>
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">

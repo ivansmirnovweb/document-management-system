@@ -2,18 +2,18 @@ import { z } from "zod";
 import { DocumentDeadlineState } from "../enums/document-deadline-state";
 import { DocumentStatus } from "../enums/document-status";
 import { employerSchema } from "./employer";
-import { isoDateStringSchema } from "./common";
+import { isoDateStringSchema, requiredText } from "./common";
 import { userSchema } from "./user";
 
 export const documentListItemSchema = z
   .object({
     id: z.number().int().positive(),
-    registrationNumber: z.string().min(1),
+    registrationNumber: requiredText("Registration number"),
     registrationDate: isoDateStringSchema,
-    title: z.string().min(1),
+    title: requiredText("Title"),
     status: z.nativeEnum(DocumentStatus),
-    ownerId: z.number().int().positive(),
-    executorId: z.number().int().positive(),
+    ownerId: z.coerce.number().int().positive("Owner ID must be a positive number"),
+    executorId: z.coerce.number().int().positive("Executor ID must be a positive number"),
     employerId: z.number().int().positive().nullable(),
     dueDate: isoDateStringSchema,
     completedAt: isoDateStringSchema.nullable().optional(),
@@ -38,15 +38,15 @@ export const documentDetailsSchema = documentListItemSchema
 
 export const createDocumentInputSchema = z
   .object({
-    registrationNumber: z.string().min(1),
+    registrationNumber: requiredText("Registration number"),
     registrationDate: isoDateStringSchema,
-    title: z.string().min(1),
+    title: requiredText("Title"),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
     outgoingNumber: z.string().nullable().optional(),
     employerId: z.number().int().positive().nullable().optional(),
-    ownerId: z.number().int().positive(),
-    executorId: z.number().int().positive(),
+    ownerId: z.coerce.number().int().positive("Owner ID must be a positive number"),
+    executorId: z.coerce.number().int().positive("Executor ID must be a positive number"),
     dueDate: isoDateStringSchema,
     isControl: z.boolean().optional(),
   })
@@ -54,15 +54,15 @@ export const createDocumentInputSchema = z
 
 export const updateDocumentInputSchema = z
   .object({
-    registrationNumber: z.string().min(1).optional(),
+    registrationNumber: requiredText("Registration number").optional(),
     registrationDate: isoDateStringSchema.optional(),
-    title: z.string().min(1).optional(),
+    title: requiredText("Title").optional(),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
     outgoingNumber: z.string().nullable().optional(),
     employerId: z.number().int().positive().nullable().optional(),
-    ownerId: z.number().int().positive().optional(),
-    executorId: z.number().int().positive().optional(),
+    ownerId: z.coerce.number().int().positive("Owner ID must be a positive number").optional(),
+    executorId: z.coerce.number().int().positive("Executor ID must be a positive number").optional(),
     dueDate: isoDateStringSchema.optional(),
     status: z.nativeEnum(DocumentStatus).optional(),
     isControl: z.boolean().optional(),

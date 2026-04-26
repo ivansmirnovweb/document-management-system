@@ -3,6 +3,7 @@
 import type { ExecutorStatistics } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { StateCard } from "@/shared/ui/state-card";
 
 function percent(value: number): string {
   return new Intl.NumberFormat("en-GB", {
@@ -16,6 +17,10 @@ type ExecutorStatisticsTableProps = {
 };
 
 export function ExecutorStatisticsTable({ statistics }: ExecutorStatisticsTableProps) {
+  if (statistics.length === 0) {
+    return <StateCard title="No statistics available" description="Try a different date range or filters." icon="📊" />;
+  }
+
   return (
     <Card className="space-y-4">
       <div>
@@ -36,13 +41,6 @@ export function ExecutorStatisticsTable({ statistics }: ExecutorStatisticsTableP
             </tr>
           </thead>
           <tbody>
-            {statistics.length === 0 ? (
-              <tr>
-                <td className="px-4 py-10 text-center text-zinc-500" colSpan={6}>
-                  No statistics for this period.
-                </td>
-              </tr>
-            ) : null}
             {statistics.map((item) => (
               <tr key={item.executor.id} className="border-t border-zinc-200 hover:bg-zinc-50">
                 <td className="px-4 py-4 align-top">
