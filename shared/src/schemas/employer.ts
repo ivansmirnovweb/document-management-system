@@ -13,3 +13,21 @@ export const employerSchema = z
     deletedAt: isoDateStringSchema.nullable().optional(),
   })
   .strict();
+
+export const createEmployerInputSchema = z
+  .object({
+    fullName: z.string().min(1),
+    shortName: z.string().min(1),
+    legalAddress: z.string().min(1),
+    actualAddress: z.string().min(1),
+  })
+  .strict();
+
+export const updateEmployerInputSchema = z
+  .object({
+    fullName: z.string().min(1).optional(),
+    shortName: z.string().min(1).optional(),
+    legalAddress: z.string().min(1).optional(),
+    actualAddress: z.string().min(1).optional(),
+  })
+  .strict();

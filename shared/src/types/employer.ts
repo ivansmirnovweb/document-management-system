@@ -10,3 +10,12 @@ export type Employer = {
   updatedAt: IsoDateString;
   deletedAt?: IsoDateString | null;
 };
+
+export type CreateEmployerInput = {
+  fullName: string;
+  shortName: string;
+  legalAddress: string;
+  actualAddress: string;
+};
+
+export type UpdateEmployerInput = Partial<CreateEmployerInput>;
