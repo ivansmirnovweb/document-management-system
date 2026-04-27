@@ -353,24 +353,24 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="space-y-4 bg-zinc-950 text-white">
+      <Card className="space-y-4 border-blue-100 bg-blue-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-zinc-400">Document workflow</p>
-            <CardTitle className="text-3xl text-white">
+            <p className="text-sm uppercase tracking-[0.2em] text-blue-700/80">Document workflow</p>
+            <CardTitle className="text-3xl text-zinc-950">
               {variant === "public" ? "Public active documents" : "Documents workspace"}
             </CardTitle>
-            <CardDescription className="max-w-3xl text-zinc-300">
+            <CardDescription className="max-w-3xl text-zinc-700">
               {variant === "public"
                 ? "Active records are visible without sign in."
                 : "Browse, search, create, edit, and complete documents from one place."}
             </CardDescription>
           </div>
           {variant === "private" && currentUser ? (
-            <div className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-2xl border border-blue-200 bg-white/90 px-4 py-3">
               <div>
                 <div className="text-sm font-semibold">{auth.user?.displayName}</div>
-                <div className="text-xs text-zinc-400">@{auth.user?.username}</div>
+                <div className="text-xs text-zinc-500">@{auth.user?.username}</div>
               </div>
               <Badge tone={currentUser.role === "ROOT" ? "warning" : "info"}>{currentUser.role}</Badge>
               <Button variant="secondary" onClick={() => void auth.logout()}>
@@ -395,7 +395,11 @@ export function DocumentsPage({ variant }: DocumentsPageProps) {
                   }}
                 >
                   {item.label}
-                  <span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                      tab === item.value ? "bg-white/20 text-white" : "bg-zinc-200 text-zinc-700"
+                    }`}
+                  >
                     {item.value === DocumentStatus.DONE ? completedListQuery.data?.length ?? 0 : activeListQuery.data?.length ?? 0}
                   </span>
                 </Button>

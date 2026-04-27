@@ -59,7 +59,7 @@ export function AuthStatusPanel() {
           href="/dashboard"
           className={cn(
             "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium transition",
-            "bg-zinc-950 text-white hover:bg-zinc-800",
+            "bg-blue-600 text-white hover:bg-blue-500",
           )}
         >
           Open dashboard

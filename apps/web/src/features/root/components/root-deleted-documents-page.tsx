@@ -86,16 +86,16 @@ export function RootDeletedDocumentsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="space-y-4 bg-zinc-950 text-white">
+      <Card className="space-y-4 border-red-100 bg-red-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-zinc-400">Root tools</p>
-            <CardTitle className="text-3xl text-white">Deleted records management</CardTitle>
-            <CardDescription className="max-w-3xl text-zinc-300">
+            <p className="text-sm uppercase tracking-[0.2em] text-red-700/80">Root tools</p>
+            <CardTitle className="text-3xl text-zinc-950">Deleted records management</CardTitle>
+            <CardDescription className="max-w-3xl text-zinc-700">
               Restore documents, reassign ownership, or hard-delete records that can no longer stay in the archive.
             </CardDescription>
           </div>
-          <div className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-200">
+          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-white/90 px-4 py-3 text-sm text-zinc-700">
             {auth.user?.displayName}
             <Button variant="secondary" onClick={() => void auth.logout()}>
               Sign out

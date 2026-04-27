@@ -36,7 +36,7 @@ export function MainNavigation() {
                 href={link.href}
                 className={cn(
                   "rounded-xl px-3 py-2 text-sm font-medium transition",
-                  active ? "bg-zinc-950 text-white" : "text-zinc-600 hover:bg-zinc-100",
+                  active ? "bg-blue-600 text-white" : "text-zinc-700 hover:bg-zinc-100",
                 )}
               >
                 {link.label}
@@ -48,7 +48,7 @@ export function MainNavigation() {
               href="/login"
               className={cn(
                 "rounded-xl px-3 py-2 text-sm font-medium transition",
-                pathname === "/login" ? "bg-zinc-950 text-white" : "text-zinc-600 hover:bg-zinc-100",
+                pathname === "/login" ? "bg-blue-600 text-white" : "text-zinc-700 hover:bg-zinc-100",
               )}
             >
               Login
