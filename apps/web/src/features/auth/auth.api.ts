@@ -1,7 +1,21 @@
-import { loginRequestSchema, loginResponseSchema, changePasswordRequestSchema, changePasswordResponseSchema } from "@document-flow/shared";
-import type { LoginRequest, ChangePasswordRequest, LoginResponse, ChangePasswordResponse } from "@document-flow/shared";
+import {
+  changePasswordRequestSchema,
+  changePasswordResponseSchema,
+  loginRequestSchema,
+  loginResponseSchema,
+  registerRequestSchema,
+  registerResponseSchema,
+} from "@document-flow/shared";
+import type {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  User,
+} from "@document-flow/shared";
 import { apiNoContent, apiRequest, isApiError } from "@/lib/api";
-import type { User } from "@document-flow/shared";
 
 export type SessionResponse = { user: User | null };
 
@@ -22,6 +36,11 @@ export const authApi = {
   async login(input: LoginRequest): Promise<LoginResponse> {
     const payload = loginRequestSchema.parse(input);
     return apiRequest("/auth/login", { method: "POST", body: payload }, loginResponseSchema);
+  },
+
+  async register(input: RegisterRequest): Promise<RegisterResponse> {
+    const payload = registerRequestSchema.parse(input);
+    return apiRequest("/auth/register", { method: "POST", body: payload }, registerResponseSchema);
   },
 
   async logout(): Promise<null> {

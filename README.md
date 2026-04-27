@@ -31,6 +31,8 @@ docker compose -f docker-compose.dev.yml up -d postgres
 
 Use `.env.example` as the reference.
 
+To enable public sign-up, set `AUTH_SELF_REGISTRATION_ENABLED=true` in `apps/api/.env`.
+
 4. Run database seed
 
 ```bash
