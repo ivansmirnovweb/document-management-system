@@ -44,7 +44,10 @@ function getErrorMessage(payload: unknown, fallback: string): string {
     return fallback;
   }
 
-  const maybeError = payload as { message?: unknown; error?: unknown };
+  const maybeError = payload as {
+    message?: unknown;
+    error?: unknown;
+  };
 
   if (Array.isArray(maybeError.message) && maybeError.message.length > 0) {
     return String(maybeError.message[0]);
@@ -56,6 +59,28 @@ function getErrorMessage(payload: unknown, fallback: string): string {
 
   if (typeof maybeError.error === "string" && maybeError.error.length > 0) {
     return maybeError.error;
+  }
+
+  if (maybeError.error && typeof maybeError.error === "object") {
+    const nested = maybeError.error as {
+      message?: unknown;
+      path?: unknown;
+      statusCode?: unknown;
+    };
+
+    if (Array.isArray(nested.message) && nested.message.length > 0) {
+      return String(nested.message[0]);
+    }
+
+    if (typeof nested.message === "string" && nested.message.length > 0) {
+      return nested.message;
+    }
+
+    if (typeof nested.path === "string" && nested.path.length > 0) {
+      const statusCode =
+        typeof nested.statusCode === "number" ? nested.statusCode : "unknown";
+      return `Request failed on ${nested.path} (status ${statusCode})`;
+    }
   }
 
   return fallback;
