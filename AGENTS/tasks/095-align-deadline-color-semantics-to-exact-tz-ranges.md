@@ -30,8 +30,8 @@ Current deadline-state buckets do not exactly match TZ ranges.
 
 ## Result
 
-Date: `TBD`
+Date: `2026-04-28`
 
 Executed:
 
-- TBD
+- Deadline state calculation now uses Amsterdam day boundaries with exact TZ buckets (neutral >7 days, green 7–4, yellow 3–1, red due/overdue, completed preserved). Frontend badges/row tones follow the same states. Validation: `pnpm --filter api test -- document-deadline-state.spec.ts document-permissions.service.spec.ts`, `pnpm build`.

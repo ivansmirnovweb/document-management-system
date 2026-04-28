@@ -16,9 +16,9 @@ import {
 } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
-  DocumentDeadlineState,
   DocumentKind,
   DocumentStatus,
+  getDocumentDeadlineState,
   type DocumentDetails,
   type DocumentListItem,
   UserRole,
@@ -43,7 +43,6 @@ import {
 const ownerUsers = alias(users, 'document_owner_users');
 const executorUsers = alias(users, 'document_executor_users');
 const lastChangedByUsers = alias(users, 'document_last_changed_by_users');
-const DUE_SOON_MS = 3 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class DocumentsService {
@@ -1003,7 +1002,7 @@ export class DocumentsService {
       dueDate: row.dueDate.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
       isControl: row.isControl,
-      deadlineState: this.calculateDeadlineState(
+      deadlineState: getDocumentDeadlineState(
         row.status as DocumentStatus,
         row.dueDate,
         row.completedAt,
@@ -1089,7 +1088,7 @@ export class DocumentsService {
       dueDate: row.dueDate.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
       isControl: row.isControl,
-      deadlineState: this.calculateDeadlineState(
+      deadlineState: getDocumentDeadlineState(
         row.status as DocumentStatus,
         row.dueDate,
         row.completedAt,
@@ -1144,30 +1143,4 @@ export class DocumentsService {
     }
   }
 
-  private calculateDeadlineState(
-    status: DocumentStatus,
-    dueDate: Date,
-    completedAt: Date | null,
-  ): DocumentDeadlineState {
-    if (
-      status === DocumentStatus.DONE ||
-      status === ('WRITTEN_OFF' as DocumentStatus) ||
-      completedAt
-    ) {
-      return DocumentDeadlineState.COMPLETED;
-    }
-
-    const now = Date.now();
-    const dueAt = dueDate.getTime();
-
-    if (dueAt < now) {
-      return DocumentDeadlineState.OVERDUE;
-    }
-
-    if (dueAt - now <= DUE_SOON_MS) {
-      return DocumentDeadlineState.DUE_SOON;
-    }
-
-    return DocumentDeadlineState.ON_TIME;
-  }
 }

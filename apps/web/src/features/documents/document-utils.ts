@@ -21,12 +21,13 @@ export function deadlineTone(
   state: DocumentDeadlineState,
 ): "neutral" | "success" | "warning" | "danger" {
   switch (state) {
-    case DocumentDeadlineState.ON_TIME:
+    case DocumentDeadlineState.GREEN:
       return "success";
-    case DocumentDeadlineState.DUE_SOON:
+    case DocumentDeadlineState.YELLOW:
       return "warning";
-    case DocumentDeadlineState.OVERDUE:
+    case DocumentDeadlineState.RED:
       return "danger";
+    case DocumentDeadlineState.NEUTRAL:
     case DocumentDeadlineState.COMPLETED:
       return "neutral";
   }
@@ -34,12 +35,14 @@ export function deadlineTone(
 
 export function deadlineLabel(state: DocumentDeadlineState): string {
   switch (state) {
-    case DocumentDeadlineState.ON_TIME:
-      return "В срок";
-    case DocumentDeadlineState.DUE_SOON:
-      return "Скоро срок";
-    case DocumentDeadlineState.OVERDUE:
-      return "Просрочено";
+    case DocumentDeadlineState.GREEN:
+      return "7–4 дня";
+    case DocumentDeadlineState.YELLOW:
+      return "3–1 дня";
+    case DocumentDeadlineState.RED:
+      return "Сегодня / просрочено";
+    case DocumentDeadlineState.NEUTRAL:
+      return "Без выделения";
     case DocumentDeadlineState.COMPLETED:
       return "Завершено";
   }

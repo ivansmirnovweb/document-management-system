@@ -202,16 +202,17 @@ export function DocumentsTable({
             const document = row.original;
             const selected = selectedDocumentId === document.id;
             const rowTone =
-              document.deadlineState === "OVERDUE"
-                ? "bg-red-50"
-                : document.deadlineState === "DUE_SOON"
+              document.deadlineState === "GREEN"
+                ? "bg-emerald-50"
+                : document.deadlineState === "YELLOW"
                   ? "bg-amber-50"
-                  : document.deadlineState === "COMPLETED"
-                    ? "bg-zinc-50"
-                    : document.isControl
-                      ? "bg-sky-50"
-                      : "";
-
+                  : document.deadlineState === "RED"
+                    ? "bg-red-50"
+                    : document.deadlineState === "COMPLETED"
+                      ? "bg-zinc-50"
+                      : document.isControl
+                        ? "bg-sky-50"
+                        : "";
             return (
               <tr
                 key={row.id}
