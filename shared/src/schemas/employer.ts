@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isoDateStringSchema, requiredText } from "./common.js";
+import { isoDateStringSchema, requiredText } from "./common";
 
 export const employerSchema = z
   .object({

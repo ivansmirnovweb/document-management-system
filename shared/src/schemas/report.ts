@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { DocumentStatus } from "../enums/document-status.js";
-import { userSchema } from "./user.js";
-import { isoDateStringSchema } from "./common.js";
+import { DocumentStatus } from "../enums/document-status";
+import { userSchema } from "./user";
+import { isoDateStringSchema } from "./common";
 
 export const reportFilterInputSchema = z
   .object({

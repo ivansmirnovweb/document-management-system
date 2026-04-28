@@ -1,6 +1,6 @@
-import type { DocumentStatus } from "../enums/document-status.js";
-import type { IsoDateString } from "./common.js";
-import type { User } from "./user.js";
+import type { DocumentStatus } from "../enums/document-status";
+import type { IsoDateString } from "./common";
+import type { User } from "./user";
 
 export type ReportFilterInput = {
   dateFrom: IsoDateString;

@@ -1,17 +1,17 @@
-export * from "./enums/user-role.js";
-export * from "./enums/document-status.js";
-export * from "./enums/document-deadline-state.js";
+export * from "./enums/user-role";
+export * from "./enums/document-status";
+export * from "./enums/document-deadline-state";
 
-export type * from "./types/common.js";
-export type * from "./types/employer.js";
-export type * from "./types/user.js";
-export type * from "./types/auth.js";
-export type * from "./types/document.js";
-export type * from "./types/report.js";
+export type * from "./types/common";
+export type * from "./types/employer";
+export type * from "./types/user";
+export type * from "./types/auth";
+export type * from "./types/document";
+export type * from "./types/report";
 
-export * from "./schemas/common.js";
-export * from "./schemas/employer.js";
-export * from "./schemas/user.js";
-export * from "./schemas/auth.js";
-export * from "./schemas/document.js";
-export * from "./schemas/report.js";
+export * from "./schemas/common";
+export * from "./schemas/employer";
+export * from "./schemas/user";
+export * from "./schemas/auth";
+export * from "./schemas/document";
+export * from "./schemas/report";
