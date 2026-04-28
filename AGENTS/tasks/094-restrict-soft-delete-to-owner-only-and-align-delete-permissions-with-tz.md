@@ -31,8 +31,8 @@ Current permissions allow root to soft-delete, which conflicts with TZ wording.
 
 ## Result
 
-Date: `TBD`
+Date: `2026-04-28`
 
 Executed:
 
-- TBD
+- Enforced owner-only soft delete in API permissions; root now keeps only restore/reassign/hard-delete. Validation: `pnpm --filter api test -- document-permissions.service.spec.ts`, `pnpm build`.
