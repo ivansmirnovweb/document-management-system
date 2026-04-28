@@ -58,4 +58,8 @@ export const documents = pgTable('documents', {
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  lastChangedAt: timestamp('last_changed_at').notNull().defaultNow(),
+  lastChangedById: integer('last_changed_by_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'restrict' }),
 });

@@ -30,6 +30,7 @@ export const documentListItemSchema = z
     deletedAt: isoDateStringSchema.nullable().optional(),
     createdAt: isoDateStringSchema,
     updatedAt: isoDateStringSchema,
+    lastChangedAt: isoDateStringSchema,
   })
   .strict();
 
@@ -42,6 +43,7 @@ export const documentDetailsSchema = documentListItemSchema
     owner: userSchema,
     executor: userSchema,
     resolutions: z.array(resolutionSchema),
+    lastChangedBy: userSchema,
   })
   .strict();
 

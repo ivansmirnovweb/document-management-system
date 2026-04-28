@@ -219,6 +219,8 @@ function AuditInfo({ document }: { document: DocumentDetails }) {
       <dl className="grid gap-3 text-sm sm:grid-cols-2">
         <AuditField label="Создан" value={formatDateTime(document.createdAt)} />
         <AuditField label="Обновлён" value={formatDateTime(document.updatedAt)} />
+        <AuditField label="Последнее изменение" value={formatDateTime(document.lastChangedAt)} />
+        <AuditField label="Кем изменён" value={`${document.lastChangedBy.displayName} (@${document.lastChangedBy.username})`} />
         <AuditField label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
         <AuditField label="Удалён" value={document.deletedAt ? formatDateTime(document.deletedAt) : "—"} />
       </dl>
