@@ -208,7 +208,7 @@ export class ReportsService {
     const statusLabel = (status: DocumentStatus): string => {
       if (status === DocumentStatus.NOT_DONE) return 'НЕ ВЫПОЛНЕНО';
       if (status === DocumentStatus.DONE) return 'ВЫПОЛНЕНО';
-      return 'СПИСАНО В ДЕЛО';
+      return 'ВЫПОЛНЕНО';
     };
 
     const escapeCell = (value: string | number | boolean | null) => {

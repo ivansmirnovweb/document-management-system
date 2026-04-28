@@ -14,7 +14,6 @@ import { users } from './users';
 export const documentStatusEnum = pgEnum('document_status', [
   'NOT_DONE',
   'DONE',
-  'WRITTEN_OFF',
 ]);
 
 export const documentKindEnum = pgEnum('document_kind', [
@@ -54,6 +53,7 @@ export const documents = pgTable('documents', {
   status: documentStatusEnum('status').notNull().default('NOT_DONE'),
   dueDate: timestamp('due_date').notNull(),
   completedAt: timestamp('completed_at'),
+  writtenOffAt: timestamp('written_off_at'),
   isControl: boolean('is_control').notNull().default(false),
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),

@@ -25,6 +25,7 @@ export const documentListItemSchema = z
     broadcast: z.string(),
     dueDate: isoDateStringSchema,
     completedAt: isoDateStringSchema.nullable().optional(),
+    writtenOffAt: isoDateStringSchema.nullable().optional(),
     isControl: z.boolean(),
     deadlineState: z.nativeEnum(DocumentDeadlineState),
     deletedAt: isoDateStringSchema.nullable().optional(),
