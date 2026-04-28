@@ -7,17 +7,17 @@ import {
   registerResponseSchema,
 } from "@document-flow/shared";
 import type {
+  AuthenticatedUser,
   ChangePasswordRequest,
   ChangePasswordResponse,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
-  User,
 } from "@document-flow/shared";
 import { apiNoContent, apiRequest, isApiError } from "@/lib/api";
 
-export type SessionResponse = { user: User | null };
+export type SessionResponse = { user: AuthenticatedUser | null };
 
 export const authApi = {
   async me(): Promise<SessionResponse> {

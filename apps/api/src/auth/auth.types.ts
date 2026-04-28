@@ -1,4 +1,4 @@
-import type { User } from '@document-flow/shared';
+import type { AuthenticatedUser as SessionUser } from '@document-flow/shared';
 
 export type JwtRole = 'USER' | 'ROOT';
 
@@ -13,7 +13,7 @@ export type JwtDecodedPayload = JwtSessionPayload & {
   exp?: number;
 };
 
-export type AuthenticatedUser = User;
+export type AuthenticatedUser = SessionUser;
 
 export type AuthenticatedRequest = {
   user?: AuthenticatedUser;

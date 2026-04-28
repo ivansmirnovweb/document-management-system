@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useAuth } from "@/features/auth/auth.provider";
+import { ChangePasswordForm } from "@/features/auth/components/change-password-form";
 import { StateCard } from "@/shared/ui/state-card";
 
 export function ProtectedView({ children }: { children: ReactNode }) {
@@ -38,6 +39,17 @@ export function ProtectedView({ children }: { children: ReactNode }) {
         actionHref="/login"
         icon="🔐"
       />
+    );
+  }
+
+  if (auth.user.passwordRotationRequired) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] w-full max-w-lg items-center px-4 py-8">
+        <ChangePasswordForm
+          title="Требуется смена пароля"
+          description="Сначала обновите пароль, затем продолжайте работу."
+        />
+      </div>
     );
   }
 

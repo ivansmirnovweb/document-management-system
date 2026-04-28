@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -49,7 +50,24 @@ export class JwtCookieAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid session');
     }
 
-    request.user = await this.authService.validateSession(payload);
+    const user = await this.authService.validateSession(payload);
+    request.user = user;
+
+    if (user.passwordRotationRequired && !this.canAccessExpiredPasswordRoute(request)) {
+      throw new ForbiddenException('Password change required');
+    }
+
     return true;
+  }
+
+  private canAccessExpiredPasswordRoute(request: Request): boolean {
+    const path = request.path;
+    const method = request.method;
+
+    return (
+      (method === 'GET' && path === '/auth/me') ||
+      (method === 'PATCH' && path === '/auth/password') ||
+      (method === 'POST' && path === '/auth/logout')
+    );
   }
 }
