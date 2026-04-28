@@ -77,7 +77,11 @@ export class ReportsService {
         item.totalDocuments === 0
           ? 0
           : Number(
-              ((item.overdueCount / item.totalDocuments) * 100).toFixed(2),
+              (
+                ((item.completedLate + item.overdueCount) /
+                  item.totalDocuments) *
+                100
+              ).toFixed(2),
             ),
     }));
   }
@@ -111,6 +115,7 @@ export class ReportsService {
         registrationNumber: documents.registrationNumber,
         registrationDate: documents.registrationDate,
         title: documents.title,
+        about1: documents.about1,
         description: documents.description,
         incomingNumber: documents.incomingNumber,
         outgoingNumber: documents.outgoingNumber,
@@ -187,19 +192,22 @@ export class ReportsService {
     rows: Awaited<ReturnType<ReportsService['findReportRows']>>,
   ): string {
     const headers = [
-      'id',
-      'registrationNumber',
-      'registrationDate',
-      'title',
-      'status',
-      'dueDate',
-      'completedAt',
-      'isControl',
-      'ownerLogin',
-      'executorLogin',
-      'employer',
-      'deletedAt',
+      '№ п/п',
+      'Рег. номер',
+      'Дата',
+      'Краткое содержание',
+      'Исполнитель',
+      'Срок исполнения',
+      'Статус',
+      'Приоритет',
+      'Осталось дней',
     ];
+
+    const statusLabel = (status: DocumentStatus): string => {
+      if (status === DocumentStatus.NOT_DONE) return 'НЕ ВЫПОЛНЕНО';
+      if (status === DocumentStatus.DONE) return 'ВЫПОЛНЕНО';
+      return 'СПИСАНО В ДЕЛО';
+    };
 
     const escapeCell = (value: string | number | boolean | null) => {
       const normalized = value === null ? '' : String(value);
@@ -209,25 +217,31 @@ export class ReportsService {
       return normalized;
     };
 
-    const lines = rows.map((row) =>
-      [
-        row.id,
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const lines = rows.map((row, index) => {
+      const due = new Date(row.dueDate);
+      due.setHours(0, 0, 0, 0);
+      const daysLeft = Math.ceil(
+        (due.getTime() - startOfToday.getTime()) / (24 * 60 * 60 * 1000),
+      );
+
+      return [
+        index + 1,
         row.registrationNumber,
-        row.registrationDate.toISOString(),
-        row.title,
-        row.status,
-        row.dueDate.toISOString(),
-        row.completedAt?.toISOString() ?? '',
-        row.isControl,
-        row.ownerUsername,
-        row.executorUsername,
-        row.employerFullName ?? '',
-        row.deletedAt?.toISOString() ?? '',
+        row.registrationDate.toISOString().slice(0, 10),
+        row.about1 ?? row.title,
+        row.executorDisplayName,
+        row.dueDate.toISOString().slice(0, 10),
+        statusLabel(row.status as DocumentStatus),
+        row.isControl ? 'НА КОНТРОЛЕ' : 'ОБЫЧНЫЙ',
+        daysLeft,
       ]
         .map(escapeCell)
-        .join(','),
-    );
+        .join(';');
+    });
 
-    return [headers.join(','), ...lines].join('\n');
+    return [headers.join(';'), ...lines].join('\n');
   }
 }
