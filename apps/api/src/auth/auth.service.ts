@@ -80,6 +80,7 @@ export class AuthService {
       .values({
         username: normalizedUsername,
         displayName,
+        unit: dto.unit.trim(),
         role: 'USER',
         passwordHash,
         passwordChangedAt: now,
@@ -218,6 +219,7 @@ export class AuthService {
     id: number;
     username: string;
     displayName: string;
+    unit: string;
     role: 'USER' | 'ROOT';
     passwordChangedAt: Date | null;
     createdAt: Date;
@@ -227,6 +229,7 @@ export class AuthService {
       id: user.id,
       username: user.username,
       displayName: user.displayName,
+      unit: user.unit,
       role: user.role as UserRole,
       passwordChangedAt: user.passwordChangedAt?.toISOString() ?? null,
       createdAt: user.createdAt.toISOString(),

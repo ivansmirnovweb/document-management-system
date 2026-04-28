@@ -28,6 +28,7 @@ export function RegisterForm() {
     defaultValues: {
       username: "",
       displayName: "",
+      unit: "",
       password: "",
     },
   });
@@ -68,6 +69,14 @@ export function RegisterForm() {
           <Input autoComplete="username" {...form.register("username")} />
           {form.formState.errors.username ? (
             <span className="text-xs text-red-600">{form.formState.errors.username.message}</span>
+          ) : null}
+        </label>
+
+        <label className="block space-y-2 text-sm font-medium text-zinc-800">
+          <span>Подразделение</span>
+          <Input {...form.register("unit")} />
+          {form.formState.errors.unit ? (
+            <span className="text-xs text-red-600">{form.formState.errors.unit.message}</span>
           ) : null}
         </label>
 

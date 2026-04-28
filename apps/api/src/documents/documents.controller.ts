@@ -41,8 +41,8 @@ export class DocumentsController {
   }
 
   @Get()
-  list(@Query() query: ListDocumentsQueryDto) {
-    return this.documentsService.list(query);
+  list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListDocumentsQueryDto) {
+    return this.documentsService.list(user, query);
   }
 
   @Get('search')

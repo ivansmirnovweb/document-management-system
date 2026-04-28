@@ -50,7 +50,7 @@ export function AuthStatusPanel() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <CardTitle>{auth.user.displayName}</CardTitle>
-          <CardDescription>@{auth.user.username}</CardDescription>
+          <CardDescription>@{auth.user.username} · {auth.user.unit}</CardDescription>
         </div>
         <Badge tone={auth.user.role === "ROOT" ? "warning" : "info"}>{auth.user.role}</Badge>
       </div>

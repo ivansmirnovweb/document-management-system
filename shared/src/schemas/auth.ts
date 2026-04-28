@@ -22,6 +22,7 @@ export const registerRequestSchema = z
   .object({
     username: usernameSchema,
     displayName: requiredText("Display name"),
+    unit: requiredText("Unit"),
     password: passwordSchema,
   })
   .strict();

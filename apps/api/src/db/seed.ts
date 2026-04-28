@@ -31,6 +31,7 @@ async function seed(): Promise<void> {
       .values({
         username: 'root',
         displayName: 'System Root',
+        unit: 'Администрация',
         role: 'ROOT',
         passwordHash,
         passwordChangedAt: null,
@@ -45,6 +46,7 @@ async function seed(): Promise<void> {
         {
           username: 'alice',
           displayName: 'Alice Johnson',
+          unit: 'Юридический отдел',
           role: 'USER',
           passwordHash,
           passwordChangedAt: null,
@@ -54,6 +56,7 @@ async function seed(): Promise<void> {
         {
           username: 'bob',
           displayName: 'Bob Williams',
+          unit: 'Канцелярия',
           role: 'USER',
           passwordHash,
           passwordChangedAt: null,
@@ -63,6 +66,7 @@ async function seed(): Promise<void> {
         {
           username: 'charlie',
           displayName: 'Charlie Brown',
+          unit: 'Канцелярия',
           role: 'USER',
           passwordHash,
           passwordChangedAt: null,
