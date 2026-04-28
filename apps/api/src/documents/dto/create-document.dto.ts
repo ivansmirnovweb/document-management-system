@@ -22,6 +22,14 @@ export class CreateDocumentDto {
   @MinLength(1)
   title!: string;
 
+  @IsOptional()
+  @IsString()
+  about1?: string;
+
+  @IsOptional()
+  @IsString()
+  about2?: string | null;
+
   @IsEnum(DocumentKind)
   kind!: DocumentKind;
 
@@ -38,9 +46,22 @@ export class CreateDocumentDto {
   outgoingNumber?: string | null;
 
   @IsOptional()
+  @IsDateString()
+  outgoingDate?: string | null;
+
+  @IsOptional()
   @IsInt()
   @Min(1)
   employerId?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  outSenderEmployerId?: number | null;
+
+  @IsOptional()
+  @IsString()
+  broadcast?: string;
 
   @IsInt()
   @Min(1)

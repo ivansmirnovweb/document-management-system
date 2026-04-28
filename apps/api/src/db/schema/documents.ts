@@ -30,13 +30,21 @@ export const documents = pgTable('documents', {
     .unique(),
   registrationDate: timestamp('registration_date').notNull(),
   title: varchar('title', { length: 255 }).notNull(),
+  about1: varchar('about1', { length: 255 }).notNull(),
+  about2: varchar('about2', { length: 255 }),
   kind: documentKindEnum('kind').notNull(),
   description: text('description'),
   incomingNumber: varchar('incoming_number', { length: 100 }),
   outgoingNumber: varchar('outgoing_number', { length: 100 }),
+  outgoingDate: timestamp('outgoing_date'),
   employerId: integer('employer_id').references(() => employers.id, {
     onDelete: 'set null',
   }),
+  outSenderEmployerId: integer('out_sender_employer_id').references(
+    () => employers.id,
+    { onDelete: 'set null' },
+  ),
+  broadcast: varchar('broadcast', { length: 255 }).notNull().default(''),
   ownerId: integer('owner_id')
     .notNull()
     .references(() => users.id, { onDelete: 'restrict' }),
