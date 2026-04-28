@@ -16,6 +16,12 @@ export const documentStatusEnum = pgEnum('document_status', [
   'DONE',
 ]);
 
+export const documentKindEnum = pgEnum('document_kind', [
+  'INCOMING',
+  'OUTGOING',
+  'INTERNAL',
+]);
+
 export const documents = pgTable('documents', {
   id: serial('id').primaryKey(),
   registrationNumber: varchar('registration_number', { length: 100 })
@@ -23,6 +29,7 @@ export const documents = pgTable('documents', {
     .unique(),
   registrationDate: timestamp('registration_date').notNull(),
   title: varchar('title', { length: 255 }).notNull(),
+  kind: documentKindEnum('kind').notNull(),
   description: text('description'),
   incomingNumber: varchar('incoming_number', { length: 100 }),
   outgoingNumber: varchar('outgoing_number', { length: 100 }),

@@ -6,7 +6,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { StateCard } from "@/shared/ui/state-card";
 import { cn } from "@/lib/cn";
-import { canCompleteDocument, canDeleteDocument, canEditDocument, deadlineLabel, deadlineTone, formatDate, statusLabel } from "../document-utils";
+import { canCompleteDocument, canDeleteDocument, canEditDocument, deadlineLabel, deadlineTone, formatDate, kindLabel, statusLabel } from "../document-utils";
 
 const columnHelper = createColumnHelper<DocumentListItem>();
 
@@ -51,6 +51,7 @@ export function DocumentsTable({
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-zinc-950">{document.title}</span>
               {document.isControl ? <Badge tone="warning">Контроль</Badge> : null}
+              <Badge tone="info">{kindLabel(document.kind)}</Badge>
               <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
             </div>
             <div className="text-sm text-zinc-600">

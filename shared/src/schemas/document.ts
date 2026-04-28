@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DocumentDeadlineState } from "../enums/document-deadline-state";
 import { DocumentStatus } from "../enums/document-status";
+import { DocumentKind } from "../enums/document-kind";
 import { employerSchema } from "./employer";
 import { isoDateStringSchema, requiredText } from "./common";
 import { userSchema } from "./user";
@@ -11,6 +12,7 @@ export const documentListItemSchema = z
     registrationNumber: requiredText("Registration number"),
     registrationDate: isoDateStringSchema,
     title: requiredText("Title"),
+    kind: z.nativeEnum(DocumentKind),
     status: z.nativeEnum(DocumentStatus),
     ownerId: z.coerce.number().int().positive("Owner ID must be a positive number"),
     executorId: z.coerce.number().int().positive("Executor ID must be a positive number"),
@@ -41,6 +43,7 @@ export const createDocumentInputSchema = z
     registrationNumber: requiredText("Registration number"),
     registrationDate: isoDateStringSchema,
     title: requiredText("Title"),
+    kind: z.nativeEnum(DocumentKind),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
     outgoingNumber: z.string().nullable().optional(),
@@ -57,6 +60,7 @@ export const updateDocumentInputSchema = z
     registrationNumber: requiredText("Registration number").optional(),
     registrationDate: isoDateStringSchema.optional(),
     title: requiredText("Title").optional(),
+    kind: z.nativeEnum(DocumentKind).optional(),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
     outgoingNumber: z.string().nullable().optional(),

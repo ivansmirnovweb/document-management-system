@@ -1,5 +1,6 @@
 import type { DocumentDeadlineState } from "../enums/document-deadline-state";
 import type { DocumentStatus } from "../enums/document-status";
+import type { DocumentKind } from "../enums/document-kind";
 import type { IsoDateString } from "./common";
 import type { Employer } from "./employer";
 import type { User } from "./user";
@@ -9,6 +10,7 @@ export type DocumentListItem = {
   registrationNumber: string;
   registrationDate: IsoDateString;
   title: string;
+  kind: DocumentKind;
   status: DocumentStatus;
   ownerId: number;
   executorId: number;
@@ -35,6 +37,7 @@ export type CreateDocumentInput = {
   registrationNumber: string;
   registrationDate: IsoDateString;
   title: string;
+  kind: DocumentKind;
   description?: string | null;
   incomingNumber?: string | null;
   outgoingNumber?: string | null;
@@ -49,6 +52,7 @@ export type UpdateDocumentInput = {
   registrationNumber?: string;
   registrationDate?: IsoDateString;
   title?: string;
+  kind?: DocumentKind;
   description?: string | null;
   incomingNumber?: string | null;
   outgoingNumber?: string | null;

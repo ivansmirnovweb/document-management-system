@@ -7,6 +7,7 @@ import {
   createDocumentInputSchema,
   updateDocumentInputSchema,
   type DocumentDetails,
+  type DocumentKind,
   type UserRole,
 } from "@document-flow/shared";
 import { cn } from "@/lib/cn";
@@ -26,6 +27,7 @@ type DocumentFormValues = {
   registrationNumber: string;
   registrationDate: string;
   title: string;
+  kind: DocumentKind;
   description?: string | null;
   incomingNumber?: string | null;
   outgoingNumber?: string | null;
@@ -52,6 +54,7 @@ function toFormDefaults(document: DocumentDetails | null, currentUser: { id: num
       registrationNumber: "",
       registrationDate: new Date().toISOString().slice(0, 10),
       title: "",
+      kind: "INTERNAL" as DocumentKind,
       description: "",
       incomingNumber: "",
       outgoingNumber: "",
@@ -67,6 +70,7 @@ function toFormDefaults(document: DocumentDetails | null, currentUser: { id: num
     registrationNumber: document.registrationNumber,
     registrationDate: document.registrationDate.slice(0, 10),
     title: document.title,
+    kind: document.kind,
     description: document.description ?? "",
     incomingNumber: document.incomingNumber ?? "",
     outgoingNumber: document.outgoingNumber ?? "",
@@ -133,6 +137,13 @@ export function DocumentFormPanel({
           </Field>
           <Field label="Название" className="sm:col-span-2" error={form.formState.errors.title?.message}>
             <Input {...form.register("title")} />
+          </Field>
+          <Field label="Вид документа" error={form.formState.errors.kind?.message}>
+            <Select {...form.register("kind")}>
+              <option value="INTERNAL">Внутренний</option>
+              <option value="INCOMING">Входящий</option>
+              <option value="OUTGOING">Исходящий</option>
+            </Select>
           </Field>
           <Field label="Срок" error={form.formState.errors.dueDate?.message}>
             <Input type="date" {...form.register("dueDate")} />

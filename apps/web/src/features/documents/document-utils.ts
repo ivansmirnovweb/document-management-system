@@ -1,5 +1,6 @@
 import {
   DocumentDeadlineState,
+  DocumentKind,
   DocumentStatus,
   UserRole,
   type DocumentDetails,
@@ -46,6 +47,19 @@ export function deadlineLabel(state: DocumentDeadlineState): string {
 
 export function statusLabel(status: DocumentStatus): string {
   return status === DocumentStatus.DONE ? "Завершено" : "Активно";
+}
+
+export function kindLabel(kind: DocumentKind): string {
+  switch (kind) {
+    case "INCOMING":
+      return "Входящий";
+    case "OUTGOING":
+      return "Исходящий";
+    case "INTERNAL":
+      return "Внутренний";
+    default:
+      return "Неизвестно";
+  }
 }
 
 export function canEditDocument(

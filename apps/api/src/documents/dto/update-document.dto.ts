@@ -8,7 +8,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { DocumentStatus } from '@document-flow/shared';
+import { DocumentKind, DocumentStatus } from '@document-flow/shared';
 
 export class UpdateDocumentDto {
   @IsOptional()
@@ -24,6 +24,10 @@ export class UpdateDocumentDto {
   @IsString()
   @MinLength(1)
   title?: string;
+
+  @IsOptional()
+  @IsEnum(DocumentKind)
+  kind?: DocumentKind;
 
   @IsOptional()
   @IsString()
