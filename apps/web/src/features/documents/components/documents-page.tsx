@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DocumentStatus, type DocumentListItem } from "@document-flow/shared";
+import { DocumentStatus, type DocumentDetails, type DocumentListItem } from "@document-flow/shared";
 import { useAuth } from "@/features/auth/auth.provider";
 import { employersApi } from "@/features/employers/employers.api";
 import { employersKeys } from "@/features/employers/employers.keys";
@@ -26,9 +26,10 @@ const tabs: Array<{ value: DocumentStatus; label: string }> = [
 type DocumentsPageProps = {
   variant: "public" | "private";
   initialPublicList?: DocumentListItem[];
+  initialPublicDocument?: DocumentDetails | null;
 };
 
-export function DocumentsPage({ variant, initialPublicList }: DocumentsPageProps) {
+export function DocumentsPage({ variant, initialPublicList, initialPublicDocument }: DocumentsPageProps) {
   const auth = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<DocumentStatus>(DocumentStatus.NOT_DONE);
@@ -102,8 +103,15 @@ export function DocumentsPage({ variant, initialPublicList }: DocumentsPageProps
 
   const selectedDocumentQuery = useQuery({
     queryKey: documentsKeys.details(variant, selectedDocumentId ?? 0),
-    queryFn: () => documentsApi.getById(selectedDocumentId ?? 0),
-    enabled: variant === "private" && selectedDocumentId !== null,
+    queryFn: () =>
+      variant === "public"
+        ? documentsApi.getPublicById(selectedDocumentId ?? 0)
+        : documentsApi.getById(selectedDocumentId ?? 0),
+    enabled: selectedDocumentId !== null,
+    initialData:
+      variant === "public" && selectedDocumentId !== null && initialPublicDocument?.id === selectedDocumentId
+        ? initialPublicDocument
+        : undefined,
   });
 
   const selectedDocument = selectedDocumentQuery.data ?? null;
@@ -279,23 +287,11 @@ export function DocumentsPage({ variant, initialPublicList }: DocumentsPageProps
       return <StateCard title="Загрузка документа" description="Получаем выбранную запись." icon="⏳" />;
     }
 
-    if (variant === "public") {
-      return (
-        <StateCard
-          title="Режим предпросмотра"
-          description="Без авторизации доступен только список активных записей. Для просмотра полной карточки войдите в систему."
-          actionLabel="Войти"
-          actionHref="/login"
-          icon="🔐"
-        />
-      );
-    }
-
     return (
       <DocumentDetailsPanel
         document={selectedDocument}
         currentUser={currentUser}
-        publicView={false}
+        publicView={variant === "public"}
         onEdit={variant === "private" ? () => setMode("edit") : undefined}
         onToggleStatus={
           variant === "private" && selectedDocument
