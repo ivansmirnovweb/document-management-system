@@ -52,28 +52,58 @@ export class DocumentsService {
     private readonly permissions: DocumentPermissionsService,
   ) {}
 
-  async list(query: ListDocumentsQueryDto): Promise<DocumentListItem[]> {
+  async list(
+    actor: DocumentActor,
+    query: ListDocumentsQueryDto,
+  ): Promise<DocumentListItem[]> {
     if (query.status === DocumentStatus.DONE) {
       return this.listCompleted();
     }
 
-    return this.listActive();
+    return this.listActive(actor);
   }
 
   async listPublic(): Promise<DocumentListItem[]> {
     return this.listActive();
   }
 
-  async listActive(): Promise<DocumentListItem[]> {
+  async listActive(actor?: DocumentActor): Promise<DocumentListItem[]> {
+    const conditions = [
+      eq(documents.status, DocumentStatus.NOT_DONE),
+      isNull(documents.deletedAt),
+    ];
+
+    if (actor && actor.role !== UserRole.ROOT) {
+      conditions.push(eq(executorUsers.unit, actor.unit));
+    }
+
     const rows = await this.db.db
-      .select()
+      .select({
+        id: documents.id,
+        registrationNumber: documents.registrationNumber,
+        registrationDate: documents.registrationDate,
+        title: documents.title,
+        about1: documents.about1,
+        about2: documents.about2,
+        kind: documents.kind,
+        status: documents.status,
+        ownerId: documents.ownerId,
+        executorId: documents.executorId,
+        employerId: documents.employerId,
+        outSenderEmployerId: documents.outSenderEmployerId,
+        outgoingDate: documents.outgoingDate,
+        broadcast: documents.broadcast,
+        dueDate: documents.dueDate,
+        completedAt: documents.completedAt,
+        isControl: documents.isControl,
+        deletedAt: documents.deletedAt,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt,
+        lastChangedAt: documents.lastChangedAt,
+      })
       .from(documents)
-      .where(
-        and(
-          eq(documents.status, DocumentStatus.NOT_DONE),
-          isNull(documents.deletedAt),
-        ),
-      )
+      .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .where(and(...conditions))
       .orderBy(
         desc(documents.isControl),
         asc(documents.dueDate),
@@ -852,6 +882,7 @@ export class DocumentsService {
         ownerIdFromJoin: ownerUsers.id,
         ownerUsername: ownerUsers.username,
         ownerDisplayName: ownerUsers.displayName,
+        ownerUnit: ownerUsers.unit,
         ownerRole: ownerUsers.role,
         ownerPasswordChangedAt: ownerUsers.passwordChangedAt,
         ownerCreatedAt: ownerUsers.createdAt,
@@ -859,6 +890,7 @@ export class DocumentsService {
         executorIdFromJoin: executorUsers.id,
         executorUsername: executorUsers.username,
         executorDisplayName: executorUsers.displayName,
+        executorUnit: executorUsers.unit,
         executorRole: executorUsers.role,
         executorPasswordChangedAt: executorUsers.passwordChangedAt,
         executorCreatedAt: executorUsers.createdAt,
@@ -866,6 +898,7 @@ export class DocumentsService {
         lastChangedById: lastChangedByUsers.id,
         lastChangedByUsername: lastChangedByUsers.username,
         lastChangedByDisplayName: lastChangedByUsers.displayName,
+        lastChangedByUnit: lastChangedByUsers.unit,
         lastChangedByRole: lastChangedByUsers.role,
         lastChangedByPasswordChangedAt: lastChangedByUsers.passwordChangedAt,
         lastChangedByCreatedAt: lastChangedByUsers.createdAt,
@@ -899,6 +932,7 @@ export class DocumentsService {
         authorIdFromJoin: users.id,
         authorUsername: users.username,
         authorDisplayName: users.displayName,
+        authorUnit: users.unit,
         authorRole: users.role,
         authorPasswordChangedAt: users.passwordChangedAt,
         authorCreatedAt: users.createdAt,
@@ -925,6 +959,7 @@ export class DocumentsService {
         id: resolution.authorIdFromJoin,
         username: resolution.authorUsername,
         displayName: resolution.authorDisplayName,
+        unit: resolution.authorUnit,
         role: resolution.authorRole as UserRole,
         passwordChangedAt:
           resolution.authorPasswordChangedAt?.toISOString() ?? null,
@@ -982,6 +1017,7 @@ export class DocumentsService {
         id: row.ownerIdFromJoin,
         username: row.ownerUsername,
         displayName: row.ownerDisplayName,
+        unit: row.ownerUnit,
         role: row.ownerRole as UserRole,
         passwordChangedAt: row.ownerPasswordChangedAt?.toISOString() ?? null,
         createdAt: row.ownerCreatedAt.toISOString(),
@@ -992,6 +1028,7 @@ export class DocumentsService {
         id: row.lastChangedById,
         username: row.lastChangedByUsername,
         displayName: row.lastChangedByDisplayName,
+        unit: row.lastChangedByUnit,
         role: row.lastChangedByRole as UserRole,
         passwordChangedAt:
           row.lastChangedByPasswordChangedAt?.toISOString() ?? null,
@@ -1002,6 +1039,7 @@ export class DocumentsService {
         id: row.executorIdFromJoin,
         username: row.executorUsername,
         displayName: row.executorDisplayName,
+        unit: row.executorUnit,
         role: row.executorRole as UserRole,
         passwordChangedAt: row.executorPasswordChangedAt?.toISOString() ?? null,
         createdAt: row.executorCreatedAt.toISOString(),

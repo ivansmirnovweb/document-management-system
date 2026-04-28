@@ -72,8 +72,8 @@ export function DocumentDetailsPanel({
       <dl className="grid gap-4 text-sm sm:grid-cols-2">
         <Detail label="Срок" value={formatDate(document.dueDate)} />
         <Detail label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
-        <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username})`} />
-        <Detail label="Исполнитель" value={`${document.executor.displayName} (@${document.executor.username})`} />
+        <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username}) · ${document.owner.unit}`} />
+        <Detail label="Исполнитель" value={`${document.executor.displayName} (@${document.executor.username}) · ${document.executor.unit}`} />
         <Detail label="Работодатель" value={document.employer ? document.employer.fullName : "—"} />
         <Detail label="Вид" value={kindLabel(document.kind)} />
         <Detail label="Рег. номер" value={document.registrationNumber} />

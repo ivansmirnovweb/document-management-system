@@ -6,7 +6,7 @@ import {
 import { DocumentStatus, UserRole } from '@document-flow/shared';
 import type { AuthenticatedUser } from '../auth/auth.types';
 
-export type DocumentActor = Pick<AuthenticatedUser, 'id' | 'role'> | null;
+export type DocumentActor = Pick<AuthenticatedUser, 'id' | 'role' | 'unit'> | null;
 
 const EXECUTION_FIELDS = new Set([
   'description',

@@ -13,6 +13,11 @@ export class RegisterDto {
   displayName!: string;
 
   @IsString()
+  @MinLength(1)
+  @MaxLength(100)
+  unit!: string;
+
+  @IsString()
   @MinLength(8)
   password!: string;
 }

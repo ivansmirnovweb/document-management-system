@@ -12,6 +12,7 @@ export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: varchar('username', { length: 100 }).notNull().unique(),
   displayName: varchar('display_name', { length: 255 }).notNull(),
+  unit: varchar('unit', { length: 100 }).notNull(),
   role: userRoleEnum('role').notNull().default('USER'),
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   passwordChangedAt: timestamp('password_changed_at'),

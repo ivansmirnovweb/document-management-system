@@ -7,6 +7,7 @@ export const userSchema = z
     id: z.number().int().positive(),
     username: requiredText("Username"),
     displayName: requiredText("Display name"),
+    unit: requiredText("Unit"),
     role: z.nativeEnum(UserRole),
     passwordChangedAt: isoDateStringSchema.nullable().optional(),
     createdAt: isoDateStringSchema,

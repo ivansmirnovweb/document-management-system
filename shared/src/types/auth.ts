@@ -8,6 +8,7 @@ export type LoginRequest = {
 export type RegisterRequest = {
   username: string;
   displayName: string;
+  unit: string;
   password: string;
 };
 
