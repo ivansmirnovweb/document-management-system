@@ -19,14 +19,14 @@ type DeletedDocumentsTableProps = {
 export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect }: DeletedDocumentsTableProps) {
   const columns = [
     columnHelper.accessor("registrationNumber", {
-      header: "Document",
+      header: "Документ",
       cell: (info) => {
         const document = info.row.original;
         return (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-zinc-950">{document.title}</span>
-              <Badge tone="danger">Deleted</Badge>
+              <Badge tone="danger">Удалён</Badge>
               <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
             </div>
             <div className="text-sm text-zinc-600">
@@ -38,34 +38,34 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
     }),
     columnHelper.display({
       id: "meta",
-      header: "Meta",
+      header: "Метаданные",
       cell: ({ row }) => {
         const document = row.original;
         return (
           <div className="space-y-2 text-sm text-zinc-600">
-            <div>Owner #{document.ownerId}</div>
-            <div>Executor #{document.executorId}</div>
-            <div>Deleted {document.deletedAt ? formatDate(document.deletedAt) : "—"}</div>
+            <div>Владелец #{document.ownerId}</div>
+            <div>Исполнитель #{document.executorId}</div>
+            <div>Удалён {document.deletedAt ? formatDate(document.deletedAt) : "—"}</div>
           </div>
         );
       },
     }),
     columnHelper.display({
       id: "deadline",
-      header: "Deadline",
+      header: "Срок",
       cell: ({ row }) => {
         const document = row.original;
         return (
           <div className="space-y-2 text-sm">
             <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
-            <div className="text-zinc-600">Due {formatDate(document.dueDate)}</div>
+            <div className="text-zinc-600">До {formatDate(document.dueDate)}</div>
           </div>
         );
       },
     }),
     columnHelper.display({
       id: "actions",
-      header: "Actions",
+      header: "Действия",
       cell: ({ row }) => {
         const document = row.original;
         return (
@@ -77,7 +77,7 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
               onSelect(document);
             }}
           >
-            Open
+            Открыть
           </Button>
         );
       },
@@ -91,7 +91,7 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
   });
 
   if (documents.length === 0) {
-    return <StateCard title="No deleted records" description="Deleted documents will appear here for root users." icon="🗂️" />;
+    return <StateCard title="Нет удалённых записей" description="Удалённые документы появятся здесь для пользователей root." icon="🗂️" />;
   }
 
   return (

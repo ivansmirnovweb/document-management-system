@@ -26,8 +26,8 @@ export function DocumentDetailsPanel({
   if (!document) {
     return (
       <Card className="space-y-4" id="details">
-        <CardTitle>Document details</CardTitle>
-        <CardDescription>Select a row to inspect the record.</CardDescription>
+        <CardTitle>Детали документа</CardTitle>
+        <CardDescription>Выберите строку, чтобы посмотреть запись.</CardDescription>
       </Card>
     );
   }
@@ -48,34 +48,34 @@ export function DocumentDetailsPanel({
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge tone={document.isControl ? "warning" : "neutral"}>{document.isControl ? "Control" : "Standard"}</Badge>
+            <Badge tone={document.isControl ? "warning" : "neutral"}>{document.isControl ? "Контроль" : "Обычный"}</Badge>
             <Badge tone={document.status === "DONE" ? "success" : "info"}>{statusLabel(document.status)}</Badge>
             <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
           </div>
         </div>
-        <p className="text-sm text-zinc-600">{document.description || "No description provided."}</p>
+        <p className="text-sm text-zinc-600">{document.description || "Описание отсутствует."}</p>
       </div>
 
       <dl className="grid gap-4 text-sm sm:grid-cols-2">
-        <Detail label="Due date" value={formatDate(document.dueDate)} />
-        <Detail label="Completed at" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
-        <Detail label="Owner" value={`${document.owner.displayName} (@${document.owner.username})`} />
-        <Detail label="Executor" value={`${document.executor.displayName} (@${document.executor.username})`} />
-        <Detail label="Employer" value={document.employer ? document.employer.fullName : "—"} />
-        <Detail label="Registration number" value={document.registrationNumber} />
-        <Detail label="Incoming number" value={document.incomingNumber ?? "—"} />
-        <Detail label="Outgoing number" value={document.outgoingNumber ?? "—"} />
-        <Detail label="Last updated" value={formatDateTime(document.updatedAt)} />
+        <Detail label="Срок" value={formatDate(document.dueDate)} />
+        <Detail label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
+        <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username})`} />
+        <Detail label="Исполнитель" value={`${document.executor.displayName} (@${document.executor.username})`} />
+        <Detail label="Работодатель" value={document.employer ? document.employer.fullName : "—"} />
+        <Detail label="Рег. номер" value={document.registrationNumber} />
+        <Detail label="Входящий номер" value={document.incomingNumber ?? "—"} />
+        <Detail label="Исходящий номер" value={document.outgoingNumber ?? "—"} />
+        <Detail label="Обновлён" value={formatDateTime(document.updatedAt)} />
       </dl>
 
       {!publicView ? (
         <div className="flex flex-wrap gap-2">
-          {editAllowed && onEdit ? <Button onClick={onEdit}>Edit</Button> : null}
-          {completeAllowed && onToggleStatus ? <Button variant="secondary" onClick={onToggleStatus}>Complete</Button> : null}
+          {editAllowed && onEdit ? <Button onClick={onEdit}>Редактировать</Button> : null}
+          {completeAllowed && onToggleStatus ? <Button variant="secondary" onClick={onToggleStatus}>Завершить</Button> : null}
           {reopenAllowed && document.status === "DONE" && onToggleStatus ? (
-            <Button variant="secondary" onClick={onToggleStatus}>Reopen</Button>
+            <Button variant="secondary" onClick={onToggleStatus}>Переоткрыть</Button>
           ) : null}
-          {deleteAllowed && onDelete ? <Button variant="danger" onClick={onDelete}>Delete</Button> : null}
+          {deleteAllowed && onDelete ? <Button variant="danger" onClick={onDelete}>Удалить</Button> : null}
         </div>
       ) : null}
     </Card>

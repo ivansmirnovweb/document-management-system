@@ -43,14 +43,14 @@ export function DocumentsTable({
 }: DocumentsTableProps) {
   const columns = [
     columnHelper.accessor("registrationNumber", {
-      header: "Document",
+      header: "Документ",
       cell: (info) => {
         const document = info.row.original;
         return (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-zinc-950">{document.title}</span>
-              {document.isControl ? <Badge tone="warning">Control</Badge> : null}
+              {document.isControl ? <Badge tone="warning">Контроль</Badge> : null}
               <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
             </div>
             <div className="text-sm text-zinc-600">
@@ -61,34 +61,34 @@ export function DocumentsTable({
       },
     }),
     columnHelper.accessor("dueDate", {
-      header: "Deadline",
+      header: "Срок",
       cell: ({ row }) => {
         const document = row.original;
         return (
           <div className="space-y-2 text-sm">
             <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
-            <div className="text-zinc-600">Due {formatDate(document.dueDate)}</div>
+            <div className="text-zinc-600">До {formatDate(document.dueDate)}</div>
           </div>
         );
       },
     }),
     columnHelper.display({
       id: "ids",
-      header: "Actors",
+      header: "Участники",
       cell: ({ row }) => {
         const document = row.original;
         return (
           <div className="space-y-1 text-sm text-zinc-600">
-            <div>Owner #{document.ownerId}</div>
-            <div>Executor #{document.executorId}</div>
-            <div>Employer {document.employerId ? `#${document.employerId}` : "—"}</div>
+            <div>Владелец #{document.ownerId}</div>
+            <div>Исполнитель #{document.executorId}</div>
+            <div>Работодатель {document.employerId ? `#${document.employerId}` : "—"}</div>
           </div>
         );
       },
     }),
     columnHelper.display({
       id: "actions",
-      header: "Actions",
+      header: "Действия",
       cell: ({ row }) => {
         const document = row.original;
         if (publicView) {
@@ -101,7 +101,7 @@ export function DocumentsTable({
                 onSelect(document);
               }}
             >
-              View
+              Открыть
             </Button>
           );
         }
@@ -120,7 +120,7 @@ export function DocumentsTable({
                 onSelect(document);
               }}
             >
-              Open
+              Открыть
             </Button>
             {canEdit && onEdit ? (
               <Button
@@ -131,7 +131,7 @@ export function DocumentsTable({
                   onEdit(document);
                 }}
               >
-                Edit
+                Редактировать
               </Button>
             ) : null}
             {canComplete && onToggleStatus ? (
@@ -143,7 +143,7 @@ export function DocumentsTable({
                   onToggleStatus(document);
                 }}
               >
-                Complete
+                Завершить
               </Button>
             ) : null}
             {canDelete && onDelete ? (
@@ -155,7 +155,7 @@ export function DocumentsTable({
                   onDelete(document);
                 }}
               >
-                Delete
+                Удалить
               </Button>
             ) : null}
           </div>

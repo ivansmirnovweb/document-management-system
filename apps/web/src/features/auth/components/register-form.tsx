@@ -39,15 +39,15 @@ export function RegisterForm() {
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "Unable to register");
+      setFormError(error instanceof Error ? error.message : "Не удалось зарегистрироваться");
     }
   });
 
   return (
     <Card className="mx-auto w-full max-w-md space-y-6">
       <div>
-        <CardTitle>Create account</CardTitle>
-        <CardDescription>Register a new user account to access the dashboard.</CardDescription>
+        <CardTitle>Регистрация</CardTitle>
+        <CardDescription>Создайте новую учётную запись для доступа к рабочей области.</CardDescription>
       </div>
 
       {formError ? (
@@ -56,7 +56,7 @@ export function RegisterForm() {
 
       <form className="space-y-4" onSubmit={submit}>
         <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Display name</span>
+          <span>Отображаемое имя</span>
           <Input autoComplete="name" {...form.register("displayName")} />
           {form.formState.errors.displayName ? (
             <span className="text-xs text-red-600">{form.formState.errors.displayName.message}</span>
@@ -64,7 +64,7 @@ export function RegisterForm() {
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Username</span>
+          <span>Логин</span>
           <Input autoComplete="username" {...form.register("username")} />
           {form.formState.errors.username ? (
             <span className="text-xs text-red-600">{form.formState.errors.username.message}</span>
@@ -72,7 +72,7 @@ export function RegisterForm() {
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Password</span>
+          <span>Пароль</span>
           <Input type="password" autoComplete="new-password" {...form.register("password")} />
           {form.formState.errors.password ? (
             <span className="text-xs text-red-600">{form.formState.errors.password.message}</span>
@@ -80,14 +80,14 @@ export function RegisterForm() {
         </label>
 
         <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Creating account..." : "Create account"}
+          {form.formState.isSubmitting ? "Создаём аккаунт..." : "Создать аккаунт"}
         </Button>
       </form>
 
       <p className="text-center text-sm text-zinc-600">
-        Already have an account?{" "}
+        Уже есть аккаунт?{" "}
         <Link href="/login" className="font-medium text-zinc-900 underline underline-offset-2">
-          Sign in
+          Войти
         </Link>
       </p>
     </Card>
