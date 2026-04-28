@@ -1,8 +1,8 @@
-import type { DocumentDeadlineState } from "../enums/document-deadline-state";
-import type { DocumentStatus } from "../enums/document-status";
-import type { IsoDateString } from "./common";
-import type { Employer } from "./employer";
-import type { User } from "./user";
+import type { DocumentDeadlineState } from "../enums/document-deadline-state.js";
+import type { DocumentStatus } from "../enums/document-status.js";
+import type { IsoDateString } from "./common.js";
+import type { Employer } from "./employer.js";
+import type { User } from "./user.js";
 
 export type DocumentListItem = {
   id: number;

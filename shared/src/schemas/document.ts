@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { DocumentDeadlineState } from "../enums/document-deadline-state";
-import { DocumentStatus } from "../enums/document-status";
-import { employerSchema } from "./employer";
-import { isoDateStringSchema, requiredText } from "./common";
-import { userSchema } from "./user";
+import { DocumentDeadlineState } from "../enums/document-deadline-state.js";
+import { DocumentStatus } from "../enums/document-status.js";
+import { employerSchema } from "./employer.js";
+import { isoDateStringSchema, requiredText } from "./common.js";
+import { userSchema } from "./user.js";
 
 export const documentListItemSchema = z
   .object({

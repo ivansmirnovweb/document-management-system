@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { UserRole } from "../enums/user-role";
-import { isoDateStringSchema, requiredText } from "./common";
+import { UserRole } from "../enums/user-role.js";
+import { isoDateStringSchema, requiredText } from "./common.js";
 
 export const userSchema = z
   .object({

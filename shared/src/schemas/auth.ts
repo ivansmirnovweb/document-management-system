@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { userSchema } from "./user";
-import { requiredText } from "./common";
+import { userSchema } from "./user.js";
+import { requiredText } from "./common.js";
 
 const usernameSchema = z
   .string()

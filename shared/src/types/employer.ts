@@ -1,4 +1,4 @@
-import type { IsoDateString } from "./common";
+import type { IsoDateString } from "./common.js";
 
 export type Employer = {
   id: number;

@@ -1,5 +1,5 @@
-import type { IsoDateString } from "./common";
-import type { UserRole } from "../enums/user-role";
+import type { IsoDateString } from "./common.js";
+import type { UserRole } from "../enums/user-role.js";
 
 export type User = {
   id: number;
