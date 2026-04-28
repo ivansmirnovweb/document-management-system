@@ -172,12 +172,6 @@ export function DocumentFormPanel({
               ))}
             </Select>
           </Field>
-          <Field label="Контрольная отметка" error={form.formState.errors.isControl?.message}>
-            <label className="flex h-11 items-center gap-3 rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-700">
-              <input type="checkbox" {...form.register("isControl")} />
-              Контрольный документ
-            </label>
-          </Field>
         </div>
 
         <Field label="Описание" error={form.formState.errors.description?.message}>
