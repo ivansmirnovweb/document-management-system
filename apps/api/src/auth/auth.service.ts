@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
@@ -8,8 +9,9 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 import {
   UserRole,
-  type LoginResponse,
   type ChangePasswordResponse,
+  type LoginResponse,
+  type RegisterResponse,
 } from '@document-flow/shared';
 import { AppConfigService } from '../config/app-config.service';
 import { DbService } from '../db/db.service';
@@ -22,6 +24,7 @@ import type {
 } from './auth.types';
 import type { ChangePasswordDto } from './dto/change-password.dto';
 import type { LoginDto } from './dto/login.dto';
+import type { RegisterDto } from './dto/register.dto';
 import type { Response } from 'express';
 
 const BCRYPT_ROUNDS = 10;
@@ -51,6 +54,43 @@ export class AuthService {
     await this.setSessionCookie(response, user);
 
     return { user: this.toAuthenticatedUser(user) };
+  }
+
+  async register(
+    dto: RegisterDto,
+    response: Response,
+  ): Promise<RegisterResponse> {
+    if (!this.config.selfRegistrationEnabled) {
+      throw new ForbiddenException('Self-registration is disabled');
+    }
+
+    const normalizedUsername = dto.username.trim().toLowerCase();
+    const displayName = dto.displayName.trim();
+
+    const existingUser = await this.findUserByUsername(normalizedUsername);
+    if (existingUser) {
+      throw new ConflictException('Username is already taken');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
+    const now = new Date();
+
+    const [createdUser] = await this.db.db
+      .insert(users)
+      .values({
+        username: normalizedUsername,
+        displayName,
+        role: 'USER',
+        passwordHash,
+        passwordChangedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    await this.setSessionCookie(response, createdUser);
+
+    return { user: this.toAuthenticatedUser(createdUser) };
   }
 
   logout(response: Response): void {

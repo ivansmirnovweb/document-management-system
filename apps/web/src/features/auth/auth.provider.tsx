@@ -7,7 +7,12 @@ import {
   type ReactNode,
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ChangePasswordRequest, LoginRequest, User } from "@document-flow/shared";
+import type {
+  ChangePasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+  User,
+} from "@document-flow/shared";
 import { authApi } from "./auth.api";
 import { authKeys } from "./auth.keys";
 
@@ -18,6 +23,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   error: Error | null;
   login: (input: LoginRequest) => Promise<void>;
+  register: (input: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   changePassword: (input: ChangePasswordRequest) => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -35,6 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
+    onSuccess: (data) => {
+      queryClient.setQueryData(authKeys.session, { user: data.user });
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: authApi.register,
     onSuccess: (data) => {
       queryClient.setQueryData(authKeys.session, { user: data.user });
     },
@@ -69,6 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const result = await loginMutation.mutateAsync(input);
         queryClient.setQueryData(authKeys.session, { user: result.user });
       },
+      register: async (input) => {
+        const result = await registerMutation.mutateAsync(input);
+        queryClient.setQueryData(authKeys.session, { user: result.user });
+      },
       logout: async () => {
         await logoutMutation.mutateAsync();
       },
@@ -83,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginMutation,
     logoutMutation,
     queryClient,
+    registerMutation,
     sessionQuery.data?.user,
     sessionQuery.error,
     sessionQuery.isFetching,

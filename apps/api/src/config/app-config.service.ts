@@ -8,6 +8,7 @@ type AppConfigValues = {
   webOrigin: string;
   databaseUrl: string;
   jwtSecret: string;
+  selfRegistrationEnabled: boolean;
 };
 
 @Injectable()
@@ -34,6 +35,10 @@ export class AppConfigService {
     return this.values.jwtSecret;
   }
 
+  get selfRegistrationEnabled(): boolean {
+    return this.values.selfRegistrationEnabled;
+  }
+
   private parse(env: NodeJS.ProcessEnv): AppConfigValues {
     const nodeEnv = this.parseNodeEnv(env.NODE_ENV);
     const port = this.parsePort(env.PORT ?? '4000');
@@ -42,8 +47,19 @@ export class AppConfigService {
       env.DATABASE_URL ??
       'postgres://postgres:postgres@localhost:5432/document_flow';
     const jwtSecret = env.JWT_SECRET ?? 'change-me-in-production';
+    const selfRegistrationEnabled = this.parseBoolean(
+      env.AUTH_SELF_REGISTRATION_ENABLED,
+      false,
+    );
 
-    return { nodeEnv, port, webOrigin, databaseUrl, jwtSecret };
+    return {
+      nodeEnv,
+      port,
+      webOrigin,
+      databaseUrl,
+      jwtSecret,
+      selfRegistrationEnabled,
+    };
   }
 
   private parseNodeEnv(value: string | undefined): NodeEnv {
@@ -62,5 +78,25 @@ export class AppConfigService {
     }
 
     return port;
+  }
+
+  private parseBoolean(value: string | undefined, fallback: boolean): boolean {
+    if (!value) {
+      return fallback;
+    }
+
+    const normalized = value.trim().toLowerCase();
+
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+      return true;
+    }
+
+    if (['0', 'false', 'no', 'off'].includes(normalized)) {
+      return false;
+    }
+
+    throw new Error(
+      `AUTH_SELF_REGISTRATION_ENABLED must be boolean-like, got: ${value}`,
+    );
   }
 }

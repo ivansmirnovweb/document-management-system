@@ -5,6 +5,7 @@ import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import type { AuthenticatedUser } from './auth.types';
 
 @Controller('auth')
@@ -15,6 +16,15 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto, @Res({ passthrough: true }) response: Response) {
     return this.authService.login(dto, response);
+  }
+
+  @Public()
+  @Post('register')
+  register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.authService.register(dto, response);
   }
 
   @Post('logout')
