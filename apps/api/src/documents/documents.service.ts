@@ -17,6 +17,7 @@ import {
 import { alias } from 'drizzle-orm/pg-core';
 import {
   DocumentDeadlineState,
+  DocumentKind,
   DocumentStatus,
   type DocumentDetails,
   type DocumentListItem,
@@ -154,6 +155,7 @@ export class DocumentsService {
         registrationNumber: documents.registrationNumber,
         registrationDate: documents.registrationDate,
         title: documents.title,
+        kind: documents.kind,
         status: documents.status,
         ownerId: documents.ownerId,
         executorId: documents.executorId,
@@ -206,6 +208,12 @@ export class DocumentsService {
   ): Promise<DocumentDetails> {
     this.permissions.assertCanCreateDocument(actor, dto.ownerId);
 
+    this.validateKindFields({
+      kind: dto.kind,
+      incomingNumber: dto.incomingNumber ?? null,
+      outgoingNumber: dto.outgoingNumber ?? null,
+    });
+
     const now = new Date();
     const [created] = await this.db.db
       .insert(documents)
@@ -213,6 +221,7 @@ export class DocumentsService {
         registrationNumber: dto.registrationNumber,
         registrationDate: new Date(dto.registrationDate),
         title: dto.title,
+        kind: dto.kind,
         description: dto.description ?? null,
         incomingNumber: dto.incomingNumber ?? null,
         outgoingNumber: dto.outgoingNumber ?? null,
@@ -272,6 +281,18 @@ export class DocumentsService {
       );
     }
 
+    this.validateKindFields({
+      kind: dto.kind ?? document.kind,
+      incomingNumber:
+        dto.incomingNumber !== undefined
+          ? dto.incomingNumber
+          : document.incomingNumber,
+      outgoingNumber:
+        dto.outgoingNumber !== undefined
+          ? dto.outgoingNumber
+          : document.outgoingNumber,
+    });
+
     const now = new Date();
     const values: Record<string, unknown> = {
       updatedAt: now,
@@ -285,6 +306,9 @@ export class DocumentsService {
     }
     if (dto.title !== undefined) {
       values.title = dto.title;
+    }
+    if (dto.kind !== undefined) {
+      values.kind = dto.kind;
     }
     if (dto.description !== undefined) {
       values.description = dto.description;
@@ -471,6 +495,9 @@ export class DocumentsService {
     ownerId: number;
     executorId: number;
     status: DocumentStatus;
+    kind: DocumentKind;
+    incomingNumber: string | null;
+    outgoingNumber: string | null;
     deletedAt: Date | null;
   } | null> {
     const whereClause = includeDeleted
@@ -482,6 +509,9 @@ export class DocumentsService {
         ownerId: documents.ownerId,
         executorId: documents.executorId,
         status: documents.status,
+        kind: documents.kind,
+        incomingNumber: documents.incomingNumber,
+        outgoingNumber: documents.outgoingNumber,
         deletedAt: documents.deletedAt,
       })
       .from(documents)
@@ -495,6 +525,9 @@ export class DocumentsService {
     return {
       ...document,
       status: document.status as DocumentStatus,
+      kind: document.kind as DocumentKind,
+      incomingNumber: document.incomingNumber,
+      outgoingNumber: document.outgoingNumber,
     };
   }
 
@@ -512,6 +545,7 @@ export class DocumentsService {
         registrationNumber: documents.registrationNumber,
         registrationDate: documents.registrationDate,
         title: documents.title,
+        kind: documents.kind,
         description: documents.description,
         incomingNumber: documents.incomingNumber,
         outgoingNumber: documents.outgoingNumber,
@@ -578,6 +612,7 @@ export class DocumentsService {
       registrationNumber: row.registrationNumber,
       registrationDate: row.registrationDate.toISOString(),
       title: row.title,
+      kind: row.kind as DocumentKind,
       description: row.description,
       incomingNumber: row.incomingNumber,
       outgoingNumber: row.outgoingNumber,
@@ -623,6 +658,7 @@ export class DocumentsService {
     registrationNumber: string;
     registrationDate: Date;
     title: string;
+    kind: 'INCOMING' | 'OUTGOING' | 'INTERNAL';
     status: 'NOT_DONE' | 'DONE';
     ownerId: number;
     executorId: number;
@@ -639,6 +675,7 @@ export class DocumentsService {
       registrationNumber: row.registrationNumber,
       registrationDate: row.registrationDate.toISOString(),
       title: row.title,
+      kind: row.kind as DocumentKind,
       status: row.status as DocumentStatus,
       ownerId: row.ownerId,
       executorId: row.executorId,
@@ -655,6 +692,49 @@ export class DocumentsService {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     };
+  }
+
+  private validateKindFields(input: {
+    kind: DocumentKind;
+    incomingNumber: string | null;
+    outgoingNumber: string | null;
+  }): void {
+    const incoming = input.incomingNumber?.trim() ?? null;
+    const outgoing = input.outgoingNumber?.trim() ?? null;
+
+    if (input.kind === DocumentKind.INCOMING) {
+      if (!incoming) {
+        throw new BadRequestException(
+          'Incoming document requires incomingNumber',
+        );
+      }
+      if (outgoing) {
+        throw new BadRequestException(
+          'Incoming document must not have outgoingNumber',
+        );
+      }
+      return;
+    }
+
+    if (input.kind === DocumentKind.OUTGOING) {
+      if (!outgoing) {
+        throw new BadRequestException(
+          'Outgoing document requires outgoingNumber',
+        );
+      }
+      if (incoming) {
+        throw new BadRequestException(
+          'Outgoing document must not have incomingNumber',
+        );
+      }
+      return;
+    }
+
+    if (incoming || outgoing) {
+      throw new BadRequestException(
+        'Internal document must not have incoming/outgoing numbers',
+      );
+    }
   }
 
   private calculateDeadlineState(

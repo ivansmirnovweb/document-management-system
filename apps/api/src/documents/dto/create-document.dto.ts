@@ -1,12 +1,14 @@
 import {
   IsBoolean,
   IsDateString,
+  IsEnum,
   IsInt,
   IsOptional,
   IsString,
   Min,
   MinLength,
 } from 'class-validator';
+import { DocumentKind } from '@document-flow/shared';
 
 export class CreateDocumentDto {
   @IsString()
@@ -19,6 +21,9 @@ export class CreateDocumentDto {
   @IsString()
   @MinLength(1)
   title!: string;
+
+  @IsEnum(DocumentKind)
+  kind!: DocumentKind;
 
   @IsOptional()
   @IsString()

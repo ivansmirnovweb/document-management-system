@@ -4,7 +4,7 @@ import type { DocumentDetails, UserRole } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
-import { canCompleteDocument, canDeleteDocument, canEditDocument, canReopenDocument, deadlineLabel, deadlineTone, formatDate, formatDateTime, statusLabel } from "../document-utils";
+import { canCompleteDocument, canDeleteDocument, canEditDocument, canReopenDocument, deadlineLabel, deadlineTone, formatDate, formatDateTime, kindLabel, statusLabel } from "../document-utils";
 
 type DocumentDetailsPanelProps = {
   document: DocumentDetails | null;
@@ -49,6 +49,7 @@ export function DocumentDetailsPanel({
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone={document.isControl ? "warning" : "neutral"}>{document.isControl ? "Контроль" : "Обычный"}</Badge>
+            <Badge tone="info">{kindLabel(document.kind)}</Badge>
             <Badge tone={document.status === "DONE" ? "success" : "info"}>{statusLabel(document.status)}</Badge>
             <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
           </div>
@@ -62,6 +63,7 @@ export function DocumentDetailsPanel({
         <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username})`} />
         <Detail label="Исполнитель" value={`${document.executor.displayName} (@${document.executor.username})`} />
         <Detail label="Работодатель" value={document.employer ? document.employer.fullName : "—"} />
+        <Detail label="Вид" value={kindLabel(document.kind)} />
         <Detail label="Рег. номер" value={document.registrationNumber} />
         <Detail label="Входящий номер" value={document.incomingNumber ?? "—"} />
         <Detail label="Исходящий номер" value={document.outgoingNumber ?? "—"} />
