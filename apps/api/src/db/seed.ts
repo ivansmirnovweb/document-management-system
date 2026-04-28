@@ -130,6 +130,8 @@ async function seed(): Promise<void> {
           deletedAt: null,
           createdAt: now,
           updatedAt: now,
+          lastChangedAt: now,
+          lastChangedById: rootUser.id,
         },
         {
           registrationNumber: 'REG-2026-0002',
@@ -154,6 +156,8 @@ async function seed(): Promise<void> {
           deletedAt: null,
           createdAt: now,
           updatedAt: now,
+          lastChangedAt: now,
+          lastChangedById: rootUser.id,
         },
         {
           registrationNumber: 'REG-2026-0003',
@@ -176,6 +180,8 @@ async function seed(): Promise<void> {
           deletedAt: null,
           createdAt: now,
           updatedAt: now,
+          lastChangedAt: now,
+          lastChangedById: rootUser.id,
         },
         {
           registrationNumber: 'REG-2026-0004',
@@ -198,6 +204,8 @@ async function seed(): Promise<void> {
           deletedAt: null,
           createdAt: now,
           updatedAt: now,
+          lastChangedAt: now,
+          lastChangedById: rootUser.id,
         },
         {
           registrationNumber: 'REG-2026-0005',
@@ -221,6 +229,8 @@ async function seed(): Promise<void> {
           deletedAt: new Date('2026-03-01T08:30:00.000Z'),
           createdAt: now,
           updatedAt: now,
+          lastChangedAt: now,
+          lastChangedById: rootUser.id,
         },
       ])
       .returning();

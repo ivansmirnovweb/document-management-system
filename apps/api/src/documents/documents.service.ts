@@ -42,6 +42,7 @@ import {
 
 const ownerUsers = alias(users, 'document_owner_users');
 const executorUsers = alias(users, 'document_executor_users');
+const lastChangedByUsers = alias(users, 'document_last_changed_by_users');
 const DUE_SOON_MS = 3 * 24 * 60 * 60 * 1000;
 
 @Injectable()
@@ -187,10 +188,15 @@ export class DocumentsService {
         deletedAt: documents.deletedAt,
         createdAt: documents.createdAt,
         updatedAt: documents.updatedAt,
+        lastChangedAt: documents.lastChangedAt,
       })
       .from(documents)
       .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .innerJoin(
+        lastChangedByUsers,
+        eq(documents.lastChangedById, lastChangedByUsers.id),
+      )
       .where(and(...conditions))
       .orderBy(
         desc(documents.isControl),
@@ -265,6 +271,8 @@ export class DocumentsService {
         isControl: dto.isControl ?? false,
         createdAt: now,
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .returning();
 
@@ -454,7 +462,12 @@ export class DocumentsService {
 
     await this.db.db
       .update(documents)
-      .set({ isControl: true, updatedAt: now })
+      .set({
+        isControl: true,
+        updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
+      })
       .where(eq(documents.id, id));
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
@@ -563,6 +576,8 @@ export class DocumentsService {
       .set({
         ownerId: dto.ownerId,
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .where(eq(documents.id, id))
       .returning({ id: documents.id });
@@ -604,6 +619,8 @@ export class DocumentsService {
         status,
         completedAt: status === DocumentStatus.DONE ? now : null,
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .where(eq(documents.id, id))
       .returning({ id: documents.id });
@@ -640,6 +657,8 @@ export class DocumentsService {
       .set({
         status: 'WRITTEN_OFF',
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .where(eq(documents.id, id))
       .returning({ id: documents.id });
@@ -681,6 +700,8 @@ export class DocumentsService {
         ownerId: rootUser.id,
         deletedAt: now,
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
       .returning({ id: documents.id });
@@ -704,6 +725,8 @@ export class DocumentsService {
       .set({
         deletedAt: null,
         updatedAt: now,
+        lastChangedAt: now,
+        lastChangedById: actor!.id,
       })
       .where(and(eq(documents.id, id), isNotNull(documents.deletedAt)))
       .returning({ id: documents.id });
@@ -815,6 +838,7 @@ export class DocumentsService {
         deletedAt: documents.deletedAt,
         createdAt: documents.createdAt,
         updatedAt: documents.updatedAt,
+        lastChangedAt: documents.lastChangedAt,
         employerIdFromJoin: employers.id,
         employerFullName: employers.fullName,
         employerShortName: employers.shortName,
@@ -837,11 +861,22 @@ export class DocumentsService {
         executorPasswordChangedAt: executorUsers.passwordChangedAt,
         executorCreatedAt: executorUsers.createdAt,
         executorUpdatedAt: executorUsers.updatedAt,
+        lastChangedById: lastChangedByUsers.id,
+        lastChangedByUsername: lastChangedByUsers.username,
+        lastChangedByDisplayName: lastChangedByUsers.displayName,
+        lastChangedByRole: lastChangedByUsers.role,
+        lastChangedByPasswordChangedAt: lastChangedByUsers.passwordChangedAt,
+        lastChangedByCreatedAt: lastChangedByUsers.createdAt,
+        lastChangedByUpdatedAt: lastChangedByUsers.updatedAt,
       })
       .from(documents)
       .leftJoin(employers, eq(documents.employerId, employers.id))
       .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .innerJoin(
+        lastChangedByUsers,
+        eq(documents.lastChangedById, lastChangedByUsers.id),
+      )
       .where(whereClause)
       .limit(1);
 
@@ -939,6 +974,7 @@ export class DocumentsService {
       deletedAt: row.deletedAt?.toISOString() ?? null,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
+      lastChangedAt: row.lastChangedAt.toISOString(),
       employer,
       owner: {
         id: row.ownerIdFromJoin,
@@ -950,6 +986,16 @@ export class DocumentsService {
         updatedAt: row.ownerUpdatedAt.toISOString(),
       },
       resolutions,
+      lastChangedBy: {
+        id: row.lastChangedById,
+        username: row.lastChangedByUsername,
+        displayName: row.lastChangedByDisplayName,
+        role: row.lastChangedByRole as UserRole,
+        passwordChangedAt:
+          row.lastChangedByPasswordChangedAt?.toISOString() ?? null,
+        createdAt: row.lastChangedByCreatedAt.toISOString(),
+        updatedAt: row.lastChangedByUpdatedAt.toISOString(),
+      },
       executor: {
         id: row.executorIdFromJoin,
         username: row.executorUsername,
@@ -983,6 +1029,7 @@ export class DocumentsService {
     deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
+    lastChangedAt: Date;
   }): DocumentListItem {
     return {
       id: row.id,
@@ -1010,6 +1057,7 @@ export class DocumentsService {
       deletedAt: row.deletedAt?.toISOString() ?? null,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
+      lastChangedAt: row.lastChangedAt.toISOString(),
     };
   }
 

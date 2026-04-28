@@ -28,6 +28,7 @@ export type DocumentListItem = {
   deletedAt?: IsoDateString | null;
   createdAt: IsoDateString;
   updatedAt: IsoDateString;
+  lastChangedAt: IsoDateString;
 };
 
 export type DocumentDetails = DocumentListItem & {
@@ -38,6 +39,7 @@ export type DocumentDetails = DocumentListItem & {
   owner: User;
   executor: User;
   resolutions: Resolution[];
+  lastChangedBy: User;
 };
 
 export type CreateDocumentInput = {
