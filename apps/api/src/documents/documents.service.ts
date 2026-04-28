@@ -664,10 +664,21 @@ export class DocumentsService {
 
     this.permissions.assertCanSoftDelete(actor, document);
 
+    const [rootUser] = await this.db.db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.role, UserRole.ROOT))
+      .limit(1);
+
+    if (!rootUser) {
+      throw new BadRequestException('Root user not found');
+    }
+
     const now = new Date();
     const [updated] = await this.db.db
       .update(documents)
       .set({
+        ownerId: rootUser.id,
         deletedAt: now,
         updatedAt: now,
       })
