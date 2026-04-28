@@ -26,6 +26,14 @@ export class UpdateDocumentDto {
   title?: string;
 
   @IsOptional()
+  @IsString()
+  about1?: string;
+
+  @IsOptional()
+  @IsString()
+  about2?: string | null;
+
+  @IsOptional()
   @IsEnum(DocumentKind)
   kind?: DocumentKind;
 
@@ -42,9 +50,22 @@ export class UpdateDocumentDto {
   outgoingNumber?: string | null;
 
   @IsOptional()
+  @IsDateString()
+  outgoingDate?: string | null;
+
+  @IsOptional()
   @IsInt()
   @Min(1)
   employerId?: number | null;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  outSenderEmployerId?: number | null;
+
+  @IsOptional()
+  @IsString()
+  broadcast?: string;
 
   @IsOptional()
   @IsInt()

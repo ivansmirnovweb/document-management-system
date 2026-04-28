@@ -171,11 +171,16 @@ export class DocumentsService {
         registrationNumber: documents.registrationNumber,
         registrationDate: documents.registrationDate,
         title: documents.title,
+        about1: documents.about1,
+        about2: documents.about2,
         kind: documents.kind,
         status: documents.status,
         ownerId: documents.ownerId,
         executorId: documents.executorId,
         employerId: documents.employerId,
+        outSenderEmployerId: documents.outSenderEmployerId,
+        outgoingDate: documents.outgoingDate,
+        broadcast: documents.broadcast,
         dueDate: documents.dueDate,
         completedAt: documents.completedAt,
         isControl: documents.isControl,
@@ -237,11 +242,16 @@ export class DocumentsService {
         registrationNumber: dto.registrationNumber,
         registrationDate: new Date(dto.registrationDate),
         title: dto.title,
+        about1: dto.about1 ?? dto.title,
+        about2: dto.about2 ?? dto.about1 ?? dto.title,
         kind: dto.kind,
         description: dto.description ?? null,
         incomingNumber: dto.incomingNumber ?? null,
         outgoingNumber: dto.outgoingNumber ?? null,
+        outgoingDate: dto.outgoingDate ? new Date(dto.outgoingDate) : null,
         employerId: dto.employerId ?? null,
+        outSenderEmployerId: dto.outSenderEmployerId ?? dto.employerId ?? null,
+        broadcast: dto.broadcast ?? '',
         ownerId: actor?.role === UserRole.ROOT ? dto.ownerId : actor!.id,
         executorId: dto.executorId,
         dueDate: new Date(dto.dueDate),
@@ -323,6 +333,12 @@ export class DocumentsService {
     if (dto.title !== undefined) {
       values.title = dto.title;
     }
+    if (dto.about1 !== undefined) {
+      values.about1 = dto.about1;
+    }
+    if (dto.about2 !== undefined) {
+      values.about2 = dto.about2;
+    }
     if (dto.kind !== undefined) {
       values.kind = dto.kind;
     }
@@ -335,8 +351,19 @@ export class DocumentsService {
     if (dto.outgoingNumber !== undefined) {
       values.outgoingNumber = dto.outgoingNumber;
     }
+    if (dto.outgoingDate !== undefined) {
+      values.outgoingDate = dto.outgoingDate
+        ? new Date(dto.outgoingDate)
+        : null;
+    }
     if (dto.employerId !== undefined) {
       values.employerId = dto.employerId;
+    }
+    if (dto.outSenderEmployerId !== undefined) {
+      values.outSenderEmployerId = dto.outSenderEmployerId;
+    }
+    if (dto.broadcast !== undefined) {
+      values.broadcast = dto.broadcast;
     }
     if (dto.ownerId !== undefined) {
       values.ownerId = dto.ownerId;
@@ -734,11 +761,16 @@ export class DocumentsService {
         registrationNumber: documents.registrationNumber,
         registrationDate: documents.registrationDate,
         title: documents.title,
+        about1: documents.about1,
+        about2: documents.about2,
         kind: documents.kind,
         description: documents.description,
         incomingNumber: documents.incomingNumber,
         outgoingNumber: documents.outgoingNumber,
+        outgoingDate: documents.outgoingDate,
         employerId: documents.employerId,
+        outSenderEmployerId: documents.outSenderEmployerId,
+        broadcast: documents.broadcast,
         ownerId: documents.ownerId,
         executorId: documents.executorId,
         status: documents.status,
@@ -848,11 +880,16 @@ export class DocumentsService {
       registrationNumber: row.registrationNumber,
       registrationDate: row.registrationDate.toISOString(),
       title: row.title,
+      about1: row.about1,
+      about2: row.about2,
       kind: row.kind as DocumentKind,
       description: row.description,
       incomingNumber: row.incomingNumber,
       outgoingNumber: row.outgoingNumber,
+      outgoingDate: row.outgoingDate?.toISOString() ?? null,
       employerId: row.employerId,
+      outSenderEmployerId: row.outSenderEmployerId,
+      broadcast: row.broadcast,
       ownerId: row.ownerId,
       executorId: row.executorId,
       status: row.status as DocumentStatus,
@@ -895,11 +932,16 @@ export class DocumentsService {
     registrationNumber: string;
     registrationDate: Date;
     title: string;
+    about1: string;
+    about2: string | null;
     kind: 'INCOMING' | 'OUTGOING' | 'INTERNAL';
     status: 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
     ownerId: number;
     executorId: number;
     employerId: number | null;
+    outSenderEmployerId: number | null;
+    outgoingDate: Date | null;
+    broadcast: string;
     dueDate: Date;
     completedAt: Date | null;
     isControl: boolean;
@@ -912,11 +954,16 @@ export class DocumentsService {
       registrationNumber: row.registrationNumber,
       registrationDate: row.registrationDate.toISOString(),
       title: row.title,
+      about1: row.about1,
+      about2: row.about2,
       kind: row.kind as DocumentKind,
       status: row.status as DocumentStatus,
       ownerId: row.ownerId,
       executorId: row.executorId,
       employerId: row.employerId,
+      outSenderEmployerId: row.outSenderEmployerId,
+      outgoingDate: row.outgoingDate?.toISOString() ?? null,
+      broadcast: row.broadcast,
       dueDate: row.dueDate.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
       isControl: row.isControl,
