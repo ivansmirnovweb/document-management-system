@@ -1,5 +1,11 @@
 import type { User } from "./user";
 
+export type AuthUser = User & {
+  passwordRotationRequired: boolean;
+};
+
+export type AuthenticatedUser = AuthUser;
+
 export type LoginRequest = {
   username: string;
   password: string;
@@ -18,13 +24,13 @@ export type ChangePasswordRequest = {
 };
 
 export type LoginResponse = {
-  user: User;
+  user: AuthUser;
 };
 
 export type RegisterResponse = {
-  user: User;
+  user: AuthUser;
 };
 
 export type ChangePasswordResponse = {
-  user: User;
+  user: AuthUser;
 };

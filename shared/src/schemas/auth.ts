@@ -1,6 +1,10 @@
 import { z } from "zod";
-import { userSchema } from "./user";
 import { requiredText } from "./common";
+import { userSchema } from "./user";
+
+export const authUserSchema = userSchema.extend({
+  passwordRotationRequired: z.boolean(),
+});
 
 const usernameSchema = z
   .string()
@@ -36,18 +40,18 @@ export const changePasswordRequestSchema = z
 
 export const loginResponseSchema = z
   .object({
-    user: userSchema,
+    user: authUserSchema,
   })
   .strict();
 
 export const registerResponseSchema = z
   .object({
-    user: userSchema,
+    user: authUserSchema,
   })
   .strict();
 
 export const changePasswordResponseSchema = z
   .object({
-    user: userSchema,
+    user: authUserSchema,
   })
   .strict();

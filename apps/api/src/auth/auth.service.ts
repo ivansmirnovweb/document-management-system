@@ -215,6 +215,14 @@ export class AuthService {
     };
   }
 
+  private isPasswordRotationRequired(passwordChangedAt: Date | null): boolean {
+    if (!passwordChangedAt) {
+      return true;
+    }
+
+    return Date.now() - passwordChangedAt.getTime() >= PASSWORD_EXPIRATION_MS;
+  }
+
   private toAuthenticatedUser(user: {
     id: number;
     username: string;
@@ -232,6 +240,9 @@ export class AuthService {
       unit: user.unit,
       role: user.role as UserRole,
       passwordChangedAt: user.passwordChangedAt?.toISOString() ?? null,
+      passwordRotationRequired: this.isPasswordRotationRequired(
+        user.passwordChangedAt,
+      ),
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

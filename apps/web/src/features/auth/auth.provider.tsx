@@ -8,16 +8,16 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+  AuthenticatedUser,
   ChangePasswordRequest,
   LoginRequest,
   RegisterRequest,
-  User,
 } from "@document-flow/shared";
 import { authApi } from "./auth.api";
 import { authKeys } from "./auth.keys";
 
 type AuthContextValue = {
-  user: User | null;
+  user: AuthenticatedUser | null;
   isLoading: boolean;
   isRefreshing: boolean;
   isAuthenticated: boolean;
