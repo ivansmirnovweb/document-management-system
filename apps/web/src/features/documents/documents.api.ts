@@ -10,7 +10,7 @@ import {
   type DocumentStatus,
   type UpdateDocumentInput,
 } from "@document-flow/shared";
-import { apiNoContent, apiRequest } from "@/lib/api";
+import { apiNoContent, apiRequest, type ApiRequestOptions } from "@/lib/api";
 
 const documentListSchema = z.array(documentListItemSchema);
 
@@ -30,8 +30,8 @@ function buildQuery(params: Record<string, string | number | undefined>): string
 }
 
 export const documentsApi = {
-  listPublic(): Promise<DocumentListItem[]> {
-    return apiRequest("/documents/public", { method: "GET" }, documentListSchema);
+  listPublic(options?: ApiRequestOptions): Promise<DocumentListItem[]> {
+    return apiRequest("/documents/public", { method: "GET", ...(options ?? {}) }, documentListSchema);
   },
 
   list(status?: DocumentStatus): Promise<DocumentListItem[]> {
@@ -54,8 +54,8 @@ export const documentsApi = {
     );
   },
 
-  getPublicById(id: number): Promise<DocumentDetails> {
-    return apiRequest(`/documents/public/${id}`, { method: "GET" }, documentDetailsSchema);
+  getPublicById(id: number, options?: ApiRequestOptions): Promise<DocumentDetails> {
+    return apiRequest(`/documents/public/${id}`, { method: "GET", ...(options ?? {}) }, documentDetailsSchema);
   },
 
   getById(id: number): Promise<DocumentDetails> {

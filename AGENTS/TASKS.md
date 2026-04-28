@@ -2,14 +2,14 @@
 
 ## Todo
 
-- [ ] 078 — Audit and fix light-theme contrast issues so text remains readable across all screens (remove black-on-black states; tune primary surface color)
 - [ ] 079 — Find and fix the cause of frontend requests failing before reaching the API (verify base URL, CORS, proxy, and container/network wiring)
-- [ ] 080 — Reduce unnecessary client-side requests on the index page and move first-load data fetching to SSR/server rendering where appropriate
 - [ ] 082 — Translate the full UI into Russian; ensure all visible interface text is localized
 
 ## Done
 
 - [x] 081 — Add or expose a proper user registration flow; verify how new users are created and whether self-registration should be supported
+- [x] 080 — Reduce unnecessary client-side requests on the index page and move first-load data fetching to SSR/server rendering where appropriate
+- [x] 078 — Audit and fix light-theme contrast issues so text remains readable across all screens (remove black-on-black states; tune primary surface color)
 - [x] 052 — Phase 10 frontend documents UI
 - [x] 046 — Phase 9 frontend foundation
 - [x] 041 — Phase 8 search, filters, reports, and export
