@@ -5,6 +5,7 @@ import { DocumentKind } from "../enums/document-kind";
 import { employerSchema } from "./employer";
 import { isoDateStringSchema, requiredText } from "./common";
 import { userSchema } from "./user";
+import { resolutionSchema } from "./resolution";
 
 export const documentListItemSchema = z
   .object({
@@ -35,6 +36,7 @@ export const documentDetailsSchema = documentListItemSchema
     employer: employerSchema.nullable(),
     owner: userSchema,
     executor: userSchema,
+    resolutions: z.array(resolutionSchema),
   })
   .strict();
 

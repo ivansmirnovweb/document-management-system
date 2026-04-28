@@ -10,4 +10,5 @@ export * from './users';
 export * from './employers';
 export * from './documents';
 export * from './document-audit-logs';
+export * from './document-resolutions';
 export * from './relations';
