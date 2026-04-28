@@ -119,7 +119,7 @@ export class DocumentPermissionsService {
       throw new ForbiddenException('Authentication required');
     }
 
-    if (actor.role === UserRole.ROOT || actor.id === document.ownerId) {
+    if (actor.role !== UserRole.ROOT && actor.id === document.ownerId) {
       return;
     }
 
@@ -151,7 +151,7 @@ export class DocumentPermissionsService {
       throw new ForbiddenException('Authentication required');
     }
 
-    if (actor.role === UserRole.ROOT || actor.id === document.ownerId) {
+    if (actor.id === document.ownerId) {
       return;
     }
 

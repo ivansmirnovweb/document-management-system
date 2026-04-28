@@ -83,7 +83,7 @@ export function canDeleteDocument(
     return false;
   }
 
-  return user.role === UserRole.ROOT || doc.ownerId === user.id;
+  return doc.ownerId === user.id;
 }
 
 export function canCompleteDocument(
