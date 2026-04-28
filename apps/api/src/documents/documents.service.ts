@@ -132,9 +132,14 @@ export class DocumentsService {
       ? [
           ilike(documents.registrationNumber, `%${searchText}%`),
           ilike(documents.title, `%${searchText}%`),
+          ilike(documents.about1, `%${searchText}%`),
+          ilike(documents.about2, `%${searchText}%`),
+          ilike(documents.description, `%${searchText}%`),
+          ilike(documents.broadcast, `%${searchText}%`),
           ilike(documents.incomingNumber, `%${searchText}%`),
           ilike(documents.outgoingNumber, `%${searchText}%`),
           ilike(sql`${documents.registrationDate}::text`, `%${searchText}%`),
+          ilike(sql`${documents.outgoingDate}::text`, `%${searchText}%`),
           ilike(sql`${documents.dueDate}::text`, `%${searchText}%`),
           ilike(ownerUsers.username, `%${searchText}%`),
           ilike(executorUsers.username, `%${searchText}%`),
@@ -151,10 +156,7 @@ export class DocumentsService {
           ? eq(documents.status, query.status)
           : undefined;
 
-    const conditions = [
-      actor?.role !== UserRole.ROOT ? isNull(documents.deletedAt) : undefined,
-      statusCondition,
-    ].filter(
+    const conditions = [statusCondition].filter(
       (condition): condition is NonNullable<typeof condition> =>
         condition !== undefined,
     );
