@@ -335,6 +335,19 @@ export class DocumentsService {
       values.dueDate = new Date(dto.dueDate);
     }
     if (dto.isControl !== undefined) {
+      if (dto.isControl === false) {
+        const [{ count }] = await this.db.db
+          .select({ count: sql<number>`count(*)` })
+          .from(documentResolutions)
+          .where(eq(documentResolutions.documentId, id));
+
+        if (Number(count) > 0) {
+          throw new BadRequestException(
+            'Control flag is assigned from resolutions and cannot be unset while resolutions exist',
+          );
+        }
+      }
+
       values.isControl = dto.isControl;
     }
 
@@ -380,6 +393,11 @@ export class DocumentsService {
       createdAt: now,
       updatedAt: now,
     });
+
+    await this.db.db
+      .update(documents)
+      .set({ isControl: true, updatedAt: now })
+      .where(eq(documents.id, id));
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
     if (!updatedDocument) {
@@ -450,6 +468,16 @@ export class DocumentsService {
           eq(documentResolutions.documentId, id),
         ),
       );
+
+    const [{ count }] = await this.db.db
+      .select({ count: sql<number>`count(*)` })
+      .from(documentResolutions)
+      .where(eq(documentResolutions.documentId, id));
+
+    await this.db.db
+      .update(documents)
+      .set({ isControl: Number(count) > 0, updatedAt: new Date() })
+      .where(eq(documents.id, id));
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
     if (!updatedDocument) {
