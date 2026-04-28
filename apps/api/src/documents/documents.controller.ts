@@ -34,12 +34,6 @@ export class DocumentsController {
     return this.documentsService.listPublic();
   }
 
-  @Public()
-  @Get('public/:id')
-  getPublicById(@Param('id', ParseIntPipe) id: number) {
-    return this.documentsService.getPublicById(id);
-  }
-
   @Get()
   list(@Query() query: ListDocumentsQueryDto) {
     return this.documentsService.list(query);
