@@ -2,11 +2,11 @@
 
 ## Todo
 
-- [ ] 079 — Find and fix the cause of frontend requests failing before reaching the API (verify base URL, CORS, proxy, and container/network wiring)
 - [ ] 082 — Translate the full UI into Russian; ensure all visible interface text is localized
 
 ## Done
 
+- [x] 079 — Find and fix the cause of frontend requests failing before reaching the API (verify base URL, CORS, proxy, and container/network wiring)
 - [x] 081 — Add or expose a proper user registration flow; verify how new users are created and whether self-registration should be supported
 - [x] 080 — Reduce unnecessary client-side requests on the index page and move first-load data fetching to SSR/server rendering where appropriate
 - [x] 078 — Audit and fix light-theme contrast issues so text remains readable across all screens (remove black-on-black states; tune primary surface color)
@@ -38,4 +38,5 @@
 
 ## Result
 
+- 079: Fixed shared ESM runtime resolution by switching shared source relative exports/imports to explicit `.js` specifiers so `shared/dist/index.js` no longer imports extensionless paths that fail in Node ESM.
 - 081: Added public `POST /auth/register` and `/register` page flow backed by shared register schemas/types, with self-registration gated by `AUTH_SELF_REGISTRATION_ENABLED` (default `false`) and forced `USER` role for safety.
