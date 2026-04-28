@@ -236,11 +236,16 @@ export class DocumentsService {
     });
 
     const now = new Date();
+    const registrationDate = new Date(dto.registrationDate);
+    const dueDate = dto.dueDate
+      ? new Date(dto.dueDate)
+      : new Date(registrationDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
     const [created] = await this.db.db
       .insert(documents)
       .values({
         registrationNumber: dto.registrationNumber,
-        registrationDate: new Date(dto.registrationDate),
+        registrationDate,
         title: dto.title,
         about1: dto.about1 ?? dto.title,
         about2: dto.about2 ?? dto.about1 ?? dto.title,
@@ -254,7 +259,7 @@ export class DocumentsService {
         broadcast: dto.broadcast ?? '',
         ownerId: actor?.role === UserRole.ROOT ? dto.ownerId : actor!.id,
         executorId: dto.executorId,
-        dueDate: new Date(dto.dueDate),
+        dueDate,
         status: DocumentStatus.NOT_DONE,
         completedAt: null,
         isControl: dto.isControl ?? false,
@@ -305,6 +310,19 @@ export class DocumentsService {
       throw new BadRequestException(
         'Use status endpoint to change document status',
       );
+    }
+
+    if (dto.dueDate !== undefined) {
+      const nextDueDate = new Date(dto.dueDate);
+      const registrationDateWillChange = dto.registrationDate !== undefined;
+      const extendsDeadline =
+        nextDueDate.getTime() > document.dueDate.getTime();
+
+      if (extendsDeadline && !registrationDateWillChange) {
+        throw new BadRequestException(
+          'Due date extension requires changing registration date per TZ rule',
+        );
+      }
     }
 
     this.validateKindFields({
@@ -714,6 +732,8 @@ export class DocumentsService {
     kind: DocumentKind;
     incomingNumber: string | null;
     outgoingNumber: string | null;
+    registrationDate: Date;
+    dueDate: Date;
     deletedAt: Date | null;
   } | null> {
     const whereClause = includeDeleted
@@ -728,6 +748,8 @@ export class DocumentsService {
         kind: documents.kind,
         incomingNumber: documents.incomingNumber,
         outgoingNumber: documents.outgoingNumber,
+        registrationDate: documents.registrationDate,
+        dueDate: documents.dueDate,
         deletedAt: documents.deletedAt,
       })
       .from(documents)
@@ -744,6 +766,8 @@ export class DocumentsService {
       kind: document.kind as DocumentKind,
       incomingNumber: document.incomingNumber,
       outgoingNumber: document.outgoingNumber,
+      registrationDate: document.registrationDate,
+      dueDate: document.dueDate,
     };
   }
 

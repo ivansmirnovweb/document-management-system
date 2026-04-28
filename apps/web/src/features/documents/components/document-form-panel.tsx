@@ -61,7 +61,7 @@ function toFormDefaults(document: DocumentDetails | null, currentUser: { id: num
       employerId: undefined,
       ownerId: currentUser.id,
       executorId: currentUser.id,
-      dueDate: new Date().toISOString().slice(0, 10),
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
       isControl: false,
     };
   }

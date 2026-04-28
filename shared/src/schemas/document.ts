@@ -62,7 +62,7 @@ export const createDocumentInputSchema = z
     broadcast: z.string().optional(),
     ownerId: z.coerce.number().int().positive("Owner ID must be a positive number"),
     executorId: z.coerce.number().int().positive("Executor ID must be a positive number"),
-    dueDate: isoDateStringSchema,
+    dueDate: isoDateStringSchema.optional(),
     isControl: z.boolean().optional(),
   })
   .strict();
