@@ -14,8 +14,8 @@ export function AuthStatusPanel() {
   if (auth.isLoading) {
     return (
       <StateCard
-        title="Checking session"
-        description="Loading the current authentication state."
+        title="Проверяем сессию"
+        description="Загружаем текущее состояние авторизации."
         icon="⏳"
       />
     );
@@ -24,9 +24,9 @@ export function AuthStatusPanel() {
   if (auth.error) {
     return (
       <StateCard
-        title="Session unavailable"
+        title="Сессия недоступна"
         description={auth.error.message}
-        actionLabel="Retry"
+        actionLabel="Повторить"
         onAction={auth.refreshSession}
         icon="⚠️"
       />
@@ -36,9 +36,9 @@ export function AuthStatusPanel() {
   if (!auth.user) {
     return (
       <StateCard
-        title="You are signed out"
-        description="Log in to access protected document workflows."
-        actionLabel="Go to login"
+        title="Вы вышли из аккаунта"
+        description="Войдите, чтобы работать с защищёнными документами."
+        actionLabel="Перейти ко входу"
         actionHref="/login"
         icon="🔐"
       />
@@ -62,10 +62,10 @@ export function AuthStatusPanel() {
             "bg-blue-600 text-white hover:bg-blue-500",
           )}
         >
-          Open dashboard
+          Открыть рабочую область
         </Link>
         <Button variant="secondary" onClick={() => void auth.logout()}>
-          Sign out
+          Выйти
         </Button>
       </div>
     </Card>

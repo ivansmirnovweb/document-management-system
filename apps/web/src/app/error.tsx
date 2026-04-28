@@ -18,9 +18,9 @@ export default function Error({
   return (
     <div className="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4">
       <Card className="space-y-4 max-w-lg">
-        <CardTitle>Something went wrong</CardTitle>
+        <CardTitle>Что-то пошло не так</CardTitle>
         <CardDescription>{error.message}</CardDescription>
-        <Button onClick={reset}>Try again</Button>
+        <Button onClick={reset}>Повторить</Button>
       </Card>
     </div>
   );

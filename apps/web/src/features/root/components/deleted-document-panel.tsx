@@ -12,7 +12,7 @@ import { Input } from "@/shared/ui/input";
 import { deadlineLabel, deadlineTone, formatDate, formatDateTime, statusLabel } from "@/features/documents/document-utils";
 
 const reassignSchema = z.object({
-  ownerId: z.string().trim().regex(/^\d+$/, "Owner ID must be a positive number"),
+  ownerId: z.string().trim().regex(/^\d+$/, "ID владельца должен быть положительным числом"),
 });
 
 type DeletedDocumentPanelProps = {
@@ -46,8 +46,8 @@ export function DeletedDocumentPanel({
   if (!document) {
     return (
       <Card className="space-y-4" id="details">
-        <CardTitle>Deleted record</CardTitle>
-        <CardDescription>Select a deleted document to manage it.</CardDescription>
+        <CardTitle>Удалённая запись</CardTitle>
+        <CardDescription>Выберите удалённый документ для управления.</CardDescription>
       </Card>
     );
   }
@@ -61,56 +61,56 @@ export function DeletedDocumentPanel({
           <div className="space-y-2">
             <CardTitle className="text-2xl">{document.title}</CardTitle>
             <CardDescription>
-              #{document.registrationNumber} · deleted {formatDateTime(document.deletedAt ?? document.updatedAt)}
+              #{document.registrationNumber} · удалён {formatDateTime(document.deletedAt ?? document.updatedAt)}
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge tone="danger">Deleted</Badge>
+            <Badge tone="danger">Удалён</Badge>
             <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
             <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
           </div>
         </div>
-        <p className="text-sm text-zinc-600">{document.description || "No description provided."}</p>
+        <p className="text-sm text-zinc-600">{document.description || "Описание отсутствует."}</p>
       </div>
 
       <dl className="grid gap-4 text-sm sm:grid-cols-2">
-        <Detail label="Deleted at" value={formatDateTime(document.deletedAt ?? document.updatedAt)} />
-        <Detail label="Due date" value={formatDate(document.dueDate)} />
-        <Detail label="Owner ID" value={String(document.ownerId)} />
-        <Detail label="Executor ID" value={String(document.executorId)} />
-        <Detail label="Employer ID" value={document.employerId ? String(document.employerId) : "—"} />
-        <Detail label="Last updated" value={formatDateTime(document.updatedAt)} />
+        <Detail label="Удалён" value={formatDateTime(document.deletedAt ?? document.updatedAt)} />
+        <Detail label="Срок" value={formatDate(document.dueDate)} />
+        <Detail label="ID владельца" value={String(document.ownerId)} />
+        <Detail label="ID исполнителя" value={String(document.executorId)} />
+        <Detail label="ID работодателя" value={document.employerId ? String(document.employerId) : "—"} />
+        <Detail label="Обновлён" value={formatDateTime(document.updatedAt)} />
       </dl>
 
       <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-950">Reassign owner</h3>
-          <p className="text-sm text-zinc-600">Enter the target owner ID and save the change.</p>
+          <h3 className="text-sm font-semibold text-zinc-950">Переназначить владельца</h3>
+          <p className="text-sm text-zinc-600">Введите ID нового владельца и сохраните изменение.</p>
         </div>
         <form className="flex flex-wrap items-end gap-3" onSubmit={submit}>
           <label className="min-w-48 flex-1 space-y-2 text-sm font-medium text-zinc-800">
-            <span>New owner ID</span>
+            <span>ID нового владельца</span>
             <Input type="number" min="1" {...form.register("ownerId", { valueAsNumber: true })} />
             {form.formState.errors.ownerId ? (
               <span className="text-xs text-red-600">{form.formState.errors.ownerId.message}</span>
             ) : null}
           </label>
           <Button type="submit" disabled={isReassigning}>
-            {isReassigning ? "Saving..." : "Reassign"}
+            {isReassigning ? "Сохраняем..." : "Переназначить"}
           </Button>
         </form>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={onRestore} disabled={isRestoring}>
-          {isRestoring ? "Restoring..." : "Restore"}
+          {isRestoring ? "Восстанавливаем..." : "Восстановить"}
         </Button>
         <Button
           variant="danger"
           onClick={onHardDelete}
           disabled={isHardDeleting}
         >
-          {isHardDeleting ? "Deleting..." : "Hard delete"}
+          {isHardDeleting ? "Удаляем..." : "Удалить навсегда"}
         </Button>
       </div>
     </Card>

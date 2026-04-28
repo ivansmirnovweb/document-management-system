@@ -79,11 +79,11 @@ export function ReportsPage() {
   const submit = form.handleSubmit((values) => setAppliedFilter(values));
 
   if (!auth.user) {
-    return <StateCard title="Sign in required" description="Open reports after logging in." actionLabel="Go to login" actionHref="/login" icon="🔐" />;
+    return <StateCard title="Требуется вход" description="Откройте отчёты после авторизации." actionLabel="Перейти ко входу" actionHref="/login" icon="🔐" />;
   }
 
   if (auth.user.role !== "ROOT") {
-    return <StateCard title="Root access required" description="Reports are visible only to the root user." icon="🛡️" />;
+    return <StateCard title="Требуется доступ ROOT" description="Отчёты доступны только пользователю root." icon="🛡️" />;
   }
 
   return (
@@ -91,10 +91,10 @@ export function ReportsPage() {
       <Card className="space-y-4 border-indigo-100 bg-indigo-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-indigo-700/80">Reports</p>
-            <CardTitle className="text-3xl text-zinc-950">Executor statistics and export</CardTitle>
+            <p className="text-sm uppercase tracking-[0.2em] text-indigo-700/80">Отчёты</p>
+            <CardTitle className="text-3xl text-zinc-950">Статистика исполнителей и экспорт</CardTitle>
             <CardDescription className="max-w-3xl text-zinc-700">
-              Select a date range, refresh the report, and download the CSV export when needed.
+              Выберите диапазон дат, обновите отчёт и при необходимости скачайте CSV.
             </CardDescription>
           </div>
           <Badge tone={auth.user?.role === "ROOT" ? "warning" : "info"}>{auth.user?.role ?? "USER"}</Badge>
@@ -103,13 +103,13 @@ export function ReportsPage() {
 
       <Card className="space-y-4">
         <div>
-          <CardTitle>Report range</CardTitle>
-          <CardDescription>Use an inclusive date range for statistics and export.</CardDescription>
+          <CardTitle>Период отчёта</CardTitle>
+          <CardDescription>Используйте включительный диапазон дат для статистики и экспорта.</CardDescription>
         </div>
 
         <form className="grid gap-4 md:grid-cols-[1fr_1fr_auto_auto] md:items-end" onSubmit={submit}>
           <label className="space-y-2 text-sm font-medium text-zinc-800">
-            <span>From</span>
+            <span>С</span>
             <Input type="date" {...form.register("dateFrom")} />
             {form.formState.errors.dateFrom ? (
               <span className="text-xs text-red-600">{form.formState.errors.dateFrom.message}</span>
@@ -117,7 +117,7 @@ export function ReportsPage() {
           </label>
 
           <label className="space-y-2 text-sm font-medium text-zinc-800">
-            <span>To</span>
+            <span>По</span>
             <Input type="date" {...form.register("dateTo")} />
             {form.formState.errors.dateTo ? (
               <span className="text-xs text-red-600">{form.formState.errors.dateTo.message}</span>
@@ -125,7 +125,7 @@ export function ReportsPage() {
           </label>
 
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            Refresh report
+            Обновить отчёт
           </Button>
 
           <Button
@@ -136,7 +136,7 @@ export function ReportsPage() {
               exportMutation.mutate(appliedFilter);
             }}
           >
-            {exportMutation.isPending ? "Exporting..." : "Download CSV"}
+            {exportMutation.isPending ? "Экспортируем..." : "Скачать CSV"}
           </Button>
         </form>
       </Card>
@@ -148,11 +148,11 @@ export function ReportsPage() {
       ) : null}
 
       {statisticsQuery.isPending ? (
-        <StateCard title="Loading report" description="Fetching executor statistics." icon="⏳" />
+        <StateCard title="Загрузка отчёта" description="Получаем статистику исполнителей." icon="⏳" />
       ) : null}
 
       {statisticsQuery.error instanceof Error ? (
-        <StateCard title="Could not load report" description={statisticsQuery.error.message} icon="⚠️" />
+        <StateCard title="Не удалось загрузить отчёт" description={statisticsQuery.error.message} icon="⚠️" />
       ) : null}
 
       {statisticsQuery.data ? <ExecutorStatisticsTable statistics={statisticsQuery.data} /> : null}

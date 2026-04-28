@@ -73,8 +73,8 @@ export function RootDeletedDocumentsPage() {
   if (auth.user?.role !== UserRole.ROOT) {
     return (
       <StateCard
-        title="Root access required"
-        description="Deleted records and destructive actions are visible only to the root user."
+        title="Требуется доступ ROOT"
+        description="Удалённые записи и опасные действия доступны только пользователю root."
         icon="🛡️"
       />
     );
@@ -89,24 +89,24 @@ export function RootDeletedDocumentsPage() {
       <Card className="space-y-4 border-red-100 bg-red-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-red-700/80">Root tools</p>
-            <CardTitle className="text-3xl text-zinc-950">Deleted records management</CardTitle>
+            <p className="text-sm uppercase tracking-[0.2em] text-red-700/80">Инструменты ROOT</p>
+            <CardTitle className="text-3xl text-zinc-950">Управление удалёнными записями</CardTitle>
             <CardDescription className="max-w-3xl text-zinc-700">
-              Restore documents, reassign ownership, or hard-delete records that can no longer stay in the archive.
+              Восстанавливайте документы, переназначайте владельца или выполняйте безвозвратное удаление из архива.
             </CardDescription>
           </div>
           <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-white/90 px-4 py-3 text-sm text-zinc-700">
             {auth.user?.displayName}
             <Button variant="secondary" onClick={() => void auth.logout()}>
-              Sign out
+              Выйти
             </Button>
           </div>
         </div>
       </Card>
 
-      {isLoading ? <StateCard title="Loading deleted records" description="Fetching root queue." icon="⏳" /> : null}
+      {isLoading ? <StateCard title="Загрузка удалённых записей" description="Получаем root-очередь." icon="⏳" /> : null}
       {deletedDocumentsQuery.error instanceof Error ? (
-        <StateCard title="Could not load deleted records" description={deletedDocumentsQuery.error.message} icon="⚠️" />
+        <StateCard title="Не удалось загрузить удалённые записи" description={deletedDocumentsQuery.error.message} icon="⚠️" />
       ) : null}
       {actionError instanceof Error ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -125,10 +125,10 @@ export function RootDeletedDocumentsPage() {
 
         <div className="space-y-4">
           {selectedDocumentQuery.error instanceof Error ? (
-            <StateCard title="Could not load record" description={selectedDocumentQuery.error.message} icon="⚠️" />
+            <StateCard title="Не удалось загрузить запись" description={selectedDocumentQuery.error.message} icon="⚠️" />
           ) : null}
           {selectedDocumentQuery.isPending && selectedDocument === null && selectedDocumentId !== null ? (
-            <StateCard title="Loading record" description="Fetching selected deleted document." icon="⏳" />
+            <StateCard title="Загрузка записи" description="Получаем выбранный удалённый документ." icon="⏳" />
           ) : null}
           <DeletedDocumentPanel
             document={selectedDocument}
@@ -146,7 +146,7 @@ export function RootDeletedDocumentsPage() {
             onHardDelete={() => {
               if (!selectedDocument) return;
               const ok = window.confirm(
-                `Hard delete ${selectedDocument.registrationNumber}? This cannot be undone.`,
+                `Безвозвратно удалить ${selectedDocument.registrationNumber}? Действие нельзя отменить.`,
               );
               if (!ok) return;
               hardDeleteMutation.mutate(selectedDocument.id);

@@ -19,8 +19,8 @@ import { DocumentFormPanel } from "./document-form-panel";
 import { DocumentsTable } from "./documents-table";
 
 const tabs: Array<{ value: DocumentStatus; label: string }> = [
-  { value: DocumentStatus.NOT_DONE, label: "Active" },
-  { value: DocumentStatus.DONE, label: "Completed" },
+  { value: DocumentStatus.NOT_DONE, label: "Активные" },
+  { value: DocumentStatus.DONE, label: "Завершённые" },
 ];
 
 type DocumentsPageProps = {
@@ -177,35 +177,35 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
   const emptyState = (() => {
     if (variant === "public") {
       return {
-        title: "No active documents",
-        description: "There are no public workflow items available right now.",
+        title: "Нет активных документов",
+        description: "Сейчас нет доступных публичных записей.",
       };
     }
 
     if (appliedSearch.length > 0) {
       return {
-        title: "No matches",
-        description: `No documents matched "${appliedSearch}" in ${statusLabel(tab).toLowerCase()} documents.`,
+        title: "Ничего не найдено",
+        description: `По запросу "${appliedSearch}" нет результатов в разделе «${statusLabel(tab).toLowerCase()}».`,
       };
     }
 
     if (tab === DocumentStatus.DONE) {
       return {
-        title: "No completed documents",
-        description: "Completed records will appear here once work is finished.",
+        title: "Нет завершённых документов",
+        description: "Завершённые записи появятся здесь после окончания работ.",
       };
     }
 
     return {
-      title: "No active documents",
-      description: "Active records will appear here once they are registered.",
+      title: "Нет активных документов",
+      description: "Активные записи появятся здесь после регистрации.",
     };
   })();
 
   const panel = (() => {
     if (mode === "create") {
       if (variant !== "private" || !currentUser) {
-        return <StateCard title="Unavailable" description="Create is only available in the protected area." icon="🔒" />;
+        return <StateCard title="Недоступно" description="Создание доступно только в защищённой зоне." icon="🔒" />;
       }
 
       return (
@@ -226,15 +226,15 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
 
     if (mode === "edit") {
       if (variant !== "private" || !currentUser) {
-        return <StateCard title="Unavailable" description="Edit is only available in the protected area." icon="🔒" />;
+        return <StateCard title="Недоступно" description="Редактирование доступно только в защищённой зоне." icon="🔒" />;
       }
 
       if (selectedDocumentQuery.error instanceof Error) {
-        return <StateCard title="Could not load document" description={selectedDocumentQuery.error.message} icon="⚠️" />;
+        return <StateCard title="Не удалось загрузить документ" description={selectedDocumentQuery.error.message} icon="⚠️" />;
       }
 
       if (!selectedDocument) {
-        return <StateCard title="Loading document" description="Waiting for the selected document to load." icon="⏳" />;
+        return <StateCard title="Загрузка документа" description="Ждём загрузки выбранного документа." icon="⏳" />;
       }
 
       return (
@@ -257,11 +257,11 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
     }
 
     if (selectedDocumentQuery.error instanceof Error) {
-      return <StateCard title="Could not load document" description={selectedDocumentQuery.error.message} icon="⚠️" />;
+      return <StateCard title="Не удалось загрузить документ" description={selectedDocumentQuery.error.message} icon="⚠️" />;
     }
 
     if (selectedDocumentId !== null && selectedDocumentQuery.isPending && !selectedDocument) {
-      return <StateCard title="Loading document" description="Fetching the selected record." icon="⏳" />;
+      return <StateCard title="Загрузка документа" description="Получаем выбранную запись." icon="⏳" />;
     }
 
     return (
@@ -291,7 +291,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
 
   const listState = (() => {
     if (listError instanceof Error) {
-      return <StateCard title="Could not load documents" description={listError.message} icon="⚠️" />;
+      return <StateCard title="Не удалось загрузить документы" description={listError.message} icon="⚠️" />;
     }
 
     if (!isLoading && list.length === 0) {
@@ -303,7 +303,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
           publicView={variant === "public"}
           emptyStateTitle={emptyState.title}
           emptyStateDescription={emptyState.description}
-          emptyStateActionLabel={variant === "private" ? "Create document" : undefined}
+          emptyStateActionLabel={variant === "private" ? "Создать документ" : undefined}
           onEmptyAction={variant === "private" ? () => setMode("create") : undefined}
           onSelect={(document) => {
             setSelectedId(document.id);
@@ -321,7 +321,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
         publicView={variant === "public"}
         emptyStateTitle={emptyState.title}
         emptyStateDescription={emptyState.description}
-        emptyStateActionLabel={variant === "private" ? "Create document" : undefined}
+        emptyStateActionLabel={variant === "private" ? "Создать документ" : undefined}
         onEmptyAction={variant === "private" ? () => setMode("create") : undefined}
         onSelect={(document) => {
           setSelectedId(document.id);
@@ -363,14 +363,14 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
       <Card className="space-y-4 border-blue-100 bg-blue-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-blue-700/80">Document workflow</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-blue-700/80">Документооборот</p>
             <CardTitle className="text-3xl text-zinc-950">
-              {variant === "public" ? "Public active documents" : "Documents workspace"}
+              {variant === "public" ? "Публичные активные документы" : "Рабочая область документов"}
             </CardTitle>
             <CardDescription className="max-w-3xl text-zinc-700">
               {variant === "public"
-                ? "Active records are visible without sign in."
-                : "Browse, search, create, edit, and complete documents from one place."}
+                ? "Активные записи доступны без входа."
+                : "Просматривайте, ищите, создавайте, редактируйте и завершайте документы в одном месте."}
             </CardDescription>
           </div>
           {variant === "private" && currentUser ? (
@@ -381,7 +381,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
               </div>
               <Badge tone={currentUser.role === "ROOT" ? "warning" : "info"}>{currentUser.role}</Badge>
               <Button variant="secondary" onClick={() => void auth.logout()}>
-                Sign out
+                Выйти
               </Button>
             </div>
           ) : null}
@@ -412,7 +412,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
                 </Button>
               ))}
             </div>
-            <Button onClick={() => setMode("create")}>Create document</Button>
+            <Button onClick={() => setMode("create")}>Создать документ</Button>
           </div>
 
           <form
@@ -425,11 +425,11 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
           >
             <Input
               className="max-w-md"
-              placeholder="Search by registration number, title, dates, or usernames"
+              placeholder="Поиск по рег. номеру, названию, датам или логинам"
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
             />
-            <Button type="submit">Search</Button>
+            <Button type="submit">Найти</Button>
             {appliedSearch ? (
               <Button
                 type="button"
@@ -439,14 +439,14 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
                   setAppliedSearch("");
                 }}
               >
-                Clear
+                Очистить
               </Button>
             ) : null}
           </form>
         </div>
       ) : null}
 
-      {isLoading ? <StateCard title="Loading documents" description="Fetching the latest records." icon="⏳" /> : null}
+      {isLoading ? <StateCard title="Загрузка документов" description="Получаем актуальные записи." icon="⏳" /> : null}
 
       {actionError instanceof Error ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -456,7 +456,7 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
 
       {variant === "private" && appliedSearch ? (
         <div className="text-sm text-zinc-600">
-          Search results for <span className="font-medium text-zinc-950">{appliedSearch}</span> in {statusLabel(tab).toLowerCase()} documents.
+          Результаты поиска по <span className="font-medium text-zinc-950">{appliedSearch}</span> в разделе «{statusLabel(tab).toLowerCase()}».
         </div>
       ) : null}
 

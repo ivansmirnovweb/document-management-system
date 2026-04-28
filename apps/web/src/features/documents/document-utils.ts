@@ -7,11 +7,11 @@ import {
 } from "@document-flow/shared";
 
 export function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(new Date(value));
+  return new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium" }).format(new Date(value));
 }
 
 export function formatDateTime(value: string): string {
-  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(
+  return new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium", timeStyle: "short" }).format(
     new Date(value),
   );
 }
@@ -34,18 +34,18 @@ export function deadlineTone(
 export function deadlineLabel(state: DocumentDeadlineState): string {
   switch (state) {
     case DocumentDeadlineState.ON_TIME:
-      return "On time";
+      return "В срок";
     case DocumentDeadlineState.DUE_SOON:
-      return "Due soon";
+      return "Скоро срок";
     case DocumentDeadlineState.OVERDUE:
-      return "Overdue";
+      return "Просрочено";
     case DocumentDeadlineState.COMPLETED:
-      return "Completed";
+      return "Завершено";
   }
 }
 
 export function statusLabel(status: DocumentStatus): string {
-  return status === DocumentStatus.DONE ? "Completed" : "Active";
+  return status === DocumentStatus.DONE ? "Завершено" : "Активно";
 }
 
 export function canEditDocument(
