@@ -71,8 +71,9 @@ export class CreateDocumentDto {
   @Min(1)
   executorId!: number;
 
+  @IsOptional()
   @IsDateString()
-  dueDate!: string;
+  dueDate?: string;
 
   @IsOptional()
   @IsBoolean()

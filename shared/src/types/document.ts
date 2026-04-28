@@ -56,10 +56,9 @@ export type CreateDocumentInput = {
   broadcast?: string;
   ownerId: number;
   executorId: number;
-  dueDate: IsoDateString;
+  dueDate?: IsoDateString;
   isControl?: boolean;
 };
-
 export type UpdateDocumentInput = {
   registrationNumber?: string;
   registrationDate?: IsoDateString;
