@@ -2,6 +2,16 @@
 
 ## Todo
 
+- [ ] 083 — Add explicit document kind classification (incoming/outgoing/internal) and enforce it across API/DB/UI
+- [ ] 084 — Implement leadership resolutions model and workflow (author, text, date, due date, linked document)
+- [ ] 085 — Implement control assignment from resolution and keep control priority ordering in lists
+- [ ] 086 — Implement case write-off workflow ("списание в дело") as a dedicated lifecycle action/state
+- [ ] 087 — Align document field mapping with formal TZ fields/defaults (about1/about2, out_sender=id_employer, broadcast, dates)
+- [ ] 088 — Enforce expiration rule: default +30 days and no extension without changing registration date
+- [ ] 089 — Implement owner-on-delete reassignment to root with deletion timestamp fixation per TZ
+- [ ] 090 — Implement immutable last-change block (date/time/user) visible in edit dialog (read-only)
+- [ ] 091 — Expand search to guaranteed coverage of active/archived/deleted by required fields from TZ
+- [ ] 092 — Extend text export and executor KPI report format to match TZ columns and overdue-percent rules
 
 ## Done
 
