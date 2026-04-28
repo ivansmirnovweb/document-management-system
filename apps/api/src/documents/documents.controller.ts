@@ -136,6 +136,14 @@ export class DocumentsController {
     return this.documentsService.deleteResolution(id, resolutionId, user);
   }
 
+  @Patch(':id/write-off')
+  writeOff(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.documentsService.writeOff(id, user);
+  }
+
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,

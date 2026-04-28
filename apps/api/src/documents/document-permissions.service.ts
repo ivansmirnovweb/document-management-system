@@ -26,7 +26,7 @@ export class DocumentPermissionsService {
   }
 
   assertCanReadPublicDocument(document: {
-    status: DocumentStatus | 'NOT_DONE' | 'DONE';
+    status: DocumentStatus | 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
     deletedAt?: string | Date | null;
   }): void {
     if (document.deletedAt || document.status !== DocumentStatus.NOT_DONE) {
@@ -55,7 +55,7 @@ export class DocumentPermissionsService {
     document: {
       ownerId: number;
       executorId: number;
-      status: DocumentStatus | 'NOT_DONE' | 'DONE';
+      status: DocumentStatus | 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
       deletedAt?: Date | null;
     },
     changes: Record<string, unknown>,
@@ -66,7 +66,10 @@ export class DocumentPermissionsService {
       throw new NotFoundException('Document not found');
     }
 
-    if (document.status === DocumentStatus.DONE) {
+    if (
+      document.status === DocumentStatus.DONE ||
+      document.status === DocumentStatus.WRITTEN_OFF
+    ) {
       throw new ForbiddenException('Completed documents are read-only');
     }
 
@@ -127,7 +130,7 @@ export class DocumentPermissionsService {
     actor: DocumentActor,
     document: {
       ownerId: number;
-      status: DocumentStatus | 'NOT_DONE' | 'DONE';
+      status: DocumentStatus | 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
       deletedAt?: Date | null;
     },
   ): void {
@@ -137,7 +140,10 @@ export class DocumentPermissionsService {
       throw new NotFoundException('Document not found');
     }
 
-    if (document.status === DocumentStatus.DONE) {
+    if (
+      document.status === DocumentStatus.DONE ||
+      document.status === DocumentStatus.WRITTEN_OFF
+    ) {
       throw new ForbiddenException('Completed documents are read-only');
     }
 

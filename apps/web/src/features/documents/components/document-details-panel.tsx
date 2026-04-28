@@ -7,7 +7,7 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
-import { canCompleteDocument, canDeleteDocument, canEditDocument, canReopenDocument, deadlineLabel, deadlineTone, formatDate, formatDateTime, kindLabel, statusLabel } from "../document-utils";
+import { canCompleteDocument, canDeleteDocument, canEditDocument, canReopenDocument, canWriteOffDocument, deadlineLabel, deadlineTone, formatDate, formatDateTime, kindLabel, statusLabel } from "../document-utils";
 
 type DocumentDetailsPanelProps = {
   document: DocumentDetails | null;
@@ -17,6 +17,7 @@ type DocumentDetailsPanelProps = {
   onToggleStatus?: () => void;
   onDelete?: () => void;
   onCreateResolution?: (input: { text: string; resolutionDate: string; dueDate: string }) => Promise<void>;
+  onWriteOff?: () => Promise<void>;
 };
 
 export function DocumentDetailsPanel({
@@ -27,6 +28,7 @@ export function DocumentDetailsPanel({
   onToggleStatus,
   onDelete,
   onCreateResolution,
+  onWriteOff,
 }: DocumentDetailsPanelProps) {
   const [resolutionText, setResolutionText] = useState("");
   const [resolutionDate, setResolutionDate] = useState(new Date().toISOString().slice(0, 10));
@@ -45,6 +47,7 @@ export function DocumentDetailsPanel({
   const deleteAllowed = !publicView && canDeleteDocument(currentUser, document);
   const completeAllowed = !publicView && canCompleteDocument(currentUser, document);
   const reopenAllowed = !publicView && canReopenDocument(currentUser, document);
+  const writeOffAllowed = !publicView && canWriteOffDocument(currentUser, document);
 
   return (
     <Card className="space-y-6" id="details">
@@ -122,6 +125,7 @@ export function DocumentDetailsPanel({
           {reopenAllowed && document.status === "DONE" && onToggleStatus ? (
             <Button variant="secondary" onClick={onToggleStatus}>Переоткрыть</Button>
           ) : null}
+          {writeOffAllowed && onWriteOff ? <Button variant="secondary" onClick={() => void onWriteOff()}>Списать в дело</Button> : null}
           {deleteAllowed && onDelete ? <Button variant="danger" onClick={onDelete}>Удалить</Button> : null}
         </div>
       ) : null}
