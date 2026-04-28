@@ -111,13 +111,13 @@ export function DocumentFormPanel({
   return (
     <Card className="space-y-6">
       <div>
-        <CardTitle>{mode === "create" ? "Create document" : "Edit document"}</CardTitle>
+        <CardTitle>{mode === "create" ? "Создать документ" : "Редактировать документ"}</CardTitle>
         <CardDescription>
           {mode === "create"
-            ? "Register a new workflow item."
+            ? "Зарегистрируйте новый документ в потоке работ."
             : document
-              ? `Editing ${document.title} (${document.registrationNumber})`
-              : "Editing document."}
+              ? `Редактирование: ${document.title} (${document.registrationNumber})`
+              : "Редактирование документа."}
         </CardDescription>
       </div>
 
@@ -125,35 +125,35 @@ export function DocumentFormPanel({
 
       <form key={`${mode}-${document?.id ?? "new"}`} className="space-y-4" onSubmit={submit}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Registration number" error={form.formState.errors.registrationNumber?.message}>
+          <Field label="Рег. номер" error={form.formState.errors.registrationNumber?.message}>
             <Input {...form.register("registrationNumber")} />
           </Field>
-          <Field label="Registration date" error={form.formState.errors.registrationDate?.message}>
+          <Field label="Дата регистрации" error={form.formState.errors.registrationDate?.message}>
             <Input type="date" {...form.register("registrationDate")} />
           </Field>
-          <Field label="Title" className="sm:col-span-2" error={form.formState.errors.title?.message}>
+          <Field label="Название" className="sm:col-span-2" error={form.formState.errors.title?.message}>
             <Input {...form.register("title")} />
           </Field>
-          <Field label="Due date" error={form.formState.errors.dueDate?.message}>
+          <Field label="Срок" error={form.formState.errors.dueDate?.message}>
             <Input type="date" {...form.register("dueDate")} />
           </Field>
-          <Field label="Executor ID" error={form.formState.errors.executorId?.message}>
+          <Field label="ID исполнителя" error={form.formState.errors.executorId?.message}>
             <Input type="number" min={1} {...form.register("executorId")} />
           </Field>
           {currentUser.role === "ROOT" ? (
-            <Field label="Owner ID" error={form.formState.errors.ownerId?.message}>
+            <Field label="ID владельца" error={form.formState.errors.ownerId?.message}>
               <Input type="number" min={1} {...form.register("ownerId")} />
             </Field>
           ) : (
             <input type="hidden" {...form.register("ownerId")} />
           )}
-          <Field label="Employer" error={form.formState.errors.employerId?.message}>
+          <Field label="Работодатель" error={form.formState.errors.employerId?.message}>
             <Select
               {...form.register("employerId", {
                 setValueAs: (value) => (value === "" ? null : Number(value)),
               })}
             >
-              <option value="">No employer</option>
+              <option value="">Без работодателя</option>
               {employers.map((employer) => (
                 <option key={employer.id} value={employer.id}>
                   {employer.fullName}
@@ -161,15 +161,15 @@ export function DocumentFormPanel({
               ))}
             </Select>
           </Field>
-          <Field label="Control mark" error={form.formState.errors.isControl?.message}>
+          <Field label="Контрольная отметка" error={form.formState.errors.isControl?.message}>
             <label className="flex h-11 items-center gap-3 rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-700">
               <input type="checkbox" {...form.register("isControl")} />
-              Control document
+              Контрольный документ
             </label>
           </Field>
         </div>
 
-        <Field label="Description" error={form.formState.errors.description?.message}>
+        <Field label="Описание" error={form.formState.errors.description?.message}>
           <Textarea
             {...form.register("description", {
               setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
@@ -178,14 +178,14 @@ export function DocumentFormPanel({
         </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Incoming number" error={form.formState.errors.incomingNumber?.message}>
+          <Field label="Входящий номер" error={form.formState.errors.incomingNumber?.message}>
             <Input
               {...form.register("incomingNumber", {
                 setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
               })}
             />
           </Field>
-          <Field label="Outgoing number" error={form.formState.errors.outgoingNumber?.message}>
+          <Field label="Исходящий номер" error={form.formState.errors.outgoingNumber?.message}>
             <Input
               {...form.register("outgoingNumber", {
                 setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
@@ -196,10 +196,10 @@ export function DocumentFormPanel({
 
         <div className="flex flex-wrap gap-2">
           <Button type="submit" disabled={form.formState.isSubmitting || isSaving}>
-            {form.formState.isSubmitting || isSaving ? "Saving..." : mode === "create" ? "Create document" : "Save changes"}
+            {form.formState.isSubmitting || isSaving ? "Сохраняем..." : mode === "create" ? "Создать документ" : "Сохранить изменения"}
           </Button>
           <Button type="button" variant="secondary" onClick={onCancel}>
-            Cancel
+            Отмена
           </Button>
         </div>
       </form>
@@ -210,12 +210,12 @@ export function DocumentFormPanel({
 function AuditInfo({ document }: { document: DocumentDetails }) {
   return (
     <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-      <div className="mb-3 text-sm font-semibold text-zinc-950">Audit info</div>
+      <div className="mb-3 text-sm font-semibold text-zinc-950">Аудит</div>
       <dl className="grid gap-3 text-sm sm:grid-cols-2">
-        <AuditField label="Created" value={formatDateTime(document.createdAt)} />
-        <AuditField label="Last updated" value={formatDateTime(document.updatedAt)} />
-        <AuditField label="Completed" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
-        <AuditField label="Deleted" value={document.deletedAt ? formatDateTime(document.deletedAt) : "—"} />
+        <AuditField label="Создан" value={formatDateTime(document.createdAt)} />
+        <AuditField label="Обновлён" value={formatDateTime(document.updatedAt)} />
+        <AuditField label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
+        <AuditField label="Удалён" value={document.deletedAt ? formatDateTime(document.deletedAt) : "—"} />
       </dl>
     </div>
   );

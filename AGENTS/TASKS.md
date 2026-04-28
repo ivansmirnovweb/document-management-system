@@ -2,8 +2,6 @@
 
 ## Todo
 
-- [ ] 079 — Find and fix the cause of frontend requests failing before reaching the API (verify base URL, CORS, proxy, and container/network wiring)
-- [ ] 082 — Translate the full UI into Russian; ensure all visible interface text is localized
 - [ ] 083 — Add explicit document kind classification (incoming/outgoing/internal) and enforce it across API/DB/UI
 - [ ] 084 — Implement leadership resolutions model and workflow (author, text, date, due date, linked document)
 - [ ] 085 — Implement control assignment from resolution and keep control priority ordering in lists
@@ -17,6 +15,8 @@
 
 ## Done
 
+- [x] 082 — Translate the full UI into Russian; ensure all visible interface text is localized
+- [x] 079 — Find and fix the cause of frontend requests failing before reaching the API (verify base URL, CORS, proxy, and container/network wiring)
 - [x] 081 — Add or expose a proper user registration flow; verify how new users are created and whether self-registration should be supported
 - [x] 080 — Reduce unnecessary client-side requests on the index page and move first-load data fetching to SSR/server rendering where appropriate
 - [x] 078 — Audit and fix light-theme contrast issues so text remains readable across all screens (remove black-on-black states; tune primary surface color)
@@ -48,4 +48,4 @@
 
 ## Result
 
-- 081: Added public `POST /auth/register` and `/register` page flow backed by shared register schemas/types, with self-registration gated by `AUTH_SELF_REGISTRATION_ENABLED` (default `false`) and forced `USER` role for safety.
+- 082: Translated visible frontend UI text to Russian across auth, navigation, documents workspace, reports, root/deleted-documents tooling, and app-level loading/error metadata.

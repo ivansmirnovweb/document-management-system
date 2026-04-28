@@ -6,7 +6,7 @@ import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { StateCard } from "@/shared/ui/state-card";
 
 function percent(value: number): string {
-  return new Intl.NumberFormat("en-GB", {
+  return new Intl.NumberFormat("ru-RU", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(value);
@@ -18,26 +18,26 @@ type ExecutorStatisticsTableProps = {
 
 export function ExecutorStatisticsTable({ statistics }: ExecutorStatisticsTableProps) {
   if (statistics.length === 0) {
-    return <StateCard title="No statistics available" description="Try a different date range or filters." icon="📊" />;
+    return <StateCard title="Статистика отсутствует" description="Попробуйте другой диапазон дат или фильтры." icon="📊" />;
   }
 
   return (
     <Card className="space-y-4">
       <div>
-        <CardTitle>Executor statistics</CardTitle>
-        <CardDescription>Performance across the selected date range.</CardDescription>
+        <CardTitle>Статистика исполнителей</CardTitle>
+        <CardDescription>Показатели за выбранный диапазон дат.</CardDescription>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-zinc-200">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-zinc-50 text-xs uppercase tracking-[0.15em] text-zinc-500">
             <tr>
-              <th className="px-4 py-3 font-semibold">Executor</th>
-              <th className="px-4 py-3 font-semibold">Total</th>
-              <th className="px-4 py-3 font-semibold">On time</th>
-              <th className="px-4 py-3 font-semibold">Late</th>
-              <th className="px-4 py-3 font-semibold">Overdue</th>
-              <th className="px-4 py-3 font-semibold">Overdue %</th>
+              <th className="px-4 py-3 font-semibold">Исполнитель</th>
+              <th className="px-4 py-3 font-semibold">Всего</th>
+              <th className="px-4 py-3 font-semibold">В срок</th>
+              <th className="px-4 py-3 font-semibold">С опозданием</th>
+              <th className="px-4 py-3 font-semibold">Просрочено</th>
+              <th className="px-4 py-3 font-semibold">Просрочка %</th>
             </tr>
           </thead>
           <tbody>

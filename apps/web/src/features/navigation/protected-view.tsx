@@ -10,8 +10,8 @@ export function ProtectedView({ children }: { children: ReactNode }) {
   if (auth.isLoading) {
     return (
       <StateCard
-        title="Loading protected area"
-        description="Checking your session before showing private content."
+        title="Загрузка защищённого раздела"
+        description="Проверяем сессию перед показом приватного контента."
         icon="🔎"
       />
     );
@@ -20,9 +20,9 @@ export function ProtectedView({ children }: { children: ReactNode }) {
   if (auth.error) {
     return (
       <StateCard
-        title="Could not load session"
+        title="Не удалось загрузить сессию"
         description={auth.error.message}
-        actionLabel="Retry"
+        actionLabel="Повторить"
         onAction={auth.refreshSession}
         icon="⚠️"
       />
@@ -32,9 +32,9 @@ export function ProtectedView({ children }: { children: ReactNode }) {
   if (!auth.user) {
     return (
       <StateCard
-        title="Access required"
-        description="This area is protected. Sign in to continue."
-        actionLabel="Go to login"
+        title="Требуется доступ"
+        description="Это защищённая зона. Войдите, чтобы продолжить."
+        actionLabel="Перейти ко входу"
         actionHref="/login"
         icon="🔐"
       />

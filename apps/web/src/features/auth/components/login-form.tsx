@@ -38,15 +38,15 @@ export function LoginForm() {
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "Unable to sign in");
+      setFormError(error instanceof Error ? error.message : "Не удалось войти");
     }
   });
 
   return (
     <Card className="mx-auto w-full max-w-md space-y-6">
       <div>
-        <CardTitle>Sign in</CardTitle>
-        <CardDescription>Use your document management credentials.</CardDescription>
+        <CardTitle>Вход</CardTitle>
+        <CardDescription>Используйте свои данные для входа в систему документооборота.</CardDescription>
       </div>
 
       {formError ? (
@@ -57,7 +57,7 @@ export function LoginForm() {
 
       <form className="space-y-4" onSubmit={submit}>
         <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Username</span>
+          <span>Логин</span>
           <Input autoComplete="username" {...form.register("username")} />
           {form.formState.errors.username ? (
             <span className="text-xs text-red-600">{form.formState.errors.username.message}</span>
@@ -65,7 +65,7 @@ export function LoginForm() {
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Password</span>
+          <span>Пароль</span>
           <Input type="password" autoComplete="current-password" {...form.register("password")} />
           {form.formState.errors.password ? (
             <span className="text-xs text-red-600">{form.formState.errors.password.message}</span>
@@ -73,14 +73,14 @@ export function LoginForm() {
         </label>
 
         <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+          {form.formState.isSubmitting ? "Входим..." : "Войти"}
         </Button>
       </form>
 
       <p className="text-center text-sm text-zinc-600">
-        Need an account?{" "}
+        Нет аккаунта?{" "}
         <Link href="/register" className="font-medium text-zinc-900 underline underline-offset-2">
-          Register
+          Зарегистрироваться
         </Link>
       </p>
     </Card>
