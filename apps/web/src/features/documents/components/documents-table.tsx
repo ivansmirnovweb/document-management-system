@@ -217,7 +217,7 @@ export function DocumentsTable({
                 className={cn(
                   "border-t border-zinc-200 transition hover:bg-zinc-50",
                   rowTone,
-                  selected ? "ring-2 ring-inset ring-zinc-950" : "",
+                  selected ? "ring-2 ring-inset ring-blue-600" : "",
                 )}
                 onClick={() => onSelect(document)}
               >

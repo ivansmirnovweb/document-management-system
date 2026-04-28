@@ -88,12 +88,12 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="space-y-4 bg-zinc-950 text-white">
+      <Card className="space-y-4 border-indigo-100 bg-indigo-50/70">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.2em] text-zinc-400">Reports</p>
-            <CardTitle className="text-3xl text-white">Executor statistics and export</CardTitle>
-            <CardDescription className="max-w-3xl text-zinc-300">
+            <p className="text-sm uppercase tracking-[0.2em] text-indigo-700/80">Reports</p>
+            <CardTitle className="text-3xl text-zinc-950">Executor statistics and export</CardTitle>
+            <CardDescription className="max-w-3xl text-zinc-700">
               Select a date range, refresh the report, and download the CSV export when needed.
             </CardDescription>
           </div>
