@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { DocumentDetails, UserRole } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/ui/textarea";
 import { canCompleteDocument, canDeleteDocument, canEditDocument, canReopenDocument, deadlineLabel, deadlineTone, formatDate, formatDateTime, kindLabel, statusLabel } from "../document-utils";
 
 type DocumentDetailsPanelProps = {
@@ -13,6 +16,7 @@ type DocumentDetailsPanelProps = {
   onEdit?: () => void;
   onToggleStatus?: () => void;
   onDelete?: () => void;
+  onCreateResolution?: (input: { text: string; resolutionDate: string; dueDate: string }) => Promise<void>;
 };
 
 export function DocumentDetailsPanel({
@@ -22,7 +26,12 @@ export function DocumentDetailsPanel({
   onEdit,
   onToggleStatus,
   onDelete,
+  onCreateResolution,
 }: DocumentDetailsPanelProps) {
+  const [resolutionText, setResolutionText] = useState("");
+  const [resolutionDate, setResolutionDate] = useState(new Date().toISOString().slice(0, 10));
+  const [resolutionDueDate, setResolutionDueDate] = useState(new Date().toISOString().slice(0, 10));
+
   if (!document) {
     return (
       <Card className="space-y-4" id="details">
@@ -69,6 +78,42 @@ export function DocumentDetailsPanel({
         <Detail label="Исходящий номер" value={document.outgoingNumber ?? "—"} />
         <Detail label="Обновлён" value={formatDateTime(document.updatedAt)} />
       </dl>
+
+      <div className="space-y-3">
+        <div className="text-sm font-semibold text-zinc-950">Резолюции</div>
+        {document.resolutions.length === 0 ? (
+          <div className="text-sm text-zinc-500">Пока нет резолюций.</div>
+        ) : (
+          <div className="space-y-2">
+            {document.resolutions.map((resolution) => (
+              <div key={resolution.id} className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm">
+                <div className="font-medium text-zinc-900">{resolution.text}</div>
+                <div className="mt-1 text-zinc-600">
+                  Автор: {resolution.author.displayName} · Дата: {formatDate(resolution.resolutionDate)} · Срок: {formatDate(resolution.dueDate)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {!publicView && onCreateResolution ? (
+          <div className="space-y-2 rounded-xl border border-zinc-200 p-3">
+            <Textarea value={resolutionText} onChange={(event) => setResolutionText(event.target.value)} placeholder="Текст резолюции" />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Input type="date" value={resolutionDate} onChange={(event) => setResolutionDate(event.target.value)} />
+              <Input type="date" value={resolutionDueDate} onChange={(event) => setResolutionDueDate(event.target.value)} />
+            </div>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                await onCreateResolution({ text: resolutionText, resolutionDate, dueDate: resolutionDueDate });
+                setResolutionText("");
+              }}
+            >
+              Добавить резолюцию
+            </Button>
+          </div>
+        ) : null}
+      </div>
 
       {!publicView ? (
         <div className="flex flex-wrap gap-2">

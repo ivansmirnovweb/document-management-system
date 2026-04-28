@@ -4,6 +4,7 @@ import type { DocumentKind } from "../enums/document-kind";
 import type { IsoDateString } from "./common";
 import type { Employer } from "./employer";
 import type { User } from "./user";
+import type { Resolution } from "./resolution";
 
 export type DocumentListItem = {
   id: number;
@@ -31,6 +32,7 @@ export type DocumentDetails = DocumentListItem & {
   employer: Employer | null;
   owner: User;
   executor: User;
+  resolutions: Resolution[];
 };
 
 export type CreateDocumentInput = {

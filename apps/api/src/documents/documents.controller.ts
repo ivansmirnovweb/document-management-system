@@ -20,6 +20,8 @@ import { SearchDocumentsQueryDto } from './dto/search-documents-query.dto';
 import { ReassignDocumentDto } from './dto/reassign-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { UpdateDocumentStatusDto } from './dto/update-document-status.dto';
+import { CreateResolutionDto } from './dto/create-resolution.dto';
+import { UpdateResolutionDto } from './dto/update-resolution.dto';
 import { DocumentsService } from './documents.service';
 
 @Controller('documents')
@@ -104,6 +106,34 @@ export class DocumentsController {
     @Body() dto: UpdateDocumentStatusDto,
   ) {
     return this.documentsService.changeStatus(id, user, dto.status);
+  }
+
+  @Post(':id/resolutions')
+  createResolution(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateResolutionDto,
+  ) {
+    return this.documentsService.createResolution(id, user, dto);
+  }
+
+  @Patch(':id/resolutions/:resolutionId')
+  updateResolution(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('resolutionId', ParseIntPipe) resolutionId: number,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateResolutionDto,
+  ) {
+    return this.documentsService.updateResolution(id, resolutionId, user, dto);
+  }
+
+  @Delete(':id/resolutions/:resolutionId')
+  deleteResolution(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('resolutionId', ParseIntPipe) resolutionId: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.documentsService.deleteResolution(id, resolutionId, user);
   }
 
   @Delete(':id')

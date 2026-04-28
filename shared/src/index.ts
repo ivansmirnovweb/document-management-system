@@ -9,6 +9,7 @@ export type * from "./types/user";
 export type * from "./types/auth";
 export type * from "./types/document";
 export type * from "./types/report";
+export type * from "./types/resolution";
 
 export * from "./schemas/common";
 export * from "./schemas/employer";
@@ -16,3 +17,4 @@ export * from "./schemas/user";
 export * from "./schemas/auth";
 export * from "./schemas/document";
 export * from "./schemas/report";
+export * from "./schemas/resolution";

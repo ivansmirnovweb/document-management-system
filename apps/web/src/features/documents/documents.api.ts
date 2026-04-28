@@ -4,11 +4,15 @@ import {
   documentDetailsSchema,
   documentListItemSchema,
   updateDocumentInputSchema,
+  createResolutionInputSchema,
+  updateResolutionInputSchema,
   type CreateDocumentInput,
+  type CreateResolutionInput,
   type DocumentDetails,
   type DocumentListItem,
   type DocumentStatus,
   type UpdateDocumentInput,
+  type UpdateResolutionInput,
 } from "@document-flow/shared";
 import { apiNoContent, apiRequest, type ApiRequestOptions } from "@/lib/api";
 
@@ -94,5 +98,19 @@ export const documentsApi = {
 
   hardDelete(id: number): Promise<null> {
     return apiRequest(`/documents/${id}/hard`, { method: "DELETE" }, apiNoContent());
+  },
+
+  createResolution(documentId: number, input: CreateResolutionInput): Promise<DocumentDetails> {
+    const payload = createResolutionInputSchema.parse(input);
+    return apiRequest(`/documents/${documentId}/resolutions`, { method: "POST", body: payload }, documentDetailsSchema);
+  },
+
+  updateResolution(documentId: number, resolutionId: number, input: UpdateResolutionInput): Promise<DocumentDetails> {
+    const payload = updateResolutionInputSchema.parse(input);
+    return apiRequest(`/documents/${documentId}/resolutions/${resolutionId}`, { method: "PATCH", body: payload }, documentDetailsSchema);
+  },
+
+  deleteResolution(documentId: number, resolutionId: number): Promise<DocumentDetails> {
+    return apiRequest(`/documents/${documentId}/resolutions/${resolutionId}`, { method: "DELETE" }, documentDetailsSchema);
   },
 };

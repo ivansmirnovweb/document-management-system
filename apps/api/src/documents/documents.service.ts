@@ -27,11 +27,14 @@ import { DbService } from '../db/db.service';
 import { documents } from '../db/schema/documents';
 import { employers } from '../db/schema/employers';
 import { users } from '../db/schema/users';
+import { documentResolutions } from '../db/schema/document-resolutions';
 import type { CreateDocumentDto } from './dto/create-document.dto';
 import type { ListDocumentsQueryDto } from './dto/list-documents-query.dto';
 import type { SearchDocumentsQueryDto } from './dto/search-documents-query.dto';
 import type { ReassignDocumentDto } from './dto/reassign-document.dto';
 import type { UpdateDocumentDto } from './dto/update-document.dto';
+import type { CreateResolutionDto } from './dto/create-resolution.dto';
+import type { UpdateResolutionDto } from './dto/update-resolution.dto';
 import {
   DocumentPermissionsService,
   type DocumentActor,
@@ -353,6 +356,109 @@ export class DocumentsService {
     return updatedDocument;
   }
 
+  async createResolution(
+    id: number,
+    actor: DocumentActor,
+    dto: CreateResolutionDto,
+  ): Promise<DocumentDetails> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanUpdateDocument(actor, document, {
+      description: dto.text,
+    });
+
+    const now = new Date();
+    await this.db.db.insert(documentResolutions).values({
+      documentId: id,
+      authorId: actor!.id,
+      text: dto.text,
+      resolutionDate: new Date(dto.resolutionDate),
+      dueDate: new Date(dto.dueDate),
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load updated document');
+    }
+
+    return updatedDocument;
+  }
+
+  async updateResolution(
+    id: number,
+    resolutionId: number,
+    actor: DocumentActor,
+    dto: UpdateResolutionDto,
+  ): Promise<DocumentDetails> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanUpdateDocument(actor, document, {
+      description: dto.text,
+    });
+
+    const values: Record<string, unknown> = { updatedAt: new Date() };
+    if (dto.text !== undefined) values.text = dto.text;
+    if (dto.resolutionDate !== undefined)
+      values.resolutionDate = new Date(dto.resolutionDate);
+    if (dto.dueDate !== undefined) values.dueDate = new Date(dto.dueDate);
+
+    await this.db.db
+      .update(documentResolutions)
+      .set(values)
+      .where(
+        and(
+          eq(documentResolutions.id, resolutionId),
+          eq(documentResolutions.documentId, id),
+        ),
+      );
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load updated document');
+    }
+
+    return updatedDocument;
+  }
+
+  async deleteResolution(
+    id: number,
+    resolutionId: number,
+    actor: DocumentActor,
+  ): Promise<DocumentDetails> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanUpdateDocument(actor, document, {
+      description: 'delete',
+    });
+
+    await this.db.db
+      .delete(documentResolutions)
+      .where(
+        and(
+          eq(documentResolutions.id, resolutionId),
+          eq(documentResolutions.documentId, id),
+        ),
+      );
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load updated document');
+    }
+
+    return updatedDocument;
+  }
+
   async reassignOwner(
     id: number,
     actor: DocumentActor,
@@ -593,6 +699,53 @@ export class DocumentsService {
       return null;
     }
 
+    const resolutionRows = await this.db.db
+      .select({
+        id: documentResolutions.id,
+        documentId: documentResolutions.documentId,
+        authorId: documentResolutions.authorId,
+        text: documentResolutions.text,
+        resolutionDate: documentResolutions.resolutionDate,
+        dueDate: documentResolutions.dueDate,
+        createdAt: documentResolutions.createdAt,
+        updatedAt: documentResolutions.updatedAt,
+        authorIdFromJoin: users.id,
+        authorUsername: users.username,
+        authorDisplayName: users.displayName,
+        authorRole: users.role,
+        authorPasswordChangedAt: users.passwordChangedAt,
+        authorCreatedAt: users.createdAt,
+        authorUpdatedAt: users.updatedAt,
+      })
+      .from(documentResolutions)
+      .innerJoin(users, eq(documentResolutions.authorId, users.id))
+      .where(eq(documentResolutions.documentId, row.id))
+      .orderBy(
+        desc(documentResolutions.createdAt),
+        desc(documentResolutions.id),
+      );
+
+    const resolutions = resolutionRows.map((resolution) => ({
+      id: resolution.id,
+      documentId: resolution.documentId,
+      authorId: resolution.authorId,
+      text: resolution.text,
+      resolutionDate: resolution.resolutionDate.toISOString(),
+      dueDate: resolution.dueDate.toISOString(),
+      createdAt: resolution.createdAt.toISOString(),
+      updatedAt: resolution.updatedAt.toISOString(),
+      author: {
+        id: resolution.authorIdFromJoin,
+        username: resolution.authorUsername,
+        displayName: resolution.authorDisplayName,
+        role: resolution.authorRole as UserRole,
+        passwordChangedAt:
+          resolution.authorPasswordChangedAt?.toISOString() ?? null,
+        createdAt: resolution.authorCreatedAt.toISOString(),
+        updatedAt: resolution.authorUpdatedAt.toISOString(),
+      },
+    }));
+
     const employer =
       row.employerIdFromJoin === null
         ? null
@@ -641,6 +794,7 @@ export class DocumentsService {
         createdAt: row.ownerCreatedAt.toISOString(),
         updatedAt: row.ownerUpdatedAt.toISOString(),
       },
+      resolutions,
       executor: {
         id: row.executorIdFromJoin,
         username: row.executorUsername,
