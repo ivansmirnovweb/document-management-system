@@ -172,6 +172,14 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
     },
   });
 
+  const writeOffMutation = useMutation({
+    mutationFn: documentsApi.writeOff,
+    onSuccess: async (document) => {
+      setSelectedId(document.id);
+      await invalidateAll();
+    },
+  });
+
   const isLoading =
     variant === "public"
       ? publicListQuery.isPending
@@ -182,7 +190,12 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
           : activeListQuery.isPending;
 
   const actionError =
-    createMutation.error ?? updateMutation.error ?? statusMutation.error ?? deleteMutation.error ?? createResolutionMutation.error;
+    createMutation.error ??
+    updateMutation.error ??
+    statusMutation.error ??
+    deleteMutation.error ??
+    createResolutionMutation.error ??
+    writeOffMutation.error;
 
   const emptyState = (() => {
     if (variant === "public") {
@@ -299,6 +312,13 @@ export function DocumentsPage({ variant, initialPublicList, initialPublicDocumen
           variant === "private" && selectedDocument
             ? async (input) => {
                 await createResolutionMutation.mutateAsync({ id: selectedDocument.id, input });
+              }
+            : undefined
+        }
+        onWriteOff={
+          variant === "private" && selectedDocument
+            ? async () => {
+                await writeOffMutation.mutateAsync(selectedDocument.id);
               }
             : undefined
         }

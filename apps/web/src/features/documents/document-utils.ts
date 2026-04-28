@@ -46,7 +46,9 @@ export function deadlineLabel(state: DocumentDeadlineState): string {
 }
 
 export function statusLabel(status: DocumentStatus): string {
-  return status === DocumentStatus.DONE ? "Завершено" : "Активно";
+  if (status === DocumentStatus.DONE) return "Завершено";
+  if (status === DocumentStatus.WRITTEN_OFF) return "Списано в дело";
+  return "Активно";
 }
 
 export function kindLabel(kind: DocumentKind): string {
@@ -104,4 +106,12 @@ export function canReopenDocument(
   }
 
   return user.role === UserRole.ROOT || doc.ownerId === user.id;
+}
+
+export function canWriteOffDocument(
+  user: { id: number; role: UserRole } | null,
+  doc: DocumentListItem | DocumentDetails,
+): boolean {
+  if (!user) return false;
+  return doc.status === DocumentStatus.DONE && (user.role === UserRole.ROOT || doc.ownerId === user.id);
 }

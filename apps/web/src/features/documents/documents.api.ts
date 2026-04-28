@@ -92,6 +92,10 @@ export const documentsApi = {
     );
   },
 
+  writeOff(id: number): Promise<DocumentDetails> {
+    return apiRequest(`/documents/${id}/write-off`, { method: "PATCH" }, documentDetailsSchema);
+  },
+
   remove(id: number): Promise<null> {
     return apiRequest(`/documents/${id}`, { method: "DELETE" }, apiNoContent());
   },

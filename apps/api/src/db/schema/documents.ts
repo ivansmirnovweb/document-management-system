@@ -14,6 +14,7 @@ import { users } from './users';
 export const documentStatusEnum = pgEnum('document_status', [
   'NOT_DONE',
   'DONE',
+  'WRITTEN_OFF',
 ]);
 
 export const documentKindEnum = pgEnum('document_kind', [

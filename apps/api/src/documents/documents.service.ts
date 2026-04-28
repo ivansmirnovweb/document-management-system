@@ -89,7 +89,10 @@ export class DocumentsService {
       .from(documents)
       .where(
         and(
-          eq(documents.status, DocumentStatus.DONE),
+          or(
+            eq(documents.status, DocumentStatus.DONE),
+            eq(documents.status, 'WRITTEN_OFF' as const),
+          ),
           isNull(documents.deletedAt),
         ),
       )
@@ -137,9 +140,19 @@ export class DocumentsService {
         ]
       : [];
 
+    const statusCondition =
+      query.status === DocumentStatus.DONE
+        ? or(
+            eq(documents.status, DocumentStatus.DONE),
+            eq(documents.status, 'WRITTEN_OFF' as const),
+          )
+        : query.status
+          ? eq(documents.status, query.status)
+          : undefined;
+
     const conditions = [
       actor?.role !== UserRole.ROOT ? isNull(documents.deletedAt) : undefined,
-      query.status ? eq(documents.status, query.status) : undefined,
+      statusCondition,
     ].filter(
       (condition): condition is NonNullable<typeof condition> =>
         condition !== undefined,
@@ -533,12 +546,54 @@ export class DocumentsService {
 
     this.permissions.assertCanChangeStatus(actor, document);
 
+    if (status === DocumentStatus.WRITTEN_OFF) {
+      throw new BadRequestException(
+        'Use write-off endpoint for case write-off workflow',
+      );
+    }
+
     const now = new Date();
     const [updated] = await this.db.db
       .update(documents)
       .set({
         status,
         completedAt: status === DocumentStatus.DONE ? now : null,
+        updatedAt: now,
+      })
+      .where(eq(documents.id, id))
+      .returning({ id: documents.id });
+
+    if (!updated) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const updatedDocument = await this.findDocumentDetailsById(id, true);
+    if (!updatedDocument) {
+      throw new BadRequestException('Failed to load updated document');
+    }
+
+    return updatedDocument;
+  }
+
+  async writeOff(id: number, actor: DocumentActor): Promise<DocumentDetails> {
+    const document = await this.findDocumentById(id, true);
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    this.permissions.assertCanChangeStatus(actor, document);
+
+    if (document.status !== DocumentStatus.DONE) {
+      throw new BadRequestException(
+        'Only completed documents can be written off to case',
+      );
+    }
+
+    const now = new Date();
+    const [updated] = await this.db.db
+      .update(documents)
+      .set({
+        status: 'WRITTEN_OFF',
         updatedAt: now,
       })
       .where(eq(documents.id, id))
@@ -841,7 +896,7 @@ export class DocumentsService {
     registrationDate: Date;
     title: string;
     kind: 'INCOMING' | 'OUTGOING' | 'INTERNAL';
-    status: 'NOT_DONE' | 'DONE';
+    status: 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
     ownerId: number;
     executorId: number;
     employerId: number | null;
@@ -924,7 +979,11 @@ export class DocumentsService {
     dueDate: Date,
     completedAt: Date | null,
   ): DocumentDeadlineState {
-    if (status === DocumentStatus.DONE || completedAt) {
+    if (
+      status === DocumentStatus.DONE ||
+      status === ('WRITTEN_OFF' as DocumentStatus) ||
+      completedAt
+    ) {
       return DocumentDeadlineState.COMPLETED;
     }
 
