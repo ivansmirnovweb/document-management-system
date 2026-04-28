@@ -23,6 +23,7 @@ export type DocumentListItem = {
   broadcast: string;
   dueDate: IsoDateString;
   completedAt?: IsoDateString | null;
+  writtenOffAt?: IsoDateString | null;
   isControl: boolean;
   deadlineState: DocumentDeadlineState;
   deletedAt?: IsoDateString | null;

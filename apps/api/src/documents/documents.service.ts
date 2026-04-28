@@ -94,6 +94,7 @@ export class DocumentsService {
         broadcast: documents.broadcast,
         dueDate: documents.dueDate,
         completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
         isControl: documents.isControl,
         deletedAt: documents.deletedAt,
         createdAt: documents.createdAt,
@@ -121,7 +122,6 @@ export class DocumentsService {
         and(
           or(
             eq(documents.status, DocumentStatus.DONE),
-            eq(documents.status, 'WRITTEN_OFF' as const),
           ),
           isNull(documents.deletedAt),
         ),
@@ -179,7 +179,6 @@ export class DocumentsService {
       query.status === DocumentStatus.DONE
         ? or(
             eq(documents.status, DocumentStatus.DONE),
-            eq(documents.status, 'WRITTEN_OFF' as const),
           )
         : query.status
           ? eq(documents.status, query.status)
@@ -215,6 +214,7 @@ export class DocumentsService {
         broadcast: documents.broadcast,
         dueDate: documents.dueDate,
         completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
         isControl: documents.isControl,
         deletedAt: documents.deletedAt,
         createdAt: documents.createdAt,
@@ -637,18 +637,13 @@ export class DocumentsService {
 
     this.permissions.assertCanChangeStatus(actor, document);
 
-    if (status === DocumentStatus.WRITTEN_OFF) {
-      throw new BadRequestException(
-        'Use write-off endpoint for case write-off workflow',
-      );
-    }
-
     const now = new Date();
     const [updated] = await this.db.db
       .update(documents)
       .set({
         status,
         completedAt: status === DocumentStatus.DONE ? now : null,
+        writtenOffAt: status === DocumentStatus.NOT_DONE ? null : undefined,
         updatedAt: now,
         lastChangedAt: now,
         lastChangedById: actor!.id,
@@ -686,7 +681,9 @@ export class DocumentsService {
     const [updated] = await this.db.db
       .update(documents)
       .set({
-        status: 'WRITTEN_OFF',
+        status: DocumentStatus.DONE,
+        completedAt: now,
+        writtenOffAt: now,
         updatedAt: now,
         lastChangedAt: now,
         lastChangedById: actor!.id,
@@ -865,6 +862,7 @@ export class DocumentsService {
         status: documents.status,
         dueDate: documents.dueDate,
         completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
         isControl: documents.isControl,
         deletedAt: documents.deletedAt,
         createdAt: documents.createdAt,
@@ -1001,6 +999,7 @@ export class DocumentsService {
       status: row.status as DocumentStatus,
       dueDate: row.dueDate.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
+      writtenOffAt: row.writtenOffAt?.toISOString() ?? null,
       isControl: row.isControl,
       deadlineState: getDocumentDeadlineState(
         row.status as DocumentStatus,
@@ -1064,6 +1063,7 @@ export class DocumentsService {
     broadcast: string;
     dueDate: Date;
     completedAt: Date | null;
+    writtenOffAt: Date | null;
     isControl: boolean;
     deletedAt: Date | null;
     createdAt: Date;
@@ -1087,6 +1087,7 @@ export class DocumentsService {
       broadcast: row.broadcast,
       dueDate: row.dueDate.toISOString(),
       completedAt: row.completedAt?.toISOString() ?? null,
+      writtenOffAt: row.writtenOffAt?.toISOString() ?? null,
       isControl: row.isControl,
       deadlineState: getDocumentDeadlineState(
         row.status as DocumentStatus,

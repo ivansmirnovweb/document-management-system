@@ -32,7 +32,6 @@ export function getDocumentDeadlineState(
 ): DocumentDeadlineState {
   if (
     status === DocumentStatus.DONE ||
-    status === DocumentStatus.WRITTEN_OFF ||
     completedAt
   ) {
     return DocumentDeadlineState.COMPLETED;

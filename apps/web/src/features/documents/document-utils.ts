@@ -50,7 +50,6 @@ export function deadlineLabel(state: DocumentDeadlineState): string {
 
 export function statusLabel(status: DocumentStatus): string {
   if (status === DocumentStatus.DONE) return "Завершено";
-  if (status === DocumentStatus.WRITTEN_OFF) return "Списано в дело";
   return "Активно";
 }
 
