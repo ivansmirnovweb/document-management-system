@@ -32,8 +32,8 @@ TZ defines status strictly as done/not-done, while implementation introduced ded
 
 ## Result
 
-Date: `TBD`
+Date: `2026-04-28`
 
 Executed:
 
-- TBD
+- Consolidated document status to binary `NOT_DONE`/`DONE`, kept write-off as a separate timestamp marker, and updated completion/search/report logic accordingly. Validation: `pnpm --filter api test -- document-deadline-state.spec.ts`, `pnpm build`.

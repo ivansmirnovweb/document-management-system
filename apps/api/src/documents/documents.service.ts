@@ -118,14 +118,7 @@ export class DocumentsService {
     const rows = await this.db.db
       .select()
       .from(documents)
-      .where(
-        and(
-          or(
-            eq(documents.status, DocumentStatus.DONE),
-          ),
-          isNull(documents.deletedAt),
-        ),
-      )
+      .where(and(eq(documents.status, DocumentStatus.DONE), isNull(documents.deletedAt)))
       .orderBy(
         desc(documents.isControl),
         asc(documents.dueDate),
@@ -175,14 +168,9 @@ export class DocumentsService {
         ]
       : [];
 
-    const statusCondition =
-      query.status === DocumentStatus.DONE
-        ? or(
-            eq(documents.status, DocumentStatus.DONE),
-          )
-        : query.status
-          ? eq(documents.status, query.status)
-          : undefined;
+    const statusCondition = query.status
+      ? eq(documents.status, query.status)
+      : undefined;
 
     const conditions = [statusCondition].filter(
       (condition): condition is NonNullable<typeof condition> =>
@@ -643,7 +631,7 @@ export class DocumentsService {
       .set({
         status,
         completedAt: status === DocumentStatus.DONE ? now : null,
-        writtenOffAt: status === DocumentStatus.NOT_DONE ? null : undefined,
+        writtenOffAt: null,
         updatedAt: now,
         lastChangedAt: now,
         lastChangedById: actor!.id,
@@ -682,7 +670,7 @@ export class DocumentsService {
       .update(documents)
       .set({
         status: DocumentStatus.DONE,
-        completedAt: now,
+        completedAt: document.completedAt ?? now,
         writtenOffAt: now,
         updatedAt: now,
         lastChangedAt: now,
@@ -796,6 +784,8 @@ export class DocumentsService {
     outgoingNumber: string | null;
     registrationDate: Date;
     dueDate: Date;
+    completedAt: Date | null;
+    writtenOffAt: Date | null;
     deletedAt: Date | null;
   } | null> {
     const whereClause = includeDeleted
@@ -812,6 +802,8 @@ export class DocumentsService {
         outgoingNumber: documents.outgoingNumber,
         registrationDate: documents.registrationDate,
         dueDate: documents.dueDate,
+        completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
         deletedAt: documents.deletedAt,
       })
       .from(documents)
@@ -1054,7 +1046,7 @@ export class DocumentsService {
     about1: string;
     about2: string | null;
     kind: 'INCOMING' | 'OUTGOING' | 'INTERNAL';
-    status: 'NOT_DONE' | 'DONE' | 'WRITTEN_OFF';
+    status: 'NOT_DONE' | 'DONE';
     ownerId: number;
     executorId: number;
     employerId: number | null;
