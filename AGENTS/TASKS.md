@@ -13,7 +13,7 @@
 - [ ] 091 — Expand search to guaranteed coverage of active/archived/deleted by required fields from TZ
 - [ ] 092 — Extend text export and executor KPI report format to match TZ columns and overdue-percent rules
 - [ ] 093 — Add executor unit model and enforce default "active by user unit" visibility per TZ
-- [ ] 094 — Restrict soft delete strictly to owner and align delete permissions with TZ
+- [x] 094 — Restrict soft delete strictly to owner and align delete permissions with TZ
 - [ ] 095 — Align deadline color semantics to exact TZ ranges (7–4 green, 3–1 yellow, due/overdue red)
 - [ ] 096 — Enforce mandatory password rotation workflow every 90 days (not only session TTL)
 - [ ] 097 — Align status domain to strict binary TZ semantics `{1,0}` and reconcile WRITTEN_OFF behavior
