@@ -58,6 +58,10 @@ export const documentsApi = {
     );
   },
 
+  getPublicById(id: number, options?: ApiRequestOptions): Promise<DocumentDetails> {
+    return apiRequest(`/documents/public/${id}`, { method: "GET", ...(options ?? {}) }, documentDetailsSchema);
+  },
+
   getById(id: number): Promise<DocumentDetails> {
     return apiRequest(`/documents/${id}`, { method: "GET" }, documentDetailsSchema);
   },
