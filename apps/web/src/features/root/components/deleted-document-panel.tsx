@@ -8,6 +8,7 @@ import type { DocumentDetails } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { deadlineLabel, deadlineTone, formatDate, formatDateTime, statusLabel } from "@/features/documents/document-utils";
 
@@ -88,13 +89,15 @@ export function DeletedDocumentPanel({
           <p className="text-sm text-zinc-600">Введите ID нового владельца и сохраните изменение.</p>
         </div>
         <form className="flex flex-wrap items-end gap-3" onSubmit={submit}>
-          <label className="min-w-48 flex-1 space-y-2 text-sm font-medium text-zinc-800">
-            <span>ID нового владельца</span>
-            <Input type="number" min="1" {...form.register("ownerId", { valueAsNumber: true })} />
-            {form.formState.errors.ownerId ? (
-              <span className="text-xs text-red-600">{form.formState.errors.ownerId.message}</span>
-            ) : null}
-          </label>
+          <FormField
+            label="ID нового владельца"
+            required
+            className="min-w-48 flex-1"
+            helperText="Введите числовой ID пользователя, которому нужно передать документ."
+            error={form.formState.errors.ownerId?.message}
+          >
+            <Input type="number" min="1" aria-required="true" {...form.register("ownerId", { valueAsNumber: true })} />
+          </FormField>
           <Button type="submit" disabled={isReassigning}>
             {isReassigning ? "Сохраняем..." : "Переназначить"}
           </Button>
