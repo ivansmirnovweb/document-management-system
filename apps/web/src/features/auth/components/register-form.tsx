@@ -10,6 +10,7 @@ import type { RegisterRequest } from "@document-flow/shared";
 import { useAuth } from "../auth.provider";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 
 export function RegisterForm() {
@@ -49,6 +50,7 @@ export function RegisterForm() {
       <div>
         <CardTitle>Регистрация</CardTitle>
         <CardDescription>Создайте новую учётную запись для доступа к рабочей области.</CardDescription>
+        <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны.</p>
       </div>
 
       {formError ? (
@@ -56,37 +58,41 @@ export function RegisterForm() {
       ) : null}
 
       <form className="space-y-4" onSubmit={submit}>
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Отображаемое имя</span>
-          <Input autoComplete="name" {...form.register("displayName")} />
-          {form.formState.errors.displayName ? (
-            <span className="text-xs text-red-600">{form.formState.errors.displayName.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Отображаемое имя"
+          required
+          helperText="Как будет отображаться ваше имя в системе."
+          error={form.formState.errors.displayName?.message}
+        >
+          <Input autoComplete="name" aria-required="true" {...form.register("displayName")} />
+        </FormField>
 
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Логин</span>
-          <Input autoComplete="username" {...form.register("username")} />
-          {form.formState.errors.username ? (
-            <span className="text-xs text-red-600">{form.formState.errors.username.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Логин"
+          required
+          helperText="Используйте латиницу, цифры, точку, подчёркивание или дефис."
+          error={form.formState.errors.username?.message}
+        >
+          <Input autoComplete="username" aria-required="true" {...form.register("username")} />
+        </FormField>
 
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Подразделение</span>
-          <Input {...form.register("unit")} />
-          {form.formState.errors.unit ? (
-            <span className="text-xs text-red-600">{form.formState.errors.unit.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Подразделение"
+          required
+          helperText="Например, отдел, филиал или команда."
+          error={form.formState.errors.unit?.message}
+        >
+          <Input aria-required="true" {...form.register("unit")} />
+        </FormField>
 
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Пароль</span>
-          <Input type="password" autoComplete="new-password" {...form.register("password")} />
-          {form.formState.errors.password ? (
-            <span className="text-xs text-red-600">{form.formState.errors.password.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Пароль"
+          required
+          helperText="Минимум 8 символов."
+          error={form.formState.errors.password?.message}
+        >
+          <Input type="password" autoComplete="new-password" aria-required="true" {...form.register("password")} />
+        </FormField>
 
         <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Создаём аккаунт..." : "Создать аккаунт"}

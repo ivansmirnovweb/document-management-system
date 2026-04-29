@@ -41,4 +41,5 @@ Current header shows links that some users cannot open (for example, regular use
 
 ## Result
 
-Pending.
+- Added a centralized navigation access helper and filtered header links by auth/role so guests only see public entries and root-only routes stay hidden from non-root users.
+- Verified with `pnpm --filter web lint` (existing warnings only) and `pnpm build:shared && pnpm --filter web build`.

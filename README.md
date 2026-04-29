@@ -60,6 +60,18 @@ pnpm --filter api db:migrate
 pnpm --filter api db:seed
 ```
 
+### Migration reliability notes
+
+- Use `pnpm --filter api db:migrate` as the default migration command.
+- `db:migrate` now validates journal/file consistency before running migrations.
+- If `drizzle-kit migrate` fails silently, `db:migrate` automatically runs a diagnostic replay and prints:
+  - exact migration file,
+  - statement index,
+  - SQL snippet,
+  - original PostgreSQL error.
+- Avoid `db:push` on existing datasets in normal workflow (it may suggest destructive operations).
+- Raw Drizzle CLI remains available as `pnpm --filter api db:migrate:raw` for low-level debugging.
+
 ## Demo data
 
 The seed creates:

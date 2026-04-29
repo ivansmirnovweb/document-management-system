@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/features/auth/auth.provider";
+import { getVisibleMainNavigationLinks } from "./navigation-links";
 import { UserRole } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -12,14 +13,7 @@ export function MainNavigation() {
     const pathname = usePathname();
     const auth = useAuth();
 
-    const links = [
-        { href: "/", label: "Публичные документы" },
-        { href: "/dashboard", label: "Рабочая область" },
-        { href: "/dashboard/reports", label: "Отчёты" },
-        ...(auth.user?.role === UserRole.ROOT
-            ? [{ href: "/dashboard/root", label: "Root" }]
-            : []),
-    ];
+    const links = getVisibleMainNavigationLinks(auth.user);
 
     return (
         <header className="border-b border-zinc-200 bg-white/90 backdrop-blur">
