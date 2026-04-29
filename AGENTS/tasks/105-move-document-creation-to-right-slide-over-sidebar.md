@@ -47,4 +47,4 @@ Current create flow appears in-page and is easy to miss, which makes UX confusin
 
 ## Result
 
-Pending.
+Implemented create flow in a reusable right slide-over. The document page now opens create mode in an overlay, closes via button/backdrop/Esc, and transitions to the created document details after save.
