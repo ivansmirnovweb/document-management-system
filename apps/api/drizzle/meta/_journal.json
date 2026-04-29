@@ -15,6 +15,55 @@
       "when": 1777127367234,
       "tag": "0001_bright_mimic",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777127367235,
+      "tag": "0002_document_kind_classification",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777127367236,
+      "tag": "0003_document_resolutions",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777127367237,
+      "tag": "0004_document_status_written_off",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777127367238,
+      "tag": "0005_tz_field_mapping",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777127367239,
+      "tag": "0006_last_change_block",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777127367240,
+      "tag": "0007_executor_unit",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1777127367241,
+      "tag": "0008_document_written_off_at_binary_status",
+      "breakpoints": true
     }
   ]
 }
