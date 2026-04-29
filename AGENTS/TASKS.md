@@ -22,7 +22,7 @@
 - [ ] 100 — Remove emoji/sticker-style visual markers from UI and replace with neutral design-system feedback
 - [ ] 101 — Add clear required-field indicators across all forms with consistent validation UX
 - [ ] 102 — Add global toast/snackbar notifications for form and API errors to ensure immediate visibility
-- [ ] 103 — Make header navigation role-aware and show only links accessible to the current user
+- [x] 103 — Make header navigation role-aware and show only links accessible to the current user
 - [ ] 104 — Reduce protected-page loading flicker via SSR session/prefetch and remove global loading flash
 - [ ] 105 — Move document creation flow into a right slide-over sidebar
 
