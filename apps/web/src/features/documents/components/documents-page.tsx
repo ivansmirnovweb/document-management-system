@@ -10,9 +10,9 @@ import {
 import { useAuth } from "@/features/auth/auth.provider";
 import { employersApi } from "@/features/employers/employers.api";
 import { employersKeys } from "@/features/employers/employers.keys";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { StateCard } from "@/shared/ui/state-card";
 import { documentsApi } from "../documents.api";
@@ -567,21 +567,27 @@ export function DocumentsPage({
                     </div>
 
                     <form
-                        className="flex flex-wrap gap-3"
+                        className="flex flex-wrap items-end gap-3"
                         onSubmit={(event) => {
                             event.preventDefault();
                             setAppliedSearch(searchInput.trim());
                             setMode("details");
                         }}
                     >
-                        <Input
-                            className="max-w-md"
-                            placeholder="Поиск по рег. номеру, названию, датам или логинам"
-                            value={searchInput}
-                            onChange={(event) =>
-                                setSearchInput(event.target.value)
-                            }
-                        />
+                        <FormField
+                            label="Поиск"
+                            optional
+                            helperText="Ищет по рег. номеру, названию, датам и логинам."
+                            className="w-full max-w-md"
+                        >
+                            <Input
+                                placeholder="Например, 24/01-15"
+                                value={searchInput}
+                                onChange={(event) =>
+                                    setSearchInput(event.target.value)
+                                }
+                            />
+                        </FormField>
                         <Button type="submit">Найти</Button>
                         {appliedSearch ? (
                             <Button

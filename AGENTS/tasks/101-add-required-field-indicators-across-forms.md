@@ -40,4 +40,4 @@ Users cannot reliably distinguish required and optional inputs in current forms,
 
 ## Result
 
-Pending.
+Completed: added a shared form-field helper, marked required/optional fields across auth, document, report, search, and root reassign forms, and aligned validation messages in shared schemas to Russian.

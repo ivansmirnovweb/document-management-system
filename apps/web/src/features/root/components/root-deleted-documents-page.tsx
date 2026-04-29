@@ -6,7 +6,7 @@ import { UserRole, type DocumentListItem } from "@document-flow/shared";
 import { useAuth } from "@/features/auth/auth.provider";
 import { documentsApi } from "@/features/documents/documents.api";
 import { documentsKeys } from "@/features/documents/documents.keys";
-import { Button } from "@/shared/ui/button";
+
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { StateCard } from "@/shared/ui/state-card";
 import { DeletedDocumentsTable } from "./deleted-documents-table";

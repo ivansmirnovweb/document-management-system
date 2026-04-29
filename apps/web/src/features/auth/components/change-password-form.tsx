@@ -8,6 +8,7 @@ import type { ChangePasswordRequest } from "@document-flow/shared";
 import { useAuth } from "../auth.provider";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 
 type ChangePasswordFormProps = {
@@ -45,6 +46,7 @@ export function ChangePasswordForm({
       <div>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
+        <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны.</p>
       </div>
 
       {formError ? (
@@ -52,21 +54,23 @@ export function ChangePasswordForm({
       ) : null}
 
       <form className="space-y-4" onSubmit={submit}>
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Текущий пароль</span>
-          <Input type="password" autoComplete="current-password" {...form.register("currentPassword")} />
-          {form.formState.errors.currentPassword ? (
-            <span className="text-xs text-red-600">{form.formState.errors.currentPassword.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Текущий пароль"
+          required
+          helperText="Подтвердите текущую учётную запись."
+          error={form.formState.errors.currentPassword?.message}
+        >
+          <Input type="password" autoComplete="current-password" aria-required="true" {...form.register("currentPassword")} />
+        </FormField>
 
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Новый пароль</span>
-          <Input type="password" autoComplete="new-password" {...form.register("newPassword")} />
-          {form.formState.errors.newPassword ? (
-            <span className="text-xs text-red-600">{form.formState.errors.newPassword.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Новый пароль"
+          required
+          helperText="Минимум 8 символов."
+          error={form.formState.errors.newPassword?.message}
+        >
+          <Input type="password" autoComplete="new-password" aria-required="true" {...form.register("newPassword")} />
+        </FormField>
 
         <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Сохраняем пароль..." : "Сменить пароль"}

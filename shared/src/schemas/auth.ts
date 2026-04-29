@@ -9,16 +9,16 @@ export const authUserSchema = userSchema.extend({
 const usernameSchema = z
   .string()
   .trim()
-  .min(3, "Username must be at least 3 characters")
-  .max(100, "Username must be at most 100 characters")
-  .regex(/^[a-z0-9._-]+$/, "Username can contain only lowercase letters, numbers, dot, underscore, and hyphen");
+  .min(3, "Имя пользователя должно быть не короче 3 символов")
+  .max(100, "Имя пользователя должно быть не длиннее 100 символов")
+  .regex(/^[a-z0-9._-]+$/, "Имя пользователя может содержать только строчные латинские буквы, цифры, точку, подчёркивание и дефис");
 
-const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
+const passwordSchema = z.string().min(8, "Пароль должен быть не короче 8 символов");
 
 export const loginRequestSchema = z
   .object({
-    username: requiredText("Username"),
-    password: z.string().min(1, "Password is required"),
+    username: requiredText("Имя пользователя"),
+    password: z.string().min(1, "Пароль — обязательное поле"),
   })
   .strict();
 
@@ -33,7 +33,7 @@ export const registerRequestSchema = z
 
 export const changePasswordRequestSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required"),
+    currentPassword: z.string().min(1, "Текущий пароль — обязательное поле"),
     newPassword: passwordSchema,
   })
   .strict();
