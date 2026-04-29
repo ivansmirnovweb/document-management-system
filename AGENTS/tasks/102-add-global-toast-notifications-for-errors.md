@@ -45,4 +45,4 @@ At the moment, errors like `Outgoing document requires outgoingNumber` can appea
 
 ## Result
 
-Pending.
+Implemented with a global toast viewport in the app shell and React Query error hooks for fetch/mutation failures.

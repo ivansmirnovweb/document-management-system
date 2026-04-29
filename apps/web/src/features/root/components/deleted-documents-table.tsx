@@ -91,7 +91,7 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
   });
 
   if (documents.length === 0) {
-    return <StateCard title="Нет удалённых записей" description="Удалённые документы появятся здесь для пользователей root." icon="🗂️" />;
+    return <StateCard title="Нет удалённых записей" description="Удалённые документы появятся здесь для пользователей root." />;
   }
 
   return (

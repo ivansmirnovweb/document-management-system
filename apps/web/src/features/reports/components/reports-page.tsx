@@ -14,9 +14,9 @@ import { reportsKeys } from "../reports.keys";
 import { ExecutorStatisticsTable } from "./executor-statistics-table";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { StateCard } from "@/shared/ui/state-card";
-import { Badge } from "@/shared/ui/badge";
 
 const reportRangeSchema = reportFilterInputSchema.pick({
     dateFrom: true,
@@ -90,7 +90,6 @@ export function ReportsPage() {
                 description="Откройте отчёты после авторизации."
                 actionLabel="Перейти ко входу"
                 actionHref="/login"
-                icon="🔐"
             />
         );
     }
@@ -100,7 +99,6 @@ export function ReportsPage() {
             <StateCard
                 title="Требуется доступ ROOT"
                 description="Отчёты доступны только пользователю root."
-                icon="🛡️"
             />
         );
     }
@@ -126,31 +124,28 @@ export function ReportsPage() {
                         Используйте включительный диапазон дат для статистики и
                         экспорта.
                     </CardDescription>
+                    <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны.</p>
                 </div>
 
                 <form
                     className="grid gap-4 md:grid-cols-[1fr_1fr_auto_auto] md:items-end"
                     onSubmit={submit}
                 >
-                    <label className="space-y-2 text-sm font-medium text-zinc-800">
-                        <span>С</span>
-                        <Input type="date" {...form.register("dateFrom")} />
-                        {form.formState.errors.dateFrom ? (
-                            <span className="text-xs text-red-600">
-                                {form.formState.errors.dateFrom.message}
-                            </span>
-                        ) : null}
-                    </label>
+                    <FormField
+                        label="С"
+                        required
+                        error={form.formState.errors.dateFrom?.message}
+                    >
+                        <Input type="date" aria-required="true" {...form.register("dateFrom")} />
+                    </FormField>
 
-                    <label className="space-y-2 text-sm font-medium text-zinc-800">
-                        <span>По</span>
-                        <Input type="date" {...form.register("dateTo")} />
-                        {form.formState.errors.dateTo ? (
-                            <span className="text-xs text-red-600">
-                                {form.formState.errors.dateTo.message}
-                            </span>
-                        ) : null}
-                    </label>
+                    <FormField
+                        label="По"
+                        required
+                        error={form.formState.errors.dateTo?.message}
+                    >
+                        <Input type="date" aria-required="true" {...form.register("dateTo")} />
+                    </FormField>
 
                     <Button
                         type="submit"
@@ -184,7 +179,6 @@ export function ReportsPage() {
                 <StateCard
                     title="Загрузка отчёта"
                     description="Получаем статистику исполнителей."
-                    icon="⏳"
                 />
             ) : null}
 
@@ -192,7 +186,6 @@ export function ReportsPage() {
                 <StateCard
                     title="Не удалось загрузить отчёт"
                     description={statisticsQuery.error.message}
-                    icon="⚠️"
                 />
             ) : null}
 

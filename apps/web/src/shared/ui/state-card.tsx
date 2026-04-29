@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { Card, CardDescription, CardTitle } from "./card";
 import { Button } from "./button";
@@ -9,7 +8,6 @@ type StateCardProps = {
   actionLabel?: string;
   onAction?: () => void;
   actionHref?: string;
-  icon?: ReactNode;
 };
 
 export function StateCard({
@@ -18,16 +16,12 @@ export function StateCard({
   actionLabel,
   onAction,
   actionHref,
-  icon,
 }: StateCardProps) {
   return (
     <Card className="space-y-4">
-      <div className="flex items-start gap-3">
-        {icon ? <div className="mt-0.5 text-2xl">{icon}</div> : null}
-        <div>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
+      <div>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </div>
       {actionLabel ? (
         actionHref ? (

@@ -10,10 +10,11 @@ import {
 import { useAuth } from "@/features/auth/auth.provider";
 import { employersApi } from "@/features/employers/employers.api";
 import { employersKeys } from "@/features/employers/employers.keys";
-import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
+import { SlideOver } from "@/shared/ui/slide-over";
 import { StateCard } from "@/shared/ui/state-card";
 import { documentsApi } from "../documents.api";
 import { documentsKeys } from "../documents.keys";
@@ -44,7 +45,9 @@ export function DocumentsPage({
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [mode, setMode] = useState<"details" | "create" | "edit">("details");
+    const [mode, setMode] = useState<"details" | "create" | "edit">(
+        "details",
+    );
     const currentUser = auth.user
         ? { id: auth.user.id, role: auth.user.role }
         : null;
@@ -111,28 +114,17 @@ export function DocumentsPage({
                 ? completedListQuery.error
                 : activeListQuery.error;
 
-    const selectedDocumentId = useMemo(() => {
-        if (
-            selectedId !== null &&
-            list.some((document) => document.id === selectedId)
-        ) {
-            return selectedId;
-        }
-
-        return list[0]?.id ?? null;
-    }, [list, selectedId]);
-
     const selectedDocumentQuery = useQuery({
-        queryKey: documentsKeys.details(variant, selectedDocumentId ?? 0),
+        queryKey: documentsKeys.details(variant, selectedId ?? 0),
         queryFn: () =>
             variant === "public"
-                ? documentsApi.getPublicById(selectedDocumentId ?? 0)
-                : documentsApi.getById(selectedDocumentId ?? 0),
-        enabled: selectedDocumentId !== null,
+                ? documentsApi.getPublicById(selectedId ?? 0)
+                : documentsApi.getById(selectedId ?? 0),
+        enabled: selectedId !== null,
         initialData:
             variant === "public" &&
-            selectedDocumentId !== null &&
-            initialPublicDocument?.id === selectedDocumentId
+            selectedId !== null &&
+            initialPublicDocument?.id === selectedId
                 ? initialPublicDocument
                 : undefined,
     });
@@ -148,6 +140,21 @@ export function DocumentsPage({
 
     const invalidateAll = async () => {
         await queryClient.invalidateQueries({ queryKey: documentsKeys.all });
+    };
+
+    const closeSidebar = () => {
+        setMode("details");
+        setSelectedId(null);
+    };
+
+    const openDetails = (document: DocumentListItem) => {
+        setSelectedId(document.id);
+        setMode("details");
+    };
+
+    const openEdit = (document: DocumentListItem) => {
+        setSelectedId(document.id);
+        setMode("edit");
     };
 
     const createMutation = useMutation({
@@ -187,8 +194,7 @@ export function DocumentsPage({
     const deleteMutation = useMutation({
         mutationFn: documentsApi.remove,
         onSuccess: async () => {
-            setMode("details");
-            setSelectedId(null);
+            closeSidebar();
             await invalidateAll();
         },
     });
@@ -268,7 +274,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Создание доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -281,7 +286,7 @@ export function DocumentsPage({
                     currentUser={currentUser}
                     employers={employersQuery.data ?? []}
                     isSaving={createMutation.isPending}
-                    onCancel={() => setMode("details")}
+                    onCancel={closeSidebar}
                     onSubmit={async (input) => {
                         await createMutation.mutateAsync(
                             input as Parameters<typeof documentsApi.create>[0],
@@ -297,7 +302,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Редактирование доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -307,7 +311,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Не удалось загрузить документ"
                         description={selectedDocumentQuery.error.message}
-                        icon="⚠️"
                     />
                 );
             }
@@ -317,7 +320,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Загрузка документа"
                         description="Ждём загрузки выбранного документа."
-                        icon="⏳"
                     />
                 );
             }
@@ -330,7 +332,7 @@ export function DocumentsPage({
                     currentUser={currentUser}
                     employers={employersQuery.data ?? []}
                     isSaving={updateMutation.isPending}
-                    onCancel={() => setMode("details")}
+                    onCancel={closeSidebar}
                     onSubmit={async (input) => {
                         await updateMutation.mutateAsync({
                             id: selectedDocument.id,
@@ -348,21 +350,15 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документ"
                     description={selectedDocumentQuery.error.message}
-                    icon="⚠️"
                 />
             );
         }
 
-        if (
-            selectedDocumentId !== null &&
-            selectedDocumentQuery.isPending &&
-            !selectedDocument
-        ) {
+        if (selectedId !== null && selectedDocumentQuery.isPending && !selectedDocument) {
             return (
                 <StateCard
                     title="Загрузка документа"
                     description="Получаем выбранную запись."
-                    icon="⏳"
                 />
             );
         }
@@ -372,9 +368,7 @@ export function DocumentsPage({
                 document={selectedDocument}
                 currentUser={currentUser}
                 publicView={variant === "public"}
-                onEdit={
-                    variant === "private" ? () => setMode("edit") : undefined
-                }
+                onEdit={variant === "private" ? () => setMode("edit") : undefined}
                 onToggleStatus={
                     variant === "private" && selectedDocument
                         ? async () => {
@@ -428,7 +422,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документы"
                     description={listError.message}
-                    icon="⚠️"
                 />
             );
         }
@@ -437,7 +430,7 @@ export function DocumentsPage({
             return (
                 <DocumentsTable
                     documents={list}
-                    selectedDocumentId={selectedDocumentId}
+                    selectedDocumentId={selectedId}
                     currentUser={currentUser}
                     publicView={variant === "public"}
                     emptyStateTitle={emptyState.title}
@@ -446,14 +439,9 @@ export function DocumentsPage({
                         variant === "private" ? "Создать документ" : undefined
                     }
                     onEmptyAction={
-                        variant === "private"
-                            ? () => setMode("create")
-                            : undefined
+                        variant === "private" ? () => setMode("create") : undefined
                     }
-                    onSelect={(document) => {
-                        setSelectedId(document.id);
-                        setMode("details");
-                    }}
+                    onSelect={openDetails}
                 />
             );
         }
@@ -472,22 +460,12 @@ export function DocumentsPage({
                 onEmptyAction={
                     variant === "private" ? () => setMode("create") : undefined
                 }
-                onSelect={(document) => {
-                    setSelectedId(document.id);
-                    setMode("details");
-                }}
-                onEdit={
-                    variant === "private"
-                        ? (document) => {
-                              setSelectedId(document.id);
-                              setMode("edit");
-                          }
-                        : undefined
-                }
+                onSelect={openDetails}
+                onEdit={variant === "private" ? openEdit : undefined}
                 onToggleStatus={
                     variant === "private"
                         ? (document) => {
-                              setSelectedId(document.id);
+                              openDetails(document);
                               void statusMutation.mutateAsync({
                                   id: document.id,
                                   status:
@@ -501,13 +479,31 @@ export function DocumentsPage({
                 onDelete={
                     variant === "private"
                         ? (document) => {
-                              setSelectedId(document.id);
+                              openDetails(document);
                               void deleteMutation.mutateAsync(document.id);
                           }
                         : undefined
                 }
             />
         );
+    })();
+
+    const sidebarOpen = mode !== "details" || selectedId !== null;
+    const sidebarTitle = (() => {
+        if (mode === "create") return "Создать документ";
+        if (mode === "edit") return "Редактировать документ";
+        return "Детали документа";
+    })();
+    const sidebarDescription = (() => {
+        if (mode === "create") {
+            return "Заполните поля и сохраните запись.";
+        }
+        if (mode === "edit") {
+            return selectedDocument
+                ? `Изменение записи №${selectedDocument.registrationNumber}.`
+                : "Изменение выбранной записи.";
+        }
+        return "Просмотр выбранной записи.";
     })();
 
     return (
@@ -541,7 +537,9 @@ export function DocumentsPage({
                                     }
                                     onClick={() => {
                                         setTab(item.value);
-                                        setMode("details");
+                                        setSearchInput("");
+                                        setAppliedSearch("");
+                                        closeSidebar();
                                     }}
                                 >
                                     {item.label}
@@ -553,35 +551,44 @@ export function DocumentsPage({
                                         }`}
                                     >
                                         {item.value === DocumentStatus.DONE
-                                            ? (completedListQuery.data
-                                                  ?.length ?? 0)
-                                            : (activeListQuery.data?.length ??
-                                              0)}
+                                            ? (completedListQuery.data?.length ?? 0)
+                                            : (activeListQuery.data?.length ?? 0)}
                                     </span>
                                 </Button>
                             ))}
                         </div>
-                        <Button onClick={() => setMode("create")}>
+                        <Button
+                            onClick={() => {
+                                setMode("create");
+                                setSelectedId(null);
+                            }}
+                        >
                             Создать документ
                         </Button>
                     </div>
 
                     <form
-                        className="flex flex-wrap gap-3"
+                        className="flex flex-wrap items-end gap-3"
                         onSubmit={(event) => {
                             event.preventDefault();
                             setAppliedSearch(searchInput.trim());
-                            setMode("details");
+                            closeSidebar();
                         }}
                     >
-                        <Input
-                            className="max-w-md"
-                            placeholder="Поиск по рег. номеру, названию, датам или логинам"
-                            value={searchInput}
-                            onChange={(event) =>
-                                setSearchInput(event.target.value)
-                            }
-                        />
+                        <FormField
+                            label="Поиск"
+                            optional
+                            helperText="Ищет по рег. номеру, названию, датам и логинам."
+                            className="w-full max-w-md"
+                        >
+                            <Input
+                                placeholder="Например, 24/01-15"
+                                value={searchInput}
+                                onChange={(event) =>
+                                    setSearchInput(event.target.value)
+                                }
+                            />
+                        </FormField>
                         <Button type="submit">Найти</Button>
                         {appliedSearch ? (
                             <Button
@@ -590,6 +597,7 @@ export function DocumentsPage({
                                 onClick={() => {
                                     setSearchInput("");
                                     setAppliedSearch("");
+                                    closeSidebar();
                                 }}
                             >
                                 Очистить
@@ -603,7 +611,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
-                    icon="⏳"
                 />
             ) : null}
 
@@ -623,11 +630,16 @@ export function DocumentsPage({
                 </div>
             ) : null}
 
-            <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-                <div className="space-y-4">{listState}</div>
+            <div className="space-y-4">{listState}</div>
 
-                <div className="space-y-4">{panel}</div>
-            </div>
+            <SlideOver
+                open={sidebarOpen}
+                title={sidebarTitle}
+                description={sidebarDescription}
+                onClose={closeSidebar}
+            >
+                {panel}
+            </SlideOver>
         </div>
     );
 }
