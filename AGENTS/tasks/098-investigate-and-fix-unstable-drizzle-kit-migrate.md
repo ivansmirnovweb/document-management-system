@@ -63,4 +63,17 @@ Out of scope:
 
 ## Result
 
-Pending.
+Implemented migration hardening in `apps/api/scripts/db-migrate.mjs` and switched `db:migrate` to this wrapper.
+
+Delivered:
+
+- Preflight consistency checks for `drizzle/meta/_journal.json` vs `drizzle/*.sql` (idx/order, missing files, extra files).
+- Primary migrate path still uses `drizzle-kit migrate` but now with deterministic fallback diagnostics.
+- On failure, automatic diagnostic replay prints exact failing migration file, statement index, SQL snippet, and PostgreSQL error.
+- Added `db:migrate:raw` script for low-level direct CLI runs.
+- Updated root README with migration reliability workflow and safe fallback guidance.
+
+Verification status in this environment:
+
+- `pnpm --filter api db:migrate` confirms actionable diagnostics for misconfiguration (`DATABASE_URL` missing).
+- Full clean-DB migration+seed run is blocked locally because PostgreSQL runtime is unavailable in this host environment.
