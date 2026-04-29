@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -10,9 +10,9 @@ import {
   type DocumentKind,
   type UserRole,
 } from "@document-flow/shared";
-import { cn } from "@/lib/cn";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { Select } from "@/shared/ui/select";
 import { Textarea } from "@/shared/ui/textarea";
@@ -123,42 +123,61 @@ export function DocumentFormPanel({
               ? `Редактирование: ${document.title} (${document.registrationNumber})`
               : "Редактирование документа."}
         </CardDescription>
+        <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны. Остальные можно оставить пустыми.</p>
       </div>
 
       {mode === "edit" && document ? <AuditInfo document={document} /> : null}
 
       <form key={`${mode}-${document?.id ?? "new"}`} className="space-y-4" onSubmit={submit}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Рег. номер" error={form.formState.errors.registrationNumber?.message}>
-            <Input {...form.register("registrationNumber")} />
-          </Field>
-          <Field label="Дата регистрации" error={form.formState.errors.registrationDate?.message}>
-            <Input type="date" {...form.register("registrationDate")} />
-          </Field>
-          <Field label="Название" className="sm:col-span-2" error={form.formState.errors.title?.message}>
-            <Input {...form.register("title")} />
-          </Field>
-          <Field label="Вид документа" error={form.formState.errors.kind?.message}>
-            <Select {...form.register("kind")}>
+          <FormField
+            label="Регистрационный номер"
+            required
+            error={form.formState.errors.registrationNumber?.message}
+          >
+            <Input aria-required="true" {...form.register("registrationNumber")} />
+          </FormField>
+          <FormField
+            label="Дата регистрации"
+            required
+            error={form.formState.errors.registrationDate?.message}
+          >
+            <Input type="date" aria-required="true" {...form.register("registrationDate")} />
+          </FormField>
+          <FormField
+            label="Название"
+            required
+            className="sm:col-span-2"
+            error={form.formState.errors.title?.message}
+          >
+            <Input aria-required="true" {...form.register("title")} />
+          </FormField>
+          <FormField label="Вид документа" required error={form.formState.errors.kind?.message}>
+            <Select aria-required="true" {...form.register("kind")}>
               <option value="INTERNAL">Внутренний</option>
               <option value="INCOMING">Входящий</option>
               <option value="OUTGOING">Исходящий</option>
             </Select>
-          </Field>
-          <Field label="Срок" error={form.formState.errors.dueDate?.message}>
-            <Input type="date" {...form.register("dueDate")} />
-          </Field>
-          <Field label="ID исполнителя" error={form.formState.errors.executorId?.message}>
-            <Input type="number" min={1} {...form.register("executorId")} />
-          </Field>
+          </FormField>
+          <FormField label="Срок" required error={form.formState.errors.dueDate?.message}>
+            <Input type="date" aria-required="true" {...form.register("dueDate")} />
+          </FormField>
+          <FormField label="ID исполнителя" required error={form.formState.errors.executorId?.message}>
+            <Input type="number" min={1} aria-required="true" {...form.register("executorId")} />
+          </FormField>
           {currentUser.role === "ROOT" ? (
-            <Field label="ID владельца" error={form.formState.errors.ownerId?.message}>
-              <Input type="number" min={1} {...form.register("ownerId")} />
-            </Field>
+            <FormField label="ID владельца" required error={form.formState.errors.ownerId?.message}>
+              <Input type="number" min={1} aria-required="true" {...form.register("ownerId")} />
+            </FormField>
           ) : (
             <input type="hidden" {...form.register("ownerId")} />
           )}
-          <Field label="Работодатель" error={form.formState.errors.employerId?.message}>
+          <FormField
+            label="Работодатель"
+            optional
+            helperText="Оставьте пустым, если документ не привязан к работодателю."
+            error={form.formState.errors.employerId?.message}
+          >
             <Select
               {...form.register("employerId", {
                 setValueAs: (value) => (value === "" ? null : Number(value)),
@@ -171,32 +190,45 @@ export function DocumentFormPanel({
                 </option>
               ))}
             </Select>
-          </Field>
+          </FormField>
         </div>
 
-        <Field label="Описание" error={form.formState.errors.description?.message}>
+        <FormField
+          label="Описание"
+          optional
+          helperText="Необязательное пояснение к документу."
+          error={form.formState.errors.description?.message}
+        >
           <Textarea
             {...form.register("description", {
               setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
             })}
           />
-        </Field>
+        </FormField>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Входящий номер" error={form.formState.errors.incomingNumber?.message}>
+          <FormField
+            label="Входящий номер"
+            optional
+            error={form.formState.errors.incomingNumber?.message}
+          >
             <Input
               {...form.register("incomingNumber", {
                 setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
               })}
             />
-          </Field>
-          <Field label="Исходящий номер" error={form.formState.errors.outgoingNumber?.message}>
+          </FormField>
+          <FormField
+            label="Исходящий номер"
+            optional
+            error={form.formState.errors.outgoingNumber?.message}
+          >
             <Input
               {...form.register("outgoingNumber", {
                 setValueAs: (value) => (String(value).trim() === "" ? null : String(value)),
               })}
             />
-          </Field>
+          </FormField>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -233,26 +265,6 @@ function AuditField({ label, value }: { label: string; value: string }) {
     <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2">
       <dt className="text-xs uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
       <dd className="mt-1 font-medium text-zinc-950">{value}</dd>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  className,
-  children,
-  error,
-}: {
-  label: string;
-  className?: string;
-  children: ReactNode;
-  error?: string;
-}) {
-  return (
-    <div className={cn("block space-y-2 text-sm font-medium text-zinc-800", className)}>
-      <span>{label}</span>
-      {children}
-      {error ? <span className="block text-xs font-normal text-red-600">{error}</span> : null}
     </div>
   );
 }

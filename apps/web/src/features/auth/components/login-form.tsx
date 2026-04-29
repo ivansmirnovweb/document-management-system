@@ -10,6 +10,7 @@ import type { LoginRequest } from "@document-flow/shared";
 import { useAuth } from "../auth.provider";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
+import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 
 export function LoginForm() {
@@ -47,6 +48,7 @@ export function LoginForm() {
       <div>
         <CardTitle>Вход</CardTitle>
         <CardDescription>Используйте свои данные для входа в систему документооборота.</CardDescription>
+        <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны.</p>
       </div>
 
       {formError ? (
@@ -56,21 +58,23 @@ export function LoginForm() {
       ) : null}
 
       <form className="space-y-4" onSubmit={submit}>
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Логин</span>
-          <Input autoComplete="username" {...form.register("username")} />
-          {form.formState.errors.username ? (
-            <span className="text-xs text-red-600">{form.formState.errors.username.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Логин"
+          required
+          helperText="Введите имя пользователя для входа."
+          error={form.formState.errors.username?.message}
+        >
+          <Input autoComplete="username" aria-required="true" {...form.register("username")} />
+        </FormField>
 
-        <label className="block space-y-2 text-sm font-medium text-zinc-800">
-          <span>Пароль</span>
-          <Input type="password" autoComplete="current-password" {...form.register("password")} />
-          {form.formState.errors.password ? (
-            <span className="text-xs text-red-600">{form.formState.errors.password.message}</span>
-          ) : null}
-        </label>
+        <FormField
+          label="Пароль"
+          required
+          helperText="Введите пароль от учётной записи."
+          error={form.formState.errors.password?.message}
+        >
+          <Input type="password" autoComplete="current-password" aria-required="true" {...form.register("password")} />
+        </FormField>
 
         <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Входим..." : "Войти"}

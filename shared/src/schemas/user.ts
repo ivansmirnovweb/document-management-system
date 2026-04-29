@@ -5,9 +5,9 @@ import { isoDateStringSchema, requiredText } from "./common";
 export const userSchema = z
   .object({
     id: z.number().int().positive(),
-    username: requiredText("Username"),
-    displayName: requiredText("Display name"),
-    unit: requiredText("Unit"),
+    username: requiredText("Имя пользователя"),
+    displayName: requiredText("Отображаемое имя"),
+    unit: requiredText("Подразделение"),
     role: z.nativeEnum(UserRole),
     passwordChangedAt: isoDateStringSchema.nullable().optional(),
     createdAt: isoDateStringSchema,
