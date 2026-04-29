@@ -12,7 +12,6 @@ import { employersApi } from "@/features/employers/employers.api";
 import { employersKeys } from "@/features/employers/employers.keys";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
-import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { SlideOver } from "@/shared/ui/slide-over";
 import { StateCard } from "@/shared/ui/state-card";
@@ -120,7 +119,7 @@ export function DocumentsPage({
             variant === "public"
                 ? documentsApi.getPublicById(selectedId ?? 0)
                 : documentsApi.getById(selectedId ?? 0),
-        enabled: selectedId !== null,
+        enabled: selectedId !== null && mode !== "create",
         initialData:
             variant === "public" &&
             selectedId !== null &&
@@ -145,6 +144,11 @@ export function DocumentsPage({
     const closeSidebar = () => {
         setMode("details");
         setSelectedId(null);
+    };
+
+    const openCreate = () => {
+        setSelectedId(null);
+        setMode("create");
     };
 
     const openDetails = (document: DocumentListItem) => {
@@ -274,6 +278,7 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Создание доступно только в защищённой зоне."
+                        icon="🔒"
                     />
                 );
             }
@@ -302,6 +307,7 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Редактирование доступно только в защищённой зоне."
+                        icon="🔒"
                     />
                 );
             }
@@ -311,6 +317,7 @@ export function DocumentsPage({
                     <StateCard
                         title="Не удалось загрузить документ"
                         description={selectedDocumentQuery.error.message}
+                        icon="⚠️"
                     />
                 );
             }
@@ -320,6 +327,7 @@ export function DocumentsPage({
                     <StateCard
                         title="Загрузка документа"
                         description="Ждём загрузки выбранного документа."
+                        icon="⏳"
                     />
                 );
             }
@@ -350,6 +358,7 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документ"
                     description={selectedDocumentQuery.error.message}
+                    icon="⚠️"
                 />
             );
         }
@@ -359,6 +368,7 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документа"
                     description="Получаем выбранную запись."
+                    icon="⏳"
                 />
             );
         }
@@ -422,6 +432,7 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документы"
                     description={listError.message}
+                    icon="⚠️"
                 />
             );
         }
@@ -438,9 +449,7 @@ export function DocumentsPage({
                     emptyStateActionLabel={
                         variant === "private" ? "Создать документ" : undefined
                     }
-                    onEmptyAction={
-                        variant === "private" ? () => setMode("create") : undefined
-                    }
+                    onEmptyAction={variant === "private" ? openCreate : undefined}
                     onSelect={openDetails}
                 />
             );
@@ -457,9 +466,7 @@ export function DocumentsPage({
                 emptyStateActionLabel={
                     variant === "private" ? "Создать документ" : undefined
                 }
-                onEmptyAction={
-                    variant === "private" ? () => setMode("create") : undefined
-                }
+                onEmptyAction={variant === "private" ? openCreate : undefined}
                 onSelect={openDetails}
                 onEdit={variant === "private" ? openEdit : undefined}
                 onToggleStatus={
@@ -490,8 +497,12 @@ export function DocumentsPage({
 
     const sidebarOpen = mode !== "details" || selectedId !== null;
     const sidebarTitle = (() => {
-        if (mode === "create") return "Создать документ";
-        if (mode === "edit") return "Редактировать документ";
+        if (mode === "create") {
+            return "Создать документ";
+        }
+        if (mode === "edit") {
+            return "Редактировать документ";
+        }
         return "Детали документа";
     })();
     const sidebarDescription = (() => {
@@ -559,8 +570,7 @@ export function DocumentsPage({
                         </div>
                         <Button
                             onClick={() => {
-                                setMode("create");
-                                setSelectedId(null);
+                                openCreate();
                             }}
                         >
                             Создать документ
@@ -568,27 +578,21 @@ export function DocumentsPage({
                     </div>
 
                     <form
-                        className="flex flex-wrap items-end gap-3"
+                        className="flex flex-wrap gap-3"
                         onSubmit={(event) => {
                             event.preventDefault();
                             setAppliedSearch(searchInput.trim());
                             closeSidebar();
                         }}
                     >
-                        <FormField
-                            label="Поиск"
-                            optional
-                            helperText="Ищет по рег. номеру, названию, датам и логинам."
-                            className="w-full max-w-md"
-                        >
-                            <Input
-                                placeholder="Например, 24/01-15"
-                                value={searchInput}
-                                onChange={(event) =>
-                                    setSearchInput(event.target.value)
-                                }
-                            />
-                        </FormField>
+                        <Input
+                            className="max-w-md"
+                            placeholder="Поиск по рег. номеру, названию, датам или логинам"
+                            value={searchInput}
+                            onChange={(event) =>
+                                setSearchInput(event.target.value)
+                            }
+                        />
                         <Button type="submit">Найти</Button>
                         {appliedSearch ? (
                             <Button
@@ -611,6 +615,7 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
+                    icon="⏳"
                 />
             ) : null}
 

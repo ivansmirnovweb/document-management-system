@@ -88,7 +88,10 @@ export function SlideOver({
             >
                 <div className="flex items-start justify-between gap-4 border-b border-zinc-200 px-4 py-4 sm:px-6">
                     <div className="min-w-0 space-y-1">
-                        <h2 id={titleId} className="truncate text-lg font-semibold text-zinc-950">
+                        <h2
+                            id={titleId}
+                            className="truncate text-lg font-semibold text-zinc-950"
+                        >
                             {title}
                         </h2>
                         {description ? (
