@@ -273,7 +273,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Создание доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -302,7 +301,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Редактирование доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -312,7 +310,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Не удалось загрузить документ"
                         description={selectedDocumentQuery.error.message}
-                        icon="⚠️"
                     />
                 );
             }
@@ -322,7 +319,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Загрузка документа"
                         description="Ждём загрузки выбранного документа."
-                        icon="⏳"
                     />
                 );
             }
@@ -353,7 +349,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документ"
                     description={selectedDocumentQuery.error.message}
-                    icon="⚠️"
                 />
             );
         }
@@ -363,7 +358,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документа"
                     description="Получаем выбранную запись."
-                    icon="⏳"
                 />
             );
         }
@@ -427,7 +421,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документы"
                     description={listError.message}
-                    icon="⚠️"
                 />
             );
         }
@@ -611,7 +604,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
-                    icon="⏳"
                 />
             ) : null}
 

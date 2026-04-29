@@ -6,7 +6,6 @@ export default function Loading() {
       <StateCard
         title="Загрузка приложения"
         description="Подготавливаем интерфейс и состояние сессии."
-        icon="⏳"
       />
     </div>
   );

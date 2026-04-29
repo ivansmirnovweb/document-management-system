@@ -18,7 +18,7 @@ type ExecutorStatisticsTableProps = {
 
 export function ExecutorStatisticsTable({ statistics }: ExecutorStatisticsTableProps) {
   if (statistics.length === 0) {
-    return <StateCard title="Статистика отсутствует" description="Попробуйте другой диапазон дат или фильтры." icon="📊" />;
+    return <StateCard title="Статистика отсутствует" description="Попробуйте другой диапазон дат или фильтры." />;
   }
 
   return (

@@ -16,7 +16,6 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { StateCard } from "@/shared/ui/state-card";
-import { Badge } from "@/shared/ui/badge";
 
 const reportRangeSchema = reportFilterInputSchema.pick({
     dateFrom: true,
@@ -90,7 +89,6 @@ export function ReportsPage() {
                 description="Откройте отчёты после авторизации."
                 actionLabel="Перейти ко входу"
                 actionHref="/login"
-                icon="🔐"
             />
         );
     }
@@ -100,7 +98,6 @@ export function ReportsPage() {
             <StateCard
                 title="Требуется доступ ROOT"
                 description="Отчёты доступны только пользователю root."
-                icon="🛡️"
             />
         );
     }
@@ -184,7 +181,6 @@ export function ReportsPage() {
                 <StateCard
                     title="Загрузка отчёта"
                     description="Получаем статистику исполнителей."
-                    icon="⏳"
                 />
             ) : null}
 
@@ -192,7 +188,6 @@ export function ReportsPage() {
                 <StateCard
                     title="Не удалось загрузить отчёт"
                     description={statisticsQuery.error.message}
-                    icon="⚠️"
                 />
             ) : null}
 

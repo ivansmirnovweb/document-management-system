@@ -16,7 +16,6 @@ export function AuthStatusPanel() {
       <StateCard
         title="Проверяем сессию"
         description="Загружаем текущее состояние авторизации."
-        icon="⏳"
       />
     );
   }
@@ -28,7 +27,6 @@ export function AuthStatusPanel() {
         description={auth.error.message}
         actionLabel="Повторить"
         onAction={auth.refreshSession}
-        icon="⚠️"
       />
     );
   }
@@ -40,7 +38,6 @@ export function AuthStatusPanel() {
         description="Войдите, чтобы работать с защищёнными документами."
         actionLabel="Перейти ко входу"
         actionHref="/login"
-        icon="🔐"
       />
     );
   }
