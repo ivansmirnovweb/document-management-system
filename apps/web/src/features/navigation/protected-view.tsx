@@ -13,7 +13,6 @@ export function ProtectedView({ children }: { children: ReactNode }) {
       <StateCard
         title="Загрузка защищённого раздела"
         description="Проверяем сессию перед показом приватного контента."
-        icon="🔎"
       />
     );
   }
@@ -25,7 +24,6 @@ export function ProtectedView({ children }: { children: ReactNode }) {
         description={auth.error.message}
         actionLabel="Повторить"
         onAction={auth.refreshSession}
-        icon="⚠️"
       />
     );
   }
@@ -37,7 +35,6 @@ export function ProtectedView({ children }: { children: ReactNode }) {
         description="Это защищённая зона. Войдите, чтобы продолжить."
         actionLabel="Перейти ко входу"
         actionHref="/login"
-        icon="🔐"
       />
     );
   }

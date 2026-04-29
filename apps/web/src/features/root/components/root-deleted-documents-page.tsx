@@ -6,7 +6,6 @@ import { UserRole, type DocumentListItem } from "@document-flow/shared";
 import { useAuth } from "@/features/auth/auth.provider";
 import { documentsApi } from "@/features/documents/documents.api";
 import { documentsKeys } from "@/features/documents/documents.keys";
-import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { StateCard } from "@/shared/ui/state-card";
 import { DeletedDocumentsTable } from "./deleted-documents-table";
@@ -93,7 +92,6 @@ export function RootDeletedDocumentsPage() {
             <StateCard
                 title="Требуется доступ ROOT"
                 description="Удалённые записи и опасные действия доступны только пользователю root."
-                icon="🛡️"
             />
         );
     }
@@ -120,14 +118,12 @@ export function RootDeletedDocumentsPage() {
                 <StateCard
                     title="Загрузка удалённых записей"
                     description="Получаем root-очередь."
-                    icon="⏳"
                 />
             ) : null}
             {deletedDocumentsQuery.error instanceof Error ? (
                 <StateCard
                     title="Не удалось загрузить удалённые записи"
                     description={deletedDocumentsQuery.error.message}
-                    icon="⚠️"
                 />
             ) : null}
             {actionError instanceof Error ? (
@@ -152,7 +148,6 @@ export function RootDeletedDocumentsPage() {
                         <StateCard
                             title="Не удалось загрузить запись"
                             description={selectedDocumentQuery.error.message}
-                            icon="⚠️"
                         />
                     ) : null}
                     {selectedDocumentQuery.isPending &&
@@ -161,7 +156,6 @@ export function RootDeletedDocumentsPage() {
                         <StateCard
                             title="Загрузка записи"
                             description="Получаем выбранный удалённый документ."
-                            icon="⏳"
                         />
                     ) : null}
                     <DeletedDocumentPanel
