@@ -20,8 +20,13 @@
 - [ ] 098 — Investigate and fix unstable Drizzle migration execution (`drizzle-kit migrate`), including broken journal/history and silent failures
 - [x] 099 — Move record details to a right slide-over sidebar to keep tables full-width across pages
 - [ ] 100 — Remove emoji/sticker-style visual markers from UI and replace with neutral design-system feedback
+<<<<<<< HEAD
+- [ ] 101 — Add clear required-field indicators across all forms with consistent validation UX
+- [x] 102 — Add global toast/snackbar notifications for form and API errors to ensure immediate visibility
+=======
 - [x] 101 — Add clear required-field indicators across all forms with consistent validation UX
 - [ ] 102 — Add global toast/snackbar notifications for form and API errors to ensure immediate visibility
+>>>>>>> origin/main
 - [ ] 103 — Make header navigation role-aware and show only links accessible to the current user
 - [ ] 104 — Reduce protected-page loading flicker via SSR session/prefetch and remove global loading flash
 - [ ] 105 — Move document creation flow into a right slide-over sidebar
@@ -64,3 +69,4 @@
 - 082: Translated visible frontend UI text to Russian across auth, navigation, documents workspace, reports, root/deleted-documents tooling, and app-level loading/error metadata.
 - 099: Moved record details into a reusable right slide-over sidebar for documents and root deleted records.
 - 101: Added a shared form-field helper and marked required/optional fields across auth, document, report, search, and root reassign forms; aligned validation copy in shared schemas to Russian.
+- 102: Added a global toast viewport in the app shell, wired React Query global error handling for mutations and fetches, and normalized error text for API/client failures.

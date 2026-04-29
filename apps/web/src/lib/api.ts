@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getErrorMessage } from "./error-message";
 
 export class ApiError extends Error {
   status: number;
@@ -39,52 +40,7 @@ async function readBody(response: Response): Promise<unknown> {
   return text.length > 0 ? text : null;
 }
 
-function getErrorMessage(payload: unknown, fallback: string): string {
-  if (!payload || typeof payload !== "object") {
-    return fallback;
-  }
-
-  const maybeError = payload as {
-    message?: unknown;
-    error?: unknown;
-  };
-
-  if (Array.isArray(maybeError.message) && maybeError.message.length > 0) {
-    return String(maybeError.message[0]);
-  }
-
-  if (typeof maybeError.message === "string" && maybeError.message.length > 0) {
-    return maybeError.message;
-  }
-
-  if (typeof maybeError.error === "string" && maybeError.error.length > 0) {
-    return maybeError.error;
-  }
-
-  if (maybeError.error && typeof maybeError.error === "object") {
-    const nested = maybeError.error as {
-      message?: unknown;
-      path?: unknown;
-      statusCode?: unknown;
-    };
-
-    if (Array.isArray(nested.message) && nested.message.length > 0) {
-      return String(nested.message[0]);
-    }
-
-    if (typeof nested.message === "string" && nested.message.length > 0) {
-      return nested.message;
-    }
-
-    if (typeof nested.path === "string" && nested.path.length > 0) {
-      const statusCode =
-        typeof nested.statusCode === "number" ? nested.statusCode : "unknown";
-      return `Request failed on ${nested.path} (status ${statusCode})`;
-    }
-  }
-
-  return fallback;
-}
+export { getErrorMessage } from "./error-message";
 
 export type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
