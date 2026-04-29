@@ -39,4 +39,4 @@ Current UI contains multiple emoji markers in states and helper blocks. This loo
 
 ## Result
 
-Pending.
+Completed. Removed emoji/sticker markers from all visible UI state cards and page-level loading/error/empty states, replacing them with neutral text-only state presentation.

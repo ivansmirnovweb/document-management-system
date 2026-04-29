@@ -17,7 +17,6 @@ type DocumentsTableProps = {
   publicView?: boolean;
   emptyStateTitle: string;
   emptyStateDescription: string;
-  emptyStateIcon?: string;
   emptyStateActionLabel?: string;
   onEmptyAction?: () => void;
   onSelect: (document: DocumentListItem) => void;
@@ -33,7 +32,6 @@ export function DocumentsTable({
   publicView = false,
   emptyStateTitle,
   emptyStateDescription,
-  emptyStateIcon,
   emptyStateActionLabel,
   onEmptyAction,
   onSelect,
@@ -178,7 +176,6 @@ export function DocumentsTable({
         description={emptyStateDescription}
         actionLabel={emptyStateActionLabel}
         onAction={onEmptyAction}
-        icon={emptyStateIcon}
       />
     );
   }
