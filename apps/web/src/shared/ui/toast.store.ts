@@ -19,10 +19,13 @@ const listeners = new Set<() => void>();
 const toasts = new Map<string, ToastItem>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 const recentFingerprints = new Map<string, number>();
+let snapshotCache: ToastItem[] = [];
+let snapshotDirty = true;
 
 let nextId = 0;
 
 function emit() {
+  snapshotDirty = true;
   listeners.forEach((listener) => listener());
 }
 
@@ -40,7 +43,13 @@ export function subscribeToasts(listener: () => void) {
 }
 
 export function getToastsSnapshot(): ToastItem[] {
-  return Array.from(toasts.values()).sort((left, right) => left.createdAt - right.createdAt);
+  if (!snapshotDirty) {
+    return snapshotCache;
+  }
+
+  snapshotCache = Array.from(toasts.values()).sort((left, right) => left.createdAt - right.createdAt);
+  snapshotDirty = false;
+  return snapshotCache;
 }
 
 export function dismissToast(id: string) {

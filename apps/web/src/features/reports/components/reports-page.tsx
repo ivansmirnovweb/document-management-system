@@ -124,7 +124,6 @@ export function ReportsPage() {
                         Используйте включительный диапазон дат для статистики и
                         экспорта.
                     </CardDescription>
-                    <p className="mt-1 text-sm text-zinc-600">Поля со * обязательны.</p>
                 </div>
 
                 <form
@@ -136,7 +135,11 @@ export function ReportsPage() {
                         required
                         error={form.formState.errors.dateFrom?.message}
                     >
-                        <Input type="date" aria-required="true" {...form.register("dateFrom")} />
+                        <Input
+                            type="date"
+                            aria-required="true"
+                            {...form.register("dateFrom")}
+                        />
                     </FormField>
 
                     <FormField
@@ -144,7 +147,11 @@ export function ReportsPage() {
                         required
                         error={form.formState.errors.dateTo?.message}
                     >
-                        <Input type="date" aria-required="true" {...form.register("dateTo")} />
+                        <Input
+                            type="date"
+                            aria-required="true"
+                            {...form.register("dateTo")}
+                        />
                     </FormField>
 
                     <Button

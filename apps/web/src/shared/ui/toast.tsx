@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { dismissToast, getToastsSnapshot, subscribeToasts, type ToastItem } from "./toast.store";
+
+const EMPTY_TOASTS: ToastItem[] = [];
 
 function ToastCard({ toast }: { toast: ToastItem }) {
   const toneClasses =
@@ -38,13 +40,7 @@ function ToastCard({ toast }: { toast: ToastItem }) {
 }
 
 export function ToastViewport() {
-  const toasts = useSyncExternalStore(subscribeToasts, getToastsSnapshot, getToastsSnapshot);
-
-  useEffect(() => {
-    return () => {
-      // Timers are owned by the store.
-    };
-  }, []);
+  const toasts = useSyncExternalStore(subscribeToasts, getToastsSnapshot, () => EMPTY_TOASTS);
 
   if (typeof window === "undefined" || toasts.length === 0) {
     return null;

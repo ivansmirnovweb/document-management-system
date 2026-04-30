@@ -18,6 +18,34 @@ function fatal(message) {
   process.exit(1);
 }
 
+function runDrizzleMigrate() {
+  const isWindows = process.platform === "win32";
+  const command = path.join(
+    apiDir,
+    "node_modules",
+    ".bin",
+    isWindows ? "drizzle-kit.CMD" : "drizzle-kit",
+  );
+
+  if (isWindows) {
+    return spawnSync(command, ["migrate"], {
+      cwd: apiDir,
+      env: process.env,
+      encoding: "utf8",
+      stdio: "pipe",
+      shell: true,
+    });
+  }
+
+  return spawnSync(command, ["migrate"], {
+    cwd: apiDir,
+    env: process.env,
+    encoding: "utf8",
+    stdio: "pipe",
+    shell: false,
+  });
+}
+
 function loadJournal() {
   if (!fs.existsSync(journalPath)) {
     fatal(`Missing journal file: ${journalPath}`);
@@ -136,14 +164,25 @@ async function main() {
 
   const entries = loadJournal();
 
-  const result = spawnSync("pnpm", ["exec", "drizzle-kit", "migrate"], {
-    cwd: apiDir,
-    stdio: "inherit",
-    env: process.env,
-  });
+  const result = runDrizzleMigrate();
 
   if (result.status === 0) {
+    if (result.stdout) process.stdout.write(result.stdout);
+    if (result.stderr) process.stderr.write(result.stderr);
     process.exit(0);
+  }
+
+  if (result.stdout) {
+    console.error("\n[db:migrate] drizzle-kit stdout:");
+    console.error(result.stdout.trimEnd());
+  }
+  if (result.stderr) {
+    console.error("\n[db:migrate] drizzle-kit stderr:");
+    console.error(result.stderr.trimEnd());
+  }
+  if (result.error) {
+    console.error("\n[db:migrate] drizzle-kit spawn error:");
+    console.error(result.error.message);
   }
 
   console.error("\n[db:migrate] drizzle-kit migrate failed. Running diagnostic replay...");
