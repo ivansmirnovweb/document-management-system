@@ -5,6 +5,7 @@ import {
   loginResponseSchema,
   registerRequestSchema,
   registerResponseSchema,
+  usersListResponseSchema,
 } from "@document-flow/shared";
 import type {
   AuthenticatedUser,
@@ -14,6 +15,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  UsersListResponse,
 } from "@document-flow/shared";
 import { apiNoContent, apiRequest, isApiError } from "@/lib/api";
 
@@ -50,5 +52,9 @@ export const authApi = {
   async changePassword(input: ChangePasswordRequest): Promise<ChangePasswordResponse> {
     const payload = changePasswordRequestSchema.parse(input);
     return apiRequest("/auth/password", { method: "PATCH", body: payload }, changePasswordResponseSchema);
+  },
+
+  listUsers(): Promise<UsersListResponse> {
+    return apiRequest("/auth/users", { method: "GET" }, usersListResponseSchema);
   },
 };

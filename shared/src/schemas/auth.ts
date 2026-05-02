@@ -55,3 +55,9 @@ export const changePasswordResponseSchema = z
     user: authUserSchema,
   })
   .strict();
+
+export const usersListResponseSchema = z
+  .object({
+    users: z.array(authUserSchema),
+  })
+  .strict();

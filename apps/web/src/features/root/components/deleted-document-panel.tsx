@@ -4,16 +4,16 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { DocumentDetails } from "@document-flow/shared";
+import type { AuthenticatedUser, DocumentDetails } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { FormField } from "@/shared/ui/form-field";
-import { Input } from "@/shared/ui/input";
+import { Select } from "@/shared/ui/select";
 import { deadlineLabel, deadlineTone, formatDate, formatDateTime, statusLabel } from "@/features/documents/document-utils";
 
 const reassignSchema = z.object({
-  ownerId: z.string().trim().regex(/^\d+$/, "ID владельца должен быть положительным числом"),
+  ownerId: z.string().trim().regex(/^\d+$/, "Владелец обязателен"),
 });
 
 type DeletedDocumentPanelProps = {
@@ -21,6 +21,7 @@ type DeletedDocumentPanelProps = {
   isRestoring: boolean;
   isReassigning: boolean;
   isHardDeleting: boolean;
+  users: AuthenticatedUser[];
   onRestore: () => void;
   onReassign: (ownerId: number) => void;
   onHardDelete: () => void;
@@ -31,6 +32,7 @@ export function DeletedDocumentPanel({
   isRestoring,
   isReassigning,
   isHardDeleting,
+  users,
   onRestore,
   onReassign,
   onHardDelete,
@@ -77,26 +79,33 @@ export function DeletedDocumentPanel({
       <dl className="grid gap-4 text-sm sm:grid-cols-2">
         <Detail label="Удалён" value={formatDateTime(document.deletedAt ?? document.updatedAt)} />
         <Detail label="Срок" value={formatDate(document.dueDate)} />
-        <Detail label="ID владельца" value={String(document.ownerId)} />
-        <Detail label="ID исполнителя" value={String(document.executorId)} />
-        <Detail label="ID работодателя" value={document.employerId ? String(document.employerId) : "—"} />
+        <Detail label="Владелец" value={document.owner.displayName || document.owner.username} />
+        <Detail label="Исполнитель" value={document.executor.displayName || document.executor.username} />
+        <Detail label="Работодатель" value={document.employer?.shortName || document.employer?.fullName || "—"} />
         <Detail label="Обновлён" value={formatDateTime(document.updatedAt)} />
       </dl>
 
       <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
         <div>
           <h3 className="text-sm font-semibold text-zinc-950">Переназначить владельца</h3>
-          <p className="text-sm text-zinc-600">Введите ID нового владельца и сохраните изменение.</p>
+          <p className="text-sm text-zinc-600">Выберите нового владельца и сохраните изменение.</p>
         </div>
         <form className="flex flex-wrap items-end gap-3" onSubmit={submit}>
           <FormField
-            label="ID нового владельца"
+            label="Новый владелец"
             required
             className="min-w-48 flex-1"
-            helperText="Введите числовой ID пользователя, которому нужно передать документ."
+            helperText="Выберите пользователя, которому нужно передать документ."
             error={form.formState.errors.ownerId?.message}
           >
-            <Input type="number" min="1" aria-required="true" {...form.register("ownerId", { valueAsNumber: true })} />
+            <Select aria-required="true" {...form.register("ownerId")}>
+              <option value="">Выберите пользователя</option>
+              {users.map((user) => (
+                <option key={user.id} value={String(user.id)}>
+                  {(user.displayName || user.username)} (@{user.username})
+                </option>
+              ))}
+            </Select>
           </FormField>
           <Button type="submit" disabled={isReassigning}>
             {isReassigning ? "Сохраняем..." : "Переназначить"}

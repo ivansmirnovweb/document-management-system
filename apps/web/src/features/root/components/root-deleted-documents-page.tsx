@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserRole, type DocumentListItem } from "@document-flow/shared";
+import { authApi } from "@/features/auth/auth.api";
 import { useAuth } from "@/features/auth/auth.provider";
 import { documentsApi } from "@/features/documents/documents.api";
 import { documentsKeys } from "@/features/documents/documents.keys";
@@ -37,6 +38,12 @@ export function RootDeletedDocumentsPage() {
         ] as const,
         queryFn: () => documentsApi.getById(selectedId ?? 0),
         enabled: auth.user?.role === UserRole.ROOT && selectedId !== null,
+    });
+
+    const usersQuery = useQuery({
+        queryKey: ["auth", "users"] as const,
+        queryFn: authApi.listUsers,
+        enabled: auth.user?.role === UserRole.ROOT,
     });
 
     const refresh = async () => {
@@ -85,7 +92,6 @@ export function RootDeletedDocumentsPage() {
             <StateCard
                 title="Требуется доступ ROOT"
                 description="Удалённые записи и опасные действия доступны только пользователю root."
-                icon="🛡️"
             />
         );
     }
@@ -112,14 +118,12 @@ export function RootDeletedDocumentsPage() {
                 <StateCard
                     title="Загрузка удалённых записей"
                     description="Получаем root-очередь."
-                    icon="⏳"
                 />
             ) : null}
             {deletedDocumentsQuery.error instanceof Error ? (
                 <StateCard
                     title="Не удалось загрузить удалённые записи"
                     description={deletedDocumentsQuery.error.message}
-                    icon="⚠️"
                 />
             ) : null}
             {actionError instanceof Error ? (
@@ -149,7 +153,6 @@ export function RootDeletedDocumentsPage() {
                     <StateCard
                         title="Не удалось загрузить запись"
                         description={selectedDocumentQuery.error.message}
-                        icon="⚠️"
                     />
                 ) : null}
                 {selectedDocumentQuery.isPending &&
@@ -158,7 +161,6 @@ export function RootDeletedDocumentsPage() {
                     <StateCard
                         title="Загрузка записи"
                         description="Получаем выбранный удалённый документ."
-                        icon="⏳"
                     />
                 ) : null}
                 <DeletedDocumentPanel
@@ -166,6 +168,7 @@ export function RootDeletedDocumentsPage() {
                     isRestoring={restoreMutation.isPending}
                     isReassigning={reassignMutation.isPending}
                     isHardDeleting={hardDeleteMutation.isPending}
+                    users={usersQuery.data?.users ?? []}
                     onRestore={() => {
                         if (!selectedDocument) return;
                         restoreMutation.mutate(selectedDocument.id);

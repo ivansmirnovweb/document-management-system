@@ -34,3 +34,7 @@ export type RegisterResponse = {
 export type ChangePasswordResponse = {
   user: AuthUser;
 };
+
+export type UsersListResponse = {
+  users: AuthUser[];
+};

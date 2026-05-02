@@ -44,9 +44,7 @@ export function DocumentsPage({
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [mode, setMode] = useState<"details" | "create" | "edit">(
-        "details",
-    );
+    const [mode, setMode] = useState<"details" | "create" | "edit">("details");
     const currentUser = auth.user
         ? { id: auth.user.id, role: auth.user.role }
         : null;
@@ -278,7 +276,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Создание доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -307,7 +304,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Недоступно"
                         description="Редактирование доступно только в защищённой зоне."
-                        icon="🔒"
                     />
                 );
             }
@@ -317,7 +313,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Не удалось загрузить документ"
                         description={selectedDocumentQuery.error.message}
-                        icon="⚠️"
                     />
                 );
             }
@@ -327,7 +322,6 @@ export function DocumentsPage({
                     <StateCard
                         title="Загрузка документа"
                         description="Ждём загрузки выбранного документа."
-                        icon="⏳"
                     />
                 );
             }
@@ -358,17 +352,19 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документ"
                     description={selectedDocumentQuery.error.message}
-                    icon="⚠️"
                 />
             );
         }
 
-        if (selectedId !== null && selectedDocumentQuery.isPending && !selectedDocument) {
+        if (
+            selectedId !== null &&
+            selectedDocumentQuery.isPending &&
+            !selectedDocument
+        ) {
             return (
                 <StateCard
                     title="Загрузка документа"
                     description="Получаем выбранную запись."
-                    icon="⏳"
                 />
             );
         }
@@ -378,7 +374,9 @@ export function DocumentsPage({
                 document={selectedDocument}
                 currentUser={currentUser}
                 publicView={variant === "public"}
-                onEdit={variant === "private" ? () => setMode("edit") : undefined}
+                onEdit={
+                    variant === "private" ? () => setMode("edit") : undefined
+                }
                 onToggleStatus={
                     variant === "private" && selectedDocument
                         ? async () => {
@@ -432,7 +430,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Не удалось загрузить документы"
                     description={listError.message}
-                    icon="⚠️"
                 />
             );
         }
@@ -449,7 +446,9 @@ export function DocumentsPage({
                     emptyStateActionLabel={
                         variant === "private" ? "Создать документ" : undefined
                     }
-                    onEmptyAction={variant === "private" ? openCreate : undefined}
+                    onEmptyAction={
+                        variant === "private" ? openCreate : undefined
+                    }
                     onSelect={openDetails}
                 />
             );
@@ -562,8 +561,10 @@ export function DocumentsPage({
                                         }`}
                                     >
                                         {item.value === DocumentStatus.DONE
-                                            ? (completedListQuery.data?.length ?? 0)
-                                            : (activeListQuery.data?.length ?? 0)}
+                                            ? (completedListQuery.data
+                                                  ?.length ?? 0)
+                                            : (activeListQuery.data?.length ??
+                                              0)}
                                     </span>
                                 </Button>
                             ))}
@@ -587,7 +588,7 @@ export function DocumentsPage({
                     >
                         <Input
                             className="max-w-md"
-                            placeholder="Поиск по рег. номеру, названию, датам или логинам"
+                            placeholder="Поиск по рег. номеру, названию, датам, исполнителям и контрагентам"
                             value={searchInput}
                             onChange={(event) =>
                                 setSearchInput(event.target.value)
@@ -615,7 +616,6 @@ export function DocumentsPage({
                 <StateCard
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
-                    icon="⏳"
                 />
             ) : null}
 

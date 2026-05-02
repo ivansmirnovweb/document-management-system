@@ -41,10 +41,12 @@ export function DeletedDocumentsTable({ documents, selectedDocumentId, onSelect 
       header: "Метаданные",
       cell: ({ row }) => {
         const document = row.original;
+        const ownerLabel = document.owner.displayName || document.owner.username;
+        const executorLabel = document.executor.displayName || document.executor.username;
         return (
           <div className="space-y-2 text-sm text-zinc-600">
-            <div>Владелец #{document.ownerId}</div>
-            <div>Исполнитель #{document.executorId}</div>
+            <div>Владелец {ownerLabel}</div>
+            <div>Исполнитель {executorLabel}</div>
             <div>Удалён {document.deletedAt ? formatDate(document.deletedAt) : "—"}</div>
           </div>
         );

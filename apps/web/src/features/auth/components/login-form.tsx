@@ -65,7 +65,6 @@ export function LoginForm() {
                 <FormField
                     label="Логин"
                     required
-                    helperText="Введите имя пользователя для входа."
                     error={form.formState.errors.username?.message}
                 >
                     <Input
@@ -78,7 +77,6 @@ export function LoginForm() {
                 <FormField
                     label="Пароль"
                     required
-                    helperText="Введите пароль от учётной записи."
                     error={form.formState.errors.password?.message}
                 >
                     <Input

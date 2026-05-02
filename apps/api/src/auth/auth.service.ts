@@ -12,6 +12,7 @@ import {
   type ChangePasswordResponse,
   type LoginResponse,
   type RegisterResponse,
+  type UsersListResponse,
 } from '@document-flow/shared';
 import { AppConfigService } from '../config/app-config.service';
 import { DbService } from '../db/db.service';
@@ -105,6 +106,13 @@ export class AuthService {
     }
 
     return { user: this.toAuthenticatedUser(user) };
+  }
+
+  async listUsers(): Promise<UsersListResponse> {
+    const rows = await this.db.db.select().from(users);
+    return {
+      users: rows.map((user) => this.toAuthenticatedUser(user)),
+    };
   }
 
   async changePassword(

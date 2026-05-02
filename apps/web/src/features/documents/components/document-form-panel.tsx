@@ -204,7 +204,7 @@ export function DocumentFormPanel({
                         />
                     </FormField>
                     <FormField
-                        label="ID исполнителя"
+                        label="Исполнитель"
                         required
                         error={form.formState.errors.executorId?.message}
                     >
@@ -217,7 +217,7 @@ export function DocumentFormPanel({
                     </FormField>
                     {currentUser.role === "ROOT" ? (
                         <FormField
-                            label="ID владельца"
+                            label="Владелец"
                             required
                             error={form.formState.errors.ownerId?.message}
                         >

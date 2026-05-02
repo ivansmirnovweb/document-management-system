@@ -43,6 +43,7 @@ import {
 const ownerUsers = alias(users, 'document_owner_users');
 const executorUsers = alias(users, 'document_executor_users');
 const lastChangedByUsers = alias(users, 'document_last_changed_by_users');
+const outSenderEmployers = alias(employers, 'document_out_sender_employers');
 
 @Injectable()
 export class DocumentsService {
@@ -100,9 +101,47 @@ export class DocumentsService {
         createdAt: documents.createdAt,
         updatedAt: documents.updatedAt,
         lastChangedAt: documents.lastChangedAt,
+        ownerIdFromJoin: ownerUsers.id,
+        ownerUsername: ownerUsers.username,
+        ownerDisplayName: ownerUsers.displayName,
+        ownerUnit: ownerUsers.unit,
+        ownerRole: ownerUsers.role,
+        ownerPasswordChangedAt: ownerUsers.passwordChangedAt,
+        ownerCreatedAt: ownerUsers.createdAt,
+        ownerUpdatedAt: ownerUsers.updatedAt,
+        executorIdFromJoin: executorUsers.id,
+        executorUsername: executorUsers.username,
+        executorDisplayName: executorUsers.displayName,
+        executorUnit: executorUsers.unit,
+        executorRole: executorUsers.role,
+        executorPasswordChangedAt: executorUsers.passwordChangedAt,
+        executorCreatedAt: executorUsers.createdAt,
+        executorUpdatedAt: executorUsers.updatedAt,
+        employerIdFromJoin: employers.id,
+        employerFullName: employers.fullName,
+        employerShortName: employers.shortName,
+        employerLegalAddress: employers.legalAddress,
+        employerActualAddress: employers.actualAddress,
+        employerCreatedAt: employers.createdAt,
+        employerUpdatedAt: employers.updatedAt,
+        employerDeletedAt: employers.deletedAt,
+        outSenderEmployerIdFromJoin: outSenderEmployers.id,
+        outSenderEmployerFullName: outSenderEmployers.fullName,
+        outSenderEmployerShortName: outSenderEmployers.shortName,
+        outSenderEmployerLegalAddress: outSenderEmployers.legalAddress,
+        outSenderEmployerActualAddress: outSenderEmployers.actualAddress,
+        outSenderEmployerCreatedAt: outSenderEmployers.createdAt,
+        outSenderEmployerUpdatedAt: outSenderEmployers.updatedAt,
+        outSenderEmployerDeletedAt: outSenderEmployers.deletedAt,
       })
       .from(documents)
+      .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .leftJoin(employers, eq(documents.employerId, employers.id))
+      .leftJoin(
+        outSenderEmployers,
+        eq(documents.outSenderEmployerId, outSenderEmployers.id),
+      )
       .where(and(...conditions))
       .orderBy(
         desc(documents.isControl),
@@ -116,8 +155,70 @@ export class DocumentsService {
 
   async listCompleted(): Promise<DocumentListItem[]> {
     const rows = await this.db.db
-      .select()
+      .select({
+        id: documents.id,
+        registrationNumber: documents.registrationNumber,
+        registrationDate: documents.registrationDate,
+        title: documents.title,
+        about1: documents.about1,
+        about2: documents.about2,
+        kind: documents.kind,
+        status: documents.status,
+        ownerId: documents.ownerId,
+        executorId: documents.executorId,
+        employerId: documents.employerId,
+        outSenderEmployerId: documents.outSenderEmployerId,
+        outgoingDate: documents.outgoingDate,
+        broadcast: documents.broadcast,
+        dueDate: documents.dueDate,
+        completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
+        isControl: documents.isControl,
+        deletedAt: documents.deletedAt,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt,
+        lastChangedAt: documents.lastChangedAt,
+        ownerIdFromJoin: ownerUsers.id,
+        ownerUsername: ownerUsers.username,
+        ownerDisplayName: ownerUsers.displayName,
+        ownerUnit: ownerUsers.unit,
+        ownerRole: ownerUsers.role,
+        ownerPasswordChangedAt: ownerUsers.passwordChangedAt,
+        ownerCreatedAt: ownerUsers.createdAt,
+        ownerUpdatedAt: ownerUsers.updatedAt,
+        executorIdFromJoin: executorUsers.id,
+        executorUsername: executorUsers.username,
+        executorDisplayName: executorUsers.displayName,
+        executorUnit: executorUsers.unit,
+        executorRole: executorUsers.role,
+        executorPasswordChangedAt: executorUsers.passwordChangedAt,
+        executorCreatedAt: executorUsers.createdAt,
+        executorUpdatedAt: executorUsers.updatedAt,
+        employerIdFromJoin: employers.id,
+        employerFullName: employers.fullName,
+        employerShortName: employers.shortName,
+        employerLegalAddress: employers.legalAddress,
+        employerActualAddress: employers.actualAddress,
+        employerCreatedAt: employers.createdAt,
+        employerUpdatedAt: employers.updatedAt,
+        employerDeletedAt: employers.deletedAt,
+        outSenderEmployerIdFromJoin: outSenderEmployers.id,
+        outSenderEmployerFullName: outSenderEmployers.fullName,
+        outSenderEmployerShortName: outSenderEmployers.shortName,
+        outSenderEmployerLegalAddress: outSenderEmployers.legalAddress,
+        outSenderEmployerActualAddress: outSenderEmployers.actualAddress,
+        outSenderEmployerCreatedAt: outSenderEmployers.createdAt,
+        outSenderEmployerUpdatedAt: outSenderEmployers.updatedAt,
+        outSenderEmployerDeletedAt: outSenderEmployers.deletedAt,
+      })
       .from(documents)
+      .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
+      .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .leftJoin(employers, eq(documents.employerId, employers.id))
+      .leftJoin(
+        outSenderEmployers,
+        eq(documents.outSenderEmployerId, outSenderEmployers.id),
+      )
       .where(and(eq(documents.status, DocumentStatus.DONE), isNull(documents.deletedAt)))
       .orderBy(
         desc(documents.isControl),
@@ -133,8 +234,70 @@ export class DocumentsService {
     this.permissions.assertCanListDeletedDocuments(actor);
 
     const rows = await this.db.db
-      .select()
+      .select({
+        id: documents.id,
+        registrationNumber: documents.registrationNumber,
+        registrationDate: documents.registrationDate,
+        title: documents.title,
+        about1: documents.about1,
+        about2: documents.about2,
+        kind: documents.kind,
+        status: documents.status,
+        ownerId: documents.ownerId,
+        executorId: documents.executorId,
+        employerId: documents.employerId,
+        outSenderEmployerId: documents.outSenderEmployerId,
+        outgoingDate: documents.outgoingDate,
+        broadcast: documents.broadcast,
+        dueDate: documents.dueDate,
+        completedAt: documents.completedAt,
+        writtenOffAt: documents.writtenOffAt,
+        isControl: documents.isControl,
+        deletedAt: documents.deletedAt,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt,
+        lastChangedAt: documents.lastChangedAt,
+        ownerIdFromJoin: ownerUsers.id,
+        ownerUsername: ownerUsers.username,
+        ownerDisplayName: ownerUsers.displayName,
+        ownerUnit: ownerUsers.unit,
+        ownerRole: ownerUsers.role,
+        ownerPasswordChangedAt: ownerUsers.passwordChangedAt,
+        ownerCreatedAt: ownerUsers.createdAt,
+        ownerUpdatedAt: ownerUsers.updatedAt,
+        executorIdFromJoin: executorUsers.id,
+        executorUsername: executorUsers.username,
+        executorDisplayName: executorUsers.displayName,
+        executorUnit: executorUsers.unit,
+        executorRole: executorUsers.role,
+        executorPasswordChangedAt: executorUsers.passwordChangedAt,
+        executorCreatedAt: executorUsers.createdAt,
+        executorUpdatedAt: executorUsers.updatedAt,
+        employerIdFromJoin: employers.id,
+        employerFullName: employers.fullName,
+        employerShortName: employers.shortName,
+        employerLegalAddress: employers.legalAddress,
+        employerActualAddress: employers.actualAddress,
+        employerCreatedAt: employers.createdAt,
+        employerUpdatedAt: employers.updatedAt,
+        employerDeletedAt: employers.deletedAt,
+        outSenderEmployerIdFromJoin: outSenderEmployers.id,
+        outSenderEmployerFullName: outSenderEmployers.fullName,
+        outSenderEmployerShortName: outSenderEmployers.shortName,
+        outSenderEmployerLegalAddress: outSenderEmployers.legalAddress,
+        outSenderEmployerActualAddress: outSenderEmployers.actualAddress,
+        outSenderEmployerCreatedAt: outSenderEmployers.createdAt,
+        outSenderEmployerUpdatedAt: outSenderEmployers.updatedAt,
+        outSenderEmployerDeletedAt: outSenderEmployers.deletedAt,
+      })
       .from(documents)
+      .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
+      .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .leftJoin(employers, eq(documents.employerId, employers.id))
+      .leftJoin(
+        outSenderEmployers,
+        eq(documents.outSenderEmployerId, outSenderEmployers.id),
+      )
       .where(isNotNull(documents.deletedAt))
       .orderBy(
         desc(documents.deletedAt),
@@ -164,7 +327,11 @@ export class DocumentsService {
           ilike(sql`${documents.outgoingDate}::text`, `%${searchText}%`),
           ilike(sql`${documents.dueDate}::text`, `%${searchText}%`),
           ilike(ownerUsers.username, `%${searchText}%`),
+          ilike(ownerUsers.displayName, `%${searchText}%`),
           ilike(executorUsers.username, `%${searchText}%`),
+          ilike(executorUsers.displayName, `%${searchText}%`),
+          ilike(employers.shortName, `%${searchText}%`),
+          ilike(employers.fullName, `%${searchText}%`),
         ]
       : [];
 
@@ -208,10 +375,47 @@ export class DocumentsService {
         createdAt: documents.createdAt,
         updatedAt: documents.updatedAt,
         lastChangedAt: documents.lastChangedAt,
+        ownerIdFromJoin: ownerUsers.id,
+        ownerUsername: ownerUsers.username,
+        ownerDisplayName: ownerUsers.displayName,
+        ownerUnit: ownerUsers.unit,
+        ownerRole: ownerUsers.role,
+        ownerPasswordChangedAt: ownerUsers.passwordChangedAt,
+        ownerCreatedAt: ownerUsers.createdAt,
+        ownerUpdatedAt: ownerUsers.updatedAt,
+        executorIdFromJoin: executorUsers.id,
+        executorUsername: executorUsers.username,
+        executorDisplayName: executorUsers.displayName,
+        executorUnit: executorUsers.unit,
+        executorRole: executorUsers.role,
+        executorPasswordChangedAt: executorUsers.passwordChangedAt,
+        executorCreatedAt: executorUsers.createdAt,
+        executorUpdatedAt: executorUsers.updatedAt,
+        employerIdFromJoin: employers.id,
+        employerFullName: employers.fullName,
+        employerShortName: employers.shortName,
+        employerLegalAddress: employers.legalAddress,
+        employerActualAddress: employers.actualAddress,
+        employerCreatedAt: employers.createdAt,
+        employerUpdatedAt: employers.updatedAt,
+        employerDeletedAt: employers.deletedAt,
+        outSenderEmployerIdFromJoin: outSenderEmployers.id,
+        outSenderEmployerFullName: outSenderEmployers.fullName,
+        outSenderEmployerShortName: outSenderEmployers.shortName,
+        outSenderEmployerLegalAddress: outSenderEmployers.legalAddress,
+        outSenderEmployerActualAddress: outSenderEmployers.actualAddress,
+        outSenderEmployerCreatedAt: outSenderEmployers.createdAt,
+        outSenderEmployerUpdatedAt: outSenderEmployers.updatedAt,
+        outSenderEmployerDeletedAt: outSenderEmployers.deletedAt,
       })
       .from(documents)
       .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
+      .leftJoin(employers, eq(documents.employerId, employers.id))
+      .leftJoin(
+        outSenderEmployers,
+        eq(documents.outSenderEmployerId, outSenderEmployers.id),
+      )
       .innerJoin(
         lastChangedByUsers,
         eq(documents.lastChangedById, lastChangedByUsers.id),
@@ -868,6 +1072,14 @@ export class DocumentsService {
         employerCreatedAt: employers.createdAt,
         employerUpdatedAt: employers.updatedAt,
         employerDeletedAt: employers.deletedAt,
+        outSenderEmployerIdFromJoin: outSenderEmployers.id,
+        outSenderEmployerFullName: outSenderEmployers.fullName,
+        outSenderEmployerShortName: outSenderEmployers.shortName,
+        outSenderEmployerLegalAddress: outSenderEmployers.legalAddress,
+        outSenderEmployerActualAddress: outSenderEmployers.actualAddress,
+        outSenderEmployerCreatedAt: outSenderEmployers.createdAt,
+        outSenderEmployerUpdatedAt: outSenderEmployers.updatedAt,
+        outSenderEmployerDeletedAt: outSenderEmployers.deletedAt,
         ownerIdFromJoin: ownerUsers.id,
         ownerUsername: ownerUsers.username,
         ownerDisplayName: ownerUsers.displayName,
@@ -895,6 +1107,10 @@ export class DocumentsService {
       })
       .from(documents)
       .leftJoin(employers, eq(documents.employerId, employers.id))
+      .leftJoin(
+        outSenderEmployers,
+        eq(documents.outSenderEmployerId, outSenderEmployers.id),
+      )
       .innerJoin(ownerUsers, eq(documents.ownerId, ownerUsers.id))
       .innerJoin(executorUsers, eq(documents.executorId, executorUsers.id))
       .innerJoin(
@@ -971,6 +1187,19 @@ export class DocumentsService {
             deletedAt: row.employerDeletedAt?.toISOString() ?? null,
           };
 
+    const outSenderEmployer =
+      row.outSenderEmployerIdFromJoin === null
+        ? null
+        : {
+            id: row.outSenderEmployerIdFromJoin,
+            fullName: row.outSenderEmployerFullName!,
+            shortName: row.outSenderEmployerShortName!,
+            legalAddress: row.outSenderEmployerLegalAddress!,
+            actualAddress: row.outSenderEmployerActualAddress!,
+            createdAt: row.outSenderEmployerCreatedAt!.toISOString(),
+            updatedAt: row.outSenderEmployerUpdatedAt!.toISOString(),
+            deletedAt: row.outSenderEmployerDeletedAt?.toISOString() ?? null,
+          };
     return {
       id: row.id,
       registrationNumber: row.registrationNumber,
@@ -1003,6 +1232,7 @@ export class DocumentsService {
       updatedAt: row.updatedAt.toISOString(),
       lastChangedAt: row.lastChangedAt.toISOString(),
       employer,
+      outSenderEmployer,
       owner: {
         id: row.ownerIdFromJoin,
         username: row.ownerUsername,
@@ -1061,7 +1291,66 @@ export class DocumentsService {
     createdAt: Date;
     updatedAt: Date;
     lastChangedAt: Date;
+    ownerIdFromJoin: number;
+    ownerUsername: string;
+    ownerDisplayName: string;
+    ownerUnit: string;
+    ownerRole: 'USER' | 'ROOT';
+    ownerPasswordChangedAt: Date | null;
+    ownerCreatedAt: Date;
+    ownerUpdatedAt: Date;
+    executorIdFromJoin: number;
+    executorUsername: string;
+    executorDisplayName: string;
+    executorUnit: string;
+    executorRole: 'USER' | 'ROOT';
+    executorPasswordChangedAt: Date | null;
+    executorCreatedAt: Date;
+    executorUpdatedAt: Date;
+    employerIdFromJoin: number | null;
+    employerFullName: string | null;
+    employerShortName: string | null;
+    employerLegalAddress: string | null;
+    employerActualAddress: string | null;
+    employerCreatedAt: Date | null;
+    employerUpdatedAt: Date | null;
+    employerDeletedAt: Date | null;
+    outSenderEmployerIdFromJoin: number | null;
+    outSenderEmployerFullName: string | null;
+    outSenderEmployerShortName: string | null;
+    outSenderEmployerLegalAddress: string | null;
+    outSenderEmployerActualAddress: string | null;
+    outSenderEmployerCreatedAt: Date | null;
+    outSenderEmployerUpdatedAt: Date | null;
+    outSenderEmployerDeletedAt: Date | null;
   }): DocumentListItem {
+    const employer =
+      row.employerIdFromJoin === null
+        ? null
+        : {
+            id: row.employerIdFromJoin,
+            fullName: row.employerFullName!,
+            shortName: row.employerShortName!,
+            legalAddress: row.employerLegalAddress!,
+            actualAddress: row.employerActualAddress!,
+            createdAt: row.employerCreatedAt!.toISOString(),
+            updatedAt: row.employerUpdatedAt!.toISOString(),
+            deletedAt: row.employerDeletedAt?.toISOString() ?? null,
+          };
+    const outSenderEmployer =
+      row.outSenderEmployerIdFromJoin === null
+        ? null
+        : {
+            id: row.outSenderEmployerIdFromJoin,
+            fullName: row.outSenderEmployerFullName!,
+            shortName: row.outSenderEmployerShortName!,
+            legalAddress: row.outSenderEmployerLegalAddress!,
+            actualAddress: row.outSenderEmployerActualAddress!,
+            createdAt: row.outSenderEmployerCreatedAt!.toISOString(),
+            updatedAt: row.outSenderEmployerUpdatedAt!.toISOString(),
+            deletedAt: row.outSenderEmployerDeletedAt?.toISOString() ?? null,
+          };
+
     return {
       id: row.id,
       registrationNumber: row.registrationNumber,
@@ -1090,6 +1379,29 @@ export class DocumentsService {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
       lastChangedAt: row.lastChangedAt.toISOString(),
+      owner: {
+        id: row.ownerIdFromJoin,
+        username: row.ownerUsername,
+        displayName: row.ownerDisplayName,
+        unit: row.ownerUnit,
+        role: row.ownerRole as UserRole,
+        passwordChangedAt: row.ownerPasswordChangedAt?.toISOString() ?? null,
+        createdAt: row.ownerCreatedAt.toISOString(),
+        updatedAt: row.ownerUpdatedAt.toISOString(),
+      },
+      executor: {
+        id: row.executorIdFromJoin,
+        username: row.executorUsername,
+        displayName: row.executorDisplayName,
+        unit: row.executorUnit,
+        role: row.executorRole as UserRole,
+        passwordChangedAt:
+          row.executorPasswordChangedAt?.toISOString() ?? null,
+        createdAt: row.executorCreatedAt.toISOString(),
+        updatedAt: row.executorUpdatedAt.toISOString(),
+      },
+      employer,
+      outSenderEmployer,
     };
   }
 

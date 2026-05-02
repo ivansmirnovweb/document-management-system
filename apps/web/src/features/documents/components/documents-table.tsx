@@ -76,11 +76,14 @@ export function DocumentsTable({
       header: "Участники",
       cell: ({ row }) => {
         const document = row.original;
+        const ownerLabel = document.owner.displayName || document.owner.username;
+        const executorLabel = document.executor.displayName || document.executor.username;
+        const employerLabel = document.employer?.shortName || document.employer?.fullName || "—";
         return (
           <div className="space-y-1 text-sm text-zinc-600">
-            <div>Владелец #{document.ownerId}</div>
-            <div>Исполнитель #{document.executorId}</div>
-            <div>Работодатель {document.employerId ? `#${document.employerId}` : "—"}</div>
+            <div>Владелец {ownerLabel}</div>
+            <div>Исполнитель {executorLabel}</div>
+            <div>Работодатель {employerLabel}</div>
           </div>
         );
       },

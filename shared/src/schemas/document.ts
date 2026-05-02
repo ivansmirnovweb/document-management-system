@@ -32,6 +32,10 @@ export const documentListItemSchema = z
     createdAt: isoDateStringSchema,
     updatedAt: isoDateStringSchema,
     lastChangedAt: isoDateStringSchema,
+    owner: userSchema,
+    executor: userSchema,
+    employer: employerSchema.nullable(),
+    outSenderEmployer: employerSchema.nullable(),
   })
   .strict();
 
@@ -40,9 +44,6 @@ export const documentDetailsSchema = documentListItemSchema
     description: z.string().nullable(),
     incomingNumber: z.string().nullable(),
     outgoingNumber: z.string().nullable(),
-    employer: employerSchema.nullable(),
-    owner: userSchema,
-    executor: userSchema,
     resolutions: z.array(resolutionSchema),
     lastChangedBy: userSchema,
   })

@@ -30,6 +30,10 @@ export type DocumentListItem = {
   createdAt: IsoDateString;
   updatedAt: IsoDateString;
   lastChangedAt: IsoDateString;
+  owner: User;
+  executor: User;
+  employer: Employer | null;
+  outSenderEmployer: Employer | null;
 };
 
 export type DocumentDetails = DocumentListItem & {

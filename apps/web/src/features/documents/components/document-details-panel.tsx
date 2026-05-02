@@ -74,7 +74,7 @@ export function DocumentDetailsPanel({
         <Detail label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
         <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username}) · ${document.owner.unit}`} />
         <Detail label="Исполнитель" value={`${document.executor.displayName} (@${document.executor.username}) · ${document.executor.unit}`} />
-        <Detail label="Работодатель" value={document.employer ? document.employer.fullName : "—"} />
+        <Detail label="Работодатель" value={document.employer?.shortName || document.employer?.fullName || "—"} />
         <Detail label="Вид" value={kindLabel(document.kind)} />
         <Detail label="Рег. номер" value={document.registrationNumber} />
         <Detail label="Входящий номер" value={document.incomingNumber ?? "—"} />
