@@ -44,10 +44,11 @@ export class CreateDocumentDto {
   @IsOptional()
   @IsString()
   @MinLength(1)
-  outgoingNumber!: string;
+  outgoingNumber?: string | null;
 
+  @IsOptional()
   @IsDateString()
-  outgoingDate!: string;
+  outgoingDate?: string | null;
 
   @IsInt()
   @Min(1)

@@ -16,6 +16,7 @@ import { Input } from "@/shared/ui/input";
 import { SlideOver } from "@/shared/ui/slide-over";
 import { StateCard } from "@/shared/ui/state-card";
 import { LoadingStateCard } from "@/shared/ui/loading-state-card";
+import { downloadCsv } from "@/shared/lib/download-csv";
 import { documentsApi } from "../documents.api";
 import { documentsKeys } from "../documents.keys";
 import { statusLabel } from "../document-utils";
@@ -245,15 +246,7 @@ export function DocumentsPage({
                 dateTo: sortedDueDates[sortedDueDates.length - 1],
                 selectedIds: ids,
             });
-            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "documents-selected-export.csv";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
+            downloadCsv("documents-selected-export.csv", csv);
         },
     });
 
@@ -265,15 +258,6 @@ export function DocumentsPage({
               : tab === DocumentStatus.DONE
                 ? completedListQuery.isPending
                 : activeListQuery.isPending;
-
-    const actionError =
-        createMutation.error ??
-        updateMutation.error ??
-        statusMutation.error ??
-        deleteMutation.error ??
-        createResolutionMutation.error ??
-        writeOffMutation.error ??
-        exportSelectedMutation.error;
 
     const emptyState = (() => {
         if (variant === "public") {
@@ -459,6 +443,60 @@ export function DocumentsPage({
         );
     })();
 
+    const onToggleExportSelect =
+        variant === "private"
+            ? (documentId: number, checked: boolean) => {
+                  setSelectedExportIds((current) =>
+                      checked
+                          ? [...new Set([...current, documentId])]
+                          : current.filter((id) => id !== documentId),
+                  );
+              }
+            : undefined;
+    const onToggleExportSelectAll =
+        variant === "private"
+            ? (checked: boolean) => {
+                  setSelectedExportIds(checked ? list.map((item) => item.id) : []);
+              }
+            : undefined;
+
+    const tableProps = {
+        documents: list,
+        selectedDocumentId: selectedId,
+        currentUser,
+        publicView: variant === "public",
+        emptyStateTitle: emptyState.title,
+        emptyStateDescription: emptyState.description,
+        emptyStateActionLabel:
+            variant === "private" ? "Создать документ" : undefined,
+        onEmptyAction: variant === "private" ? openCreate : undefined,
+        onSelect: openDetails,
+        selectedExportIds,
+        onToggleExportSelect,
+        onToggleExportSelectAll,
+        onEdit: variant === "private" ? openEdit : undefined,
+        onToggleStatus:
+            variant === "private"
+                ? (document: DocumentListItem) => {
+                      openDetails(document);
+                      void statusMutation.mutateAsync({
+                          id: document.id,
+                          status:
+                              document.status === DocumentStatus.DONE
+                                  ? DocumentStatus.NOT_DONE
+                                  : DocumentStatus.DONE,
+                      });
+                  }
+                : undefined,
+        onDelete:
+            variant === "private"
+                ? (document: DocumentListItem) => {
+                      openDetails(document);
+                      void deleteMutation.mutateAsync(document.id);
+                  }
+                : undefined,
+    };
+
     const listState = (() => {
         if (listError instanceof Error) {
             return (
@@ -469,117 +507,7 @@ export function DocumentsPage({
             );
         }
 
-        if (!isLoading && list.length === 0) {
-            return (
-                <DocumentsTable
-                    documents={list}
-                    selectedDocumentId={selectedId}
-                    currentUser={currentUser}
-                    publicView={variant === "public"}
-                    emptyStateTitle={emptyState.title}
-                    emptyStateDescription={emptyState.description}
-                    emptyStateActionLabel={
-                        variant === "private" ? "Создать документ" : undefined
-                    }
-                    onEmptyAction={
-                        variant === "private" ? openCreate : undefined
-                    }
-                    onSelect={openDetails}
-                    selectedExportIds={selectedExportIds}
-                    onToggleExportSelect={
-                        variant === "private"
-                            ? (documentId, checked) => {
-                                  setSelectedExportIds((current) =>
-                                      checked
-                                          ? [
-                                                ...new Set([
-                                                    ...current,
-                                                    documentId,
-                                                ]),
-                                            ]
-                                          : current.filter(
-                                                (id) => id !== documentId,
-                                            ),
-                                  );
-                              }
-                            : undefined
-                    }
-                    onToggleExportSelectAll={
-                        variant === "private"
-                            ? (checked) => {
-                                  setSelectedExportIds(
-                                      checked
-                                          ? list.map((item) => item.id)
-                                          : [],
-                                  );
-                              }
-                            : undefined
-                    }
-                />
-            );
-        }
-
-        return (
-            <DocumentsTable
-                documents={list}
-                selectedDocumentId={selectedId}
-                currentUser={currentUser}
-                publicView={variant === "public"}
-                emptyStateTitle={emptyState.title}
-                emptyStateDescription={emptyState.description}
-                emptyStateActionLabel={
-                    variant === "private" ? "Создать документ" : undefined
-                }
-                onEmptyAction={variant === "private" ? openCreate : undefined}
-                onSelect={openDetails}
-                selectedExportIds={selectedExportIds}
-                onToggleExportSelect={
-                    variant === "private"
-                        ? (documentId, checked) => {
-                              setSelectedExportIds((current) =>
-                                  checked
-                                      ? [...new Set([...current, documentId])]
-                                      : current.filter(
-                                            (id) => id !== documentId,
-                                        ),
-                              );
-                          }
-                        : undefined
-                }
-                onToggleExportSelectAll={
-                    variant === "private"
-                        ? (checked) => {
-                              setSelectedExportIds(
-                                  checked ? list.map((item) => item.id) : [],
-                              );
-                          }
-                        : undefined
-                }
-                onEdit={variant === "private" ? openEdit : undefined}
-                onToggleStatus={
-                    variant === "private"
-                        ? (document) => {
-                              openDetails(document);
-                              void statusMutation.mutateAsync({
-                                  id: document.id,
-                                  status:
-                                      document.status === DocumentStatus.DONE
-                                          ? DocumentStatus.NOT_DONE
-                                          : DocumentStatus.DONE,
-                              });
-                          }
-                        : undefined
-                }
-                onDelete={
-                    variant === "private"
-                        ? (document) => {
-                              openDetails(document);
-                              void deleteMutation.mutateAsync(document.id);
-                          }
-                        : undefined
-                }
-            />
-        );
+        return <DocumentsTable {...tableProps} />;
     })();
 
     const sidebarOpen = mode !== "details" || selectedId !== null;
@@ -743,12 +671,6 @@ export function DocumentsPage({
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
                 />
-            ) : null}
-
-            {actionError instanceof Error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {actionError.message}
-                </div>
             ) : null}
 
             {variant === "private" && appliedSearch ? (

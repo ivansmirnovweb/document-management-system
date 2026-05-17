@@ -220,7 +220,12 @@ export class DocumentsService {
         outSenderEmployers,
         eq(documents.outSenderEmployerId, outSenderEmployers.id),
       )
-      .where(and(eq(documents.status, DocumentStatus.DONE), isNull(documents.deletedAt)))
+      .where(
+        and(
+          eq(documents.status, DocumentStatus.DONE),
+          isNull(documents.deletedAt),
+        ),
+      )
       .orderBy(
         desc(documents.isControl),
         asc(documents.dueDate),
@@ -577,7 +582,7 @@ export class DocumentsService {
 
     const now = new Date();
     const values: Record<string, unknown> = {
-      updatedAt: now,
+      ...this.getDocumentAuditUpdate(actor, now),
     };
 
     if (dto.registrationNumber !== undefined) {
@@ -680,25 +685,30 @@ export class DocumentsService {
     });
 
     const now = new Date();
-    await this.db.db.insert(documentResolutions).values({
-      documentId: id,
-      authorId: actor!.id,
-      text: dto.text,
-      resolutionDate: new Date(dto.resolutionDate),
-      dueDate: new Date(dto.dueDate),
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    await this.db.db
-      .update(documents)
-      .set({
-        isControl: true,
+    await this.db.db.transaction(async (tx) => {
+      await tx.insert(documentResolutions).values({
+        documentId: id,
+        authorId: actor!.id,
+        text: dto.text,
+        resolutionDate: new Date(dto.resolutionDate),
+        dueDate: new Date(dto.dueDate),
+        createdAt: now,
         updatedAt: now,
-        lastChangedAt: now,
-        lastChangedById: actor!.id,
-      })
-      .where(eq(documents.id, id));
+      });
+
+      const [updated] = await tx
+        .update(documents)
+        .set({
+          isControl: true,
+          ...this.getDocumentAuditUpdate(actor, now),
+        })
+        .where(eq(documents.id, id))
+        .returning({ id: documents.id });
+
+      if (!updated) {
+        throw new NotFoundException('Document not found');
+      }
+    });
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
     if (!updatedDocument) {
@@ -723,21 +733,39 @@ export class DocumentsService {
       description: dto.text,
     });
 
-    const values: Record<string, unknown> = { updatedAt: new Date() };
+    const now = new Date();
+    const values: Record<string, unknown> = { updatedAt: now };
     if (dto.text !== undefined) values.text = dto.text;
     if (dto.resolutionDate !== undefined)
       values.resolutionDate = new Date(dto.resolutionDate);
     if (dto.dueDate !== undefined) values.dueDate = new Date(dto.dueDate);
 
-    await this.db.db
-      .update(documentResolutions)
-      .set(values)
-      .where(
-        and(
-          eq(documentResolutions.id, resolutionId),
-          eq(documentResolutions.documentId, id),
-        ),
-      );
+    await this.db.db.transaction(async (tx) => {
+      const [updatedResolution] = await tx
+        .update(documentResolutions)
+        .set(values)
+        .where(
+          and(
+            eq(documentResolutions.id, resolutionId),
+            eq(documentResolutions.documentId, id),
+          ),
+        )
+        .returning({ id: documentResolutions.id });
+
+      if (!updatedResolution) {
+        throw new NotFoundException('Resolution not found');
+      }
+
+      const [updatedDocument] = await tx
+        .update(documents)
+        .set(this.getDocumentAuditUpdate(actor, now))
+        .where(eq(documents.id, id))
+        .returning({ id: documents.id });
+
+      if (!updatedDocument) {
+        throw new NotFoundException('Document not found');
+      }
+    });
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
     if (!updatedDocument) {
@@ -761,24 +789,40 @@ export class DocumentsService {
       description: 'delete',
     });
 
-    await this.db.db
-      .delete(documentResolutions)
-      .where(
-        and(
-          eq(documentResolutions.id, resolutionId),
-          eq(documentResolutions.documentId, id),
-        ),
-      );
+    const now = new Date();
+    await this.db.db.transaction(async (tx) => {
+      const [deletedResolution] = await tx
+        .delete(documentResolutions)
+        .where(
+          and(
+            eq(documentResolutions.id, resolutionId),
+            eq(documentResolutions.documentId, id),
+          ),
+        )
+        .returning({ id: documentResolutions.id });
 
-    const [{ count }] = await this.db.db
-      .select({ count: sql<number>`count(*)` })
-      .from(documentResolutions)
-      .where(eq(documentResolutions.documentId, id));
+      if (!deletedResolution) {
+        throw new NotFoundException('Resolution not found');
+      }
 
-    await this.db.db
-      .update(documents)
-      .set({ isControl: Number(count) > 0, updatedAt: new Date() })
-      .where(eq(documents.id, id));
+      const [{ count }] = await tx
+        .select({ count: sql<number>`count(*)` })
+        .from(documentResolutions)
+        .where(eq(documentResolutions.documentId, id));
+
+      const [updatedDocument] = await tx
+        .update(documents)
+        .set({
+          isControl: Number(count) > 0,
+          ...this.getDocumentAuditUpdate(actor, now),
+        })
+        .where(eq(documents.id, id))
+        .returning({ id: documents.id });
+
+      if (!updatedDocument) {
+        throw new NotFoundException('Document not found');
+      }
+    });
 
     const updatedDocument = await this.findDocumentDetailsById(id, true);
     if (!updatedDocument) {
@@ -1407,8 +1451,7 @@ export class DocumentsService {
         displayName: row.executorDisplayName,
         unit: row.executorUnit,
         role: row.executorRole as UserRole,
-        passwordChangedAt:
-          row.executorPasswordChangedAt?.toISOString() ?? null,
+        passwordChangedAt: row.executorPasswordChangedAt?.toISOString() ?? null,
         createdAt: row.executorCreatedAt.toISOString(),
         updatedAt: row.executorUpdatedAt.toISOString(),
       },
@@ -1460,4 +1503,22 @@ export class DocumentsService {
     }
   }
 
+  private getDocumentAuditUpdate(
+    actor: DocumentActor,
+    now: Date,
+  ): {
+    updatedAt: Date;
+    lastChangedAt: Date;
+    lastChangedById: number;
+  } {
+    if (!actor) {
+      throw new BadRequestException('Authenticated actor is required');
+    }
+
+    return {
+      updatedAt: now,
+      lastChangedAt: now,
+      lastChangedById: actor.id,
+    };
+  }
 }

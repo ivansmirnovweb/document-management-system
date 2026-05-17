@@ -59,8 +59,8 @@ export const createDocumentInputSchema = z
     kind: z.nativeEnum(DocumentKind),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
-    outgoingNumber: requiredText("Исходящий номер"),
-    outgoingDate: isoDateStringSchema,
+    outgoingNumber: z.string().nullable().optional(),
+    outgoingDate: isoDateStringSchema.nullable().optional(),
     employerId: z.number().int().positive("ID работодателя должен быть положительным числом"),
     outSenderEmployerId: z.number().int().positive().nullable().optional(),
     broadcast: z.string().optional(),
@@ -68,6 +68,27 @@ export const createDocumentInputSchema = z
     executorId: z.coerce.number().int().positive("ID исполнителя должен быть положительным числом"),
     dueDate: isoDateStringSchema.optional(),
     isControl: z.boolean().optional(),
+  })
+  .superRefine((input, ctx) => {
+    const hasOutgoingNumber = (input.outgoingNumber ?? "").trim().length > 0;
+    const hasOutgoingDate = Boolean(input.outgoingDate);
+
+    if (input.kind === DocumentKind.OUTGOING) {
+      if (!hasOutgoingNumber) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outgoingNumber"],
+          message: "Исходящий номер обязателен для исходящего документа",
+        });
+      }
+      if (!hasOutgoingDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outgoingDate"],
+          message: "Дата исходящего обязательна для исходящего документа",
+        });
+      }
+    }
   })
   .strict();
 
@@ -81,8 +102,8 @@ export const updateDocumentInputSchema = z
     kind: z.nativeEnum(DocumentKind).optional(),
     description: z.string().nullable().optional(),
     incomingNumber: z.string().nullable().optional(),
-    outgoingNumber: requiredText("Исходящий номер").optional(),
-    outgoingDate: isoDateStringSchema.optional(),
+    outgoingNumber: z.string().nullable().optional(),
+    outgoingDate: isoDateStringSchema.nullable().optional(),
     employerId: z.number().int().positive().nullable().optional(),
     outSenderEmployerId: z.number().int().positive().nullable().optional(),
     broadcast: z.string().optional(),
@@ -91,5 +112,28 @@ export const updateDocumentInputSchema = z
     dueDate: isoDateStringSchema.optional(),
     status: z.nativeEnum(DocumentStatus).optional(),
     isControl: z.boolean().optional(),
+  })
+  .superRefine((input, ctx) => {
+    if (input.kind !== DocumentKind.OUTGOING) {
+      return;
+    }
+
+    const hasOutgoingNumber = (input.outgoingNumber ?? "").trim().length > 0;
+    const hasOutgoingDate = Boolean(input.outgoingDate);
+
+    if (!hasOutgoingNumber) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["outgoingNumber"],
+        message: "Исходящий номер обязателен для исходящего документа",
+      });
+    }
+    if (!hasOutgoingDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["outgoingDate"],
+        message: "Дата исходящего обязательна для исходящего документа",
+      });
+    }
   })
   .strict();

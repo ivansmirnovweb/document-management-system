@@ -32,7 +32,7 @@ type DocumentFormValues = {
     description?: string | null;
     incomingNumber?: string | null;
     outgoingNumber?: string | null;
-    outgoingDate: string;
+    outgoingDate?: string | null;
     employerId?: number | null;
     ownerId: number;
     executorId: number;
@@ -64,7 +64,7 @@ function toFormDefaults(
             description: "",
             incomingNumber: "",
             outgoingNumber: "",
-            outgoingDate: new Date().toISOString().slice(0, 10),
+            outgoingDate: "",
             employerId: undefined,
             ownerId: currentUser.id,
             executorId: currentUser.id,
@@ -84,7 +84,7 @@ function toFormDefaults(
         description: document.description ?? "",
         incomingNumber: document.incomingNumber ?? "",
         outgoingNumber: document.outgoingNumber ?? "",
-        outgoingDate: document.outgoingDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+        outgoingDate: document.outgoingDate?.slice(0, 10) ?? "",
         employerId: document.employerId ?? undefined,
         ownerId: document.ownerId,
         executorId: document.executorId,
@@ -127,6 +127,8 @@ export function DocumentFormPanel({
     useEffect(() => {
         form.reset(formDefaults);
     }, [form, formDefaults, mode]);
+
+    const selectedKind = form.watch("kind");
 
     const submit = form.handleSubmit(async (values) => {
         await onSubmit(values);
@@ -319,14 +321,14 @@ export function DocumentFormPanel({
                     </FormField>
                     <FormField
                         label="Исходящий номер"
-                        required
+                        required={selectedKind === "OUTGOING"}
                         error={form.formState.errors.outgoingNumber?.message}
                     >
                         <Input
                             {...form.register("outgoingNumber", {
                                 setValueAs: (value) =>
                                     String(value).trim() === ""
-                                        ? ""
+                                        ? undefined
                                         : String(value),
                             })}
                             disabled={isCloseOutOnlyEditor}
@@ -334,14 +336,19 @@ export function DocumentFormPanel({
                     </FormField>
                     <FormField
                         label="Дата исходящего"
-                        required
+                        required={selectedKind === "OUTGOING"}
                         error={form.formState.errors.outgoingDate?.message}
                     >
                         <Input
                             type="date"
-                            aria-required="true"
+                            aria-required={selectedKind === "OUTGOING"}
                             disabled={isCloseOutOnlyEditor}
-                            {...form.register("outgoingDate")}
+                            {...form.register("outgoingDate", {
+                                setValueAs: (value) =>
+                                    String(value).trim() === ""
+                                        ? undefined
+                                        : String(value),
+                            })}
                         />
                     </FormField>
                 </div>

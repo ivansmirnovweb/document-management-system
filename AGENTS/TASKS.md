@@ -2,6 +2,8 @@
 
 ## Todo
 
+- [x] 114 — Fix backend code review iteration 1 critical/high issues (create kind contract, audit stamps, transactions, resolution 404 semantics)
+- [x] 115 — Fix frontend code review iteration 1 duplication hotspots (single DocumentsTable render path, shared CSV helper, auth cache side-effect source)
 - [x] 106 — Replace raw ID display with human-readable entity labels across UI, search, and exports
 - [x] 113 — Close full PDF TZ compliance gaps after code audit (API/UI/contracts)
 - [x] 107 — Align non-owner editable fields with TZ rules for document close-out block

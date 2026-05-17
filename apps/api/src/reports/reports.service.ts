@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { and, asc, eq, gte, isNull, lte, sql } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   DocumentStatus,
@@ -113,7 +113,7 @@ export class ReportsService {
       if (filter.selectedIds.length === 0) {
         throw new BadRequestException('selectedIds must not be empty');
       }
-      conditions.push(sql`${documents.id} = ANY(${filter.selectedIds})`);
+      conditions.push(inArray(documents.id, filter.selectedIds));
     }
 
     return this.db.db

@@ -18,6 +18,7 @@ import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
 import { LoadingStateCard } from "@/shared/ui/loading-state-card";
 import { StateCard } from "@/shared/ui/state-card";
+import { downloadCsv } from "@/shared/lib/download-csv";
 
 const reportRangeSchema = reportFilterInputSchema.pick({
     dateFrom: true,
@@ -38,16 +39,6 @@ function startOfMonth(value: Date): Date {
     const date = new Date(value);
     date.setDate(1);
     return date;
-}
-
-function downloadCsv(filename: string, csv: string) {
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function ReportsPage() {

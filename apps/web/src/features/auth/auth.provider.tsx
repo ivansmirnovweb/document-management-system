@@ -79,19 +79,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(sessionQuery.data?.user),
       error: sessionQuery.error instanceof Error ? sessionQuery.error : null,
       login: async (input) => {
-        const result = await loginMutation.mutateAsync(input);
-        queryClient.setQueryData(authKeys.session, { user: result.user });
+        await loginMutation.mutateAsync(input);
       },
       register: async (input) => {
-        const result = await registerMutation.mutateAsync(input);
-        queryClient.setQueryData(authKeys.session, { user: result.user });
+        await registerMutation.mutateAsync(input);
       },
       logout: async () => {
         await logoutMutation.mutateAsync();
       },
       changePassword: async (input) => {
-        const result = await changePasswordMutation.mutateAsync(input);
-        queryClient.setQueryData(authKeys.session, { user: result.user });
+        await changePasswordMutation.mutateAsync(input);
       },
       refreshSession,
     };

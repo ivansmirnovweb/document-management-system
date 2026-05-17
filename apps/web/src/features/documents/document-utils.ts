@@ -90,6 +90,10 @@ export function canEditDocument(
     return false;
   }
 
+  if (doc.status === DocumentStatus.DONE || doc.deletedAt) {
+    return false;
+  }
+
   return (
     user.role === UserRole.ROOT ||
     doc.ownerId === user.id ||
@@ -105,6 +109,18 @@ export function canDeleteDocument(
     return false;
   }
 
+  if (user.role === UserRole.ROOT) {
+    return false;
+  }
+
+  if (doc.status === DocumentStatus.DONE) {
+    return false;
+  }
+
+  if (doc.deletedAt) {
+    return false;
+  }
+
   return doc.ownerId === user.id;
 }
 
@@ -116,7 +132,14 @@ export function canCompleteDocument(
     return false;
   }
 
-  return doc.status === DocumentStatus.NOT_DONE && (user.role === UserRole.ROOT || doc.ownerId === user.id);
+  if (doc.deletedAt) {
+    return false;
+  }
+
+  return (
+    doc.status === DocumentStatus.NOT_DONE &&
+    (user.role === UserRole.ROOT || doc.ownerId === user.id)
+  );
 }
 
 export function canReopenDocument(
