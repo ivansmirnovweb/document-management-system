@@ -35,6 +35,7 @@ import type { ReassignDocumentDto } from './dto/reassign-document.dto';
 import type { UpdateDocumentDto } from './dto/update-document.dto';
 import type { CreateResolutionDto } from './dto/create-resolution.dto';
 import type { UpdateResolutionDto } from './dto/update-resolution.dto';
+import type { RestoreDocumentDto } from './dto/restore-document.dto';
 import {
   DocumentPermissionsService,
   type DocumentActor,
@@ -343,6 +344,12 @@ export class DocumentsService {
       (condition): condition is NonNullable<typeof condition> =>
         condition !== undefined,
     );
+
+    if (actor?.role !== UserRole.ROOT) {
+      conditions.push(isNull(documents.deletedAt));
+    } else if (query.includeDeleted === false) {
+      conditions.push(isNull(documents.deletedAt));
+    }
 
     if (searchConditions.length > 0) {
       const searchClause = or(...searchConditions);
@@ -931,7 +938,11 @@ export class DocumentsService {
     }
   }
 
-  async restore(id: number, actor: DocumentActor): Promise<DocumentDetails> {
+  async restore(
+    id: number,
+    actor: DocumentActor,
+    dto: RestoreDocumentDto,
+  ): Promise<DocumentDetails> {
     this.permissions.assertCanRestoreDocument(actor);
 
     const document = await this.findDocumentDetailsById(id, true);
@@ -943,6 +954,7 @@ export class DocumentsService {
     const [updated] = await this.db.db
       .update(documents)
       .set({
+        ownerId: dto.ownerId,
         deletedAt: null,
         updatedAt: now,
         lastChangedAt: now,

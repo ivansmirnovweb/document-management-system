@@ -16,7 +16,10 @@ function buildQuery(filter: ReportFilterInput): string {
     if (value === undefined || value === "") {
       continue;
     }
-
+    if (Array.isArray(value)) {
+      search.set(key, value.join(","));
+      continue;
+    }
     search.set(key, String(value));
   }
 

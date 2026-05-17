@@ -42,4 +42,5 @@ TZ states that users other than owner must be able to fill a specific close-out 
 
 ## Result
 
-Pending.
+Done. Backend non-owner update permissions aligned to TZ close-out subset; UI edit access opened for executor and non-close-out fields are read-only for non-owner edit mode; permission tests extended for allow/deny cases.
+

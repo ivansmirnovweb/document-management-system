@@ -1,5 +1,7 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
+import { UserRole } from '@document-flow/shared';
 import type { Response } from 'express';
+import { Roles } from '../common/decorators/roles.decorator';
 import { ReportFilterDto } from './dto/report-filter.dto';
 import { ReportsService } from './reports.service';
 
@@ -8,6 +10,7 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('documents/export')
+  @Roles(UserRole.ROOT)
   async exportDocuments(
     @Query() filter: ReportFilterDto,
     @Res() response: Response,
@@ -25,6 +28,7 @@ export class ReportsController {
   }
 
   @Get('executors')
+  @Roles(UserRole.ROOT)
   getExecutorStatistics(@Query() filter: ReportFilterDto) {
     return this.reportsService.getExecutorStatistics(filter);
   }

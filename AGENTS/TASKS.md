@@ -3,12 +3,13 @@
 ## Todo
 
 - [x] 106 — Replace raw ID display with human-readable entity labels across UI, search, and exports
-- [ ] 107 — Align non-owner editable fields with TZ rules for document close-out block
-- [ ] 108 — Require owner assignment on root restore flow (restore with explicit reassign)
-- [ ] 109 — Add multi-select documents export flow to match TZ print/export scenario
-- [ ] 110 — Clarify and enforce deleted-record visibility rules in search by role
-- [ ] 111 — Enforce required TZ fields for inbox record creation/update
-- [ ] 112 — Enforce root-only access for reports endpoints in backend API
+- [x] 113 — Close full PDF TZ compliance gaps after code audit (API/UI/contracts)
+- [x] 107 — Align non-owner editable fields with TZ rules for document close-out block
+- [x] 108 — Require owner assignment on root restore flow (restore with explicit reassign)
+- [x] 109 — Add multi-select documents export flow to match TZ print/export scenario
+- [x] 110 — Clarify and enforce deleted-record visibility rules in search by role
+- [x] 111 — Enforce required TZ fields for inbox record creation/update
+- [x] 112 — Enforce root-only access for reports endpoints in backend API
 
 ## Done
 

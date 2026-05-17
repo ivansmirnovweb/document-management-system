@@ -1,4 +1,5 @@
-import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 import { DocumentStatus } from '@document-flow/shared';
 
 export class SearchDocumentsQueryDto {
@@ -10,4 +11,9 @@ export class SearchDocumentsQueryDto {
   @IsOptional()
   @IsEnum(DocumentStatus)
   status?: DocumentStatus;
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => value === true || value === 'true')
+  @IsBoolean()
+  includeDeleted?: boolean;
 }

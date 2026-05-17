@@ -41,4 +41,5 @@ TZ marks specific record fields as mandatory, while current create/update flow a
 
 ## Result
 
-Pending.
+Done. Required inbox fields were tightened across API/shared/UI: create/update validation now enforces mandatory TZ fields (including about1/outgoingNumber/outgoingDate/employer) and form fields were aligned with required indicators and validation.
+

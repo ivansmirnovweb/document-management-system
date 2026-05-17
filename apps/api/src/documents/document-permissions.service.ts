@@ -9,9 +9,11 @@ import type { AuthenticatedUser } from '../auth/auth.types';
 export type DocumentActor = Pick<AuthenticatedUser, 'id' | 'role' | 'unit'> | null;
 
 const EXECUTION_FIELDS = new Set([
-  'description',
-  'incomingNumber',
   'outgoingNumber',
+  'outgoingDate',
+  'outSenderEmployerId',
+  'about2',
+  'broadcast',
 ]);
 
 @Injectable()

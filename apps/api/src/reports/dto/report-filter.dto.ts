@@ -5,6 +5,10 @@ import {
   IsISO8601,
   IsOptional,
   IsInt,
+  IsArray,
+  ArrayNotEmpty,
+  ArrayUnique,
+  Min,
 } from 'class-validator';
 import { DocumentStatus } from '@document-flow/shared';
 
@@ -41,4 +45,25 @@ export class ReportFilterDto {
   @Transform(toBoolean)
   @IsBoolean()
   includeDeleted?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => Number(item));
+    }
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+        .map((item) => Number(item));
+    }
+    return value;
+  })
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  selectedIds?: number[];
 }

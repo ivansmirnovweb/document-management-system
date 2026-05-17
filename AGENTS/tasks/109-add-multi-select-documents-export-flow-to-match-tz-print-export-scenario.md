@@ -43,4 +43,5 @@ Current export is range-based and does not implement explicit multi-select expor
 
 ## Result
 
-Pending.
+Done. Added multi-select state in documents table/page and export action for selected records; report export contract extended with selectedIds filter and CSV download for selected subset.
+

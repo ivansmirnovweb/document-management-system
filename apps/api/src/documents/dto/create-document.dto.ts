@@ -22,9 +22,9 @@ export class CreateDocumentDto {
   @MinLength(1)
   title!: string;
 
-  @IsOptional()
   @IsString()
-  about1?: string;
+  @MinLength(1)
+  about1!: string;
 
   @IsOptional()
   @IsString()
@@ -43,16 +43,15 @@ export class CreateDocumentDto {
 
   @IsOptional()
   @IsString()
-  outgoingNumber?: string | null;
+  @MinLength(1)
+  outgoingNumber!: string;
 
-  @IsOptional()
   @IsDateString()
-  outgoingDate?: string | null;
+  outgoingDate!: string;
 
-  @IsOptional()
   @IsInt()
   @Min(1)
-  employerId?: number | null;
+  employerId!: number;
 
   @IsOptional()
   @IsInt()

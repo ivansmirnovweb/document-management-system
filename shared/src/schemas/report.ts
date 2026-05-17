@@ -12,6 +12,7 @@ export const reportFilterInputSchema = z
     employerId: z.number().int().positive().optional(),
     status: z.nativeEnum(DocumentStatus).optional(),
     includeDeleted: z.boolean().optional(),
+    selectedIds: z.array(z.number().int().positive()).nonempty().optional(),
   })
   .strict();
 export const executorStatisticsSchema = z

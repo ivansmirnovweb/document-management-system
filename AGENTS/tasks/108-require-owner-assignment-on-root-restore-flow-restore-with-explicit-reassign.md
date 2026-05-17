@@ -42,4 +42,5 @@ Current restore clears deletion flag but does not require immediate owner assign
 
 ## Result
 
-Pending.
+Done. Restore endpoint now requires ownerId payload and applies owner assignment atomically with restore; root deleted-doc UI now restores with mandatory owner selection in a single action.
+

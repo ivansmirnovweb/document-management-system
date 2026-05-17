@@ -50,9 +50,9 @@ export const documentsApi = {
     return apiRequest("/documents/deleted", { method: "GET" }, documentListSchema);
   },
 
-  search(params: { q?: string; status?: DocumentStatus }): Promise<DocumentListItem[]> {
+  search(params: { q?: string; status?: DocumentStatus; includeDeleted?: boolean }): Promise<DocumentListItem[]> {
     return apiRequest(
-      `/documents/search${buildQuery({ q: params.q?.trim(), status: params.status })}`,
+      `/documents/search${buildQuery({ q: params.q?.trim(), status: params.status, includeDeleted: params.includeDeleted ? "true" : undefined })}`,
       { method: "GET" },
       documentListSchema,
     );
@@ -80,8 +80,8 @@ export const documentsApi = {
     return apiRequest(`/documents/${id}/reassign`, { method: "PATCH", body: { ownerId } }, documentDetailsSchema);
   },
 
-  restore(id: number): Promise<DocumentDetails> {
-    return apiRequest(`/documents/${id}/restore`, { method: "PATCH" }, documentDetailsSchema);
+  restore(id: number, ownerId: number): Promise<DocumentDetails> {
+    return apiRequest(`/documents/${id}/restore`, { method: "PATCH", body: { ownerId } }, documentDetailsSchema);
   },
 
   changeStatus(id: number, status: DocumentStatus): Promise<DocumentDetails> {

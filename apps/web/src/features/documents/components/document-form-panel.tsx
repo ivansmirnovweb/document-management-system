@@ -27,10 +27,12 @@ type DocumentFormValues = {
     registrationNumber: string;
     registrationDate: string;
     title: string;
+    about1: string;
     kind: DocumentKind;
     description?: string | null;
     incomingNumber?: string | null;
     outgoingNumber?: string | null;
+    outgoingDate: string;
     employerId?: number | null;
     ownerId: number;
     executorId: number;
@@ -57,10 +59,12 @@ function toFormDefaults(
             registrationNumber: "",
             registrationDate: new Date().toISOString().slice(0, 10),
             title: "",
+            about1: "",
             kind: "INTERNAL" as DocumentKind,
             description: "",
             incomingNumber: "",
             outgoingNumber: "",
+            outgoingDate: new Date().toISOString().slice(0, 10),
             employerId: undefined,
             ownerId: currentUser.id,
             executorId: currentUser.id,
@@ -75,10 +79,12 @@ function toFormDefaults(
         registrationNumber: document.registrationNumber,
         registrationDate: document.registrationDate.slice(0, 10),
         title: document.title,
+        about1: document.about1,
         kind: document.kind,
         description: document.description ?? "",
         incomingNumber: document.incomingNumber ?? "",
         outgoingNumber: document.outgoingNumber ?? "",
+        outgoingDate: document.outgoingDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
         employerId: document.employerId ?? undefined,
         ownerId: document.ownerId,
         executorId: document.executorId,
@@ -96,6 +102,12 @@ export function DocumentFormPanel({
     onCancel,
     onSubmit,
 }: DocumentFormPanelProps) {
+    const isCloseOutOnlyEditor =
+        mode === "edit" &&
+        document !== null &&
+        currentUser.role !== "ROOT" &&
+        currentUser.id !== document.ownerId &&
+        currentUser.id === document.executorId;
     const schema =
         mode === "create"
             ? createDocumentInputSchema
@@ -156,6 +168,7 @@ export function DocumentFormPanel({
                     >
                         <Input
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("registrationNumber")}
                         />
                     </FormField>
@@ -167,6 +180,7 @@ export function DocumentFormPanel({
                         <Input
                             type="date"
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("registrationDate")}
                         />
                     </FormField>
@@ -178,7 +192,20 @@ export function DocumentFormPanel({
                     >
                         <Input
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("title")}
+                        />
+                    </FormField>
+                    <FormField
+                        label="Тема входящего"
+                        required
+                        className="sm:col-span-2"
+                        error={form.formState.errors.about1?.message}
+                    >
+                        <Input
+                            aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
+                            {...form.register("about1")}
                         />
                     </FormField>
                     <FormField
@@ -186,7 +213,7 @@ export function DocumentFormPanel({
                         required
                         error={form.formState.errors.kind?.message}
                     >
-                        <Select aria-required="true" {...form.register("kind")}>
+                        <Select aria-required="true" disabled={isCloseOutOnlyEditor} {...form.register("kind")}>
                             <option value="INTERNAL">Внутренний</option>
                             <option value="INCOMING">Входящий</option>
                             <option value="OUTGOING">Исходящий</option>
@@ -200,6 +227,7 @@ export function DocumentFormPanel({
                         <Input
                             type="date"
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("dueDate")}
                         />
                     </FormField>
@@ -212,6 +240,7 @@ export function DocumentFormPanel({
                             type="number"
                             min={1}
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("executorId")}
                         />
                     </FormField>
@@ -225,6 +254,7 @@ export function DocumentFormPanel({
                                 type="number"
                                 min={1}
                                 aria-required="true"
+                                disabled={isCloseOutOnlyEditor}
                                 {...form.register("ownerId")}
                             />
                         </FormField>
@@ -233,17 +263,18 @@ export function DocumentFormPanel({
                     )}
                     <FormField
                         label="Работодатель"
-                        optional
-                        helperText="Оставьте пустым, если документ не привязан к работодателю."
+                        required
+                        helperText="Выберите контрагента по документу."
                         error={form.formState.errors.employerId?.message}
                     >
                         <Select
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("employerId", {
                                 setValueAs: (value) =>
                                     value === "" ? null : Number(value),
                             })}
                         >
-                            <option value="">Без работодателя</option>
+                            <option value="">Выберите работодателя</option>
                             {employers.map((employer) => (
                                 <option key={employer.id} value={employer.id}>
                                     {employer.fullName}
@@ -260,6 +291,7 @@ export function DocumentFormPanel({
                     error={form.formState.errors.description?.message}
                 >
                     <Textarea
+                        disabled={isCloseOutOnlyEditor}
                         {...form.register("description", {
                             setValueAs: (value) =>
                                 String(value).trim() === ""
@@ -286,16 +318,28 @@ export function DocumentFormPanel({
                     </FormField>
                     <FormField
                         label="Исходящий номер"
-                        optional
+                        required
                         error={form.formState.errors.outgoingNumber?.message}
                     >
                         <Input
                             {...form.register("outgoingNumber", {
                                 setValueAs: (value) =>
                                     String(value).trim() === ""
-                                        ? null
+                                        ? ""
                                         : String(value),
                             })}
+                            disabled={isCloseOutOnlyEditor}
+                        />
+                    </FormField>
+                    <FormField
+                        label="Дата исходящего"
+                        required
+                        error={form.formState.errors.outgoingDate?.message}
+                    >
+                        <Input
+                            type="date"
+                            aria-required="true"
+                            {...form.register("outgoingDate")}
                         />
                     </FormField>
                 </div>

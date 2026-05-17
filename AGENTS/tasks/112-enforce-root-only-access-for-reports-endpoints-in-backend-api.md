@@ -39,4 +39,5 @@ Frontend already hides reports for non-root users, but backend endpoints should 
 
 ## Result
 
-Pending.
+Done. Reports controller endpoints are now protected with ROOT role metadata on backend; non-root access is blocked at API layer, independent of frontend visibility.
+

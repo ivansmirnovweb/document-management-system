@@ -41,4 +41,5 @@ Current search behavior and deleted record access checks can produce inconsisten
 
 ## Result
 
-Pending.
+Done. Search DTO/service now enforce deterministic deleted visibility: non-root cannot see deleted records in search; root can include deleted explicitly, preserving role-based access consistency.
+

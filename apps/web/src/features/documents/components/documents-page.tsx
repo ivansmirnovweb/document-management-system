@@ -18,6 +18,7 @@ import { StateCard } from "@/shared/ui/state-card";
 import { documentsApi } from "../documents.api";
 import { documentsKeys } from "../documents.keys";
 import { statusLabel } from "../document-utils";
+import { reportsApi } from "@/features/reports/reports.api";
 import { DocumentDetailsPanel } from "./document-details-panel";
 import { DocumentFormPanel } from "./document-form-panel";
 import { DocumentsTable } from "./documents-table";
@@ -45,6 +46,7 @@ export function DocumentsPage({
     const [appliedSearch, setAppliedSearch] = useState("");
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [mode, setMode] = useState<"details" | "create" | "edit">("details");
+    const [selectedExportIds, setSelectedExportIds] = useState<number[]>([]);
     const currentUser = auth.user
         ? { id: auth.user.id, role: auth.user.role }
         : null;
@@ -76,7 +78,12 @@ export function DocumentsPage({
 
     const searchQuery = useQuery({
         queryKey: documentsKeys.search("private", tab, appliedSearch),
-        queryFn: () => documentsApi.search({ q: appliedSearch, status: tab }),
+        queryFn: () =>
+            documentsApi.search({
+                q: appliedSearch,
+                status: tab,
+                includeDeleted: auth.user?.role === "ROOT",
+            }),
         enabled: variant === "private" && appliedSearch.length > 0,
     });
 
@@ -223,6 +230,32 @@ export function DocumentsPage({
         },
     });
 
+    const exportSelectedMutation = useMutation({
+        mutationFn: async (ids: number[]) => {
+            const selected = list.filter((item) => ids.includes(item.id));
+            if (selected.length === 0) {
+                throw new Error("Выберите документы для выгрузки.");
+            }
+            const sortedDueDates = selected
+                .map((item) => item.dueDate.slice(0, 10))
+                .sort();
+            const csv = await reportsApi.exportDocuments({
+                dateFrom: sortedDueDates[0],
+                dateTo: sortedDueDates[sortedDueDates.length - 1],
+                selectedIds: ids,
+            });
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "documents-selected-export.csv";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        },
+    });
+
     const isLoading =
         variant === "public"
             ? publicListQuery.isPending
@@ -238,7 +271,8 @@ export function DocumentsPage({
         statusMutation.error ??
         deleteMutation.error ??
         createResolutionMutation.error ??
-        writeOffMutation.error;
+        writeOffMutation.error ??
+        exportSelectedMutation.error;
 
     const emptyState = (() => {
         if (variant === "public") {
@@ -450,6 +484,34 @@ export function DocumentsPage({
                         variant === "private" ? openCreate : undefined
                     }
                     onSelect={openDetails}
+                    selectedExportIds={selectedExportIds}
+                    onToggleExportSelect={
+                        variant === "private"
+                            ? (documentId, checked) => {
+                                  setSelectedExportIds((current) =>
+                                      checked
+                                          ? [
+                                                ...new Set([
+                                                    ...current,
+                                                    documentId,
+                                                ]),
+                                            ]
+                                          : current.filter(
+                                                (id) => id !== documentId,
+                                            ),
+                                  );
+                              }
+                            : undefined
+                    }
+                    onToggleExportSelectAll={
+                        variant === "private"
+                            ? (checked) => {
+                                  setSelectedExportIds(
+                                      checked ? list.map((item) => item.id) : [],
+                                  );
+                              }
+                            : undefined
+                    }
                 />
             );
         }
@@ -467,6 +529,27 @@ export function DocumentsPage({
                 }
                 onEmptyAction={variant === "private" ? openCreate : undefined}
                 onSelect={openDetails}
+                selectedExportIds={selectedExportIds}
+                onToggleExportSelect={
+                    variant === "private"
+                        ? (documentId, checked) => {
+                              setSelectedExportIds((current) =>
+                                  checked
+                                      ? [...new Set([...current, documentId])]
+                                      : current.filter((id) => id !== documentId),
+                              );
+                          }
+                        : undefined
+                }
+                onToggleExportSelectAll={
+                    variant === "private"
+                        ? (checked) => {
+                              setSelectedExportIds(
+                                  checked ? list.map((item) => item.id) : [],
+                              );
+                          }
+                        : undefined
+                }
                 onEdit={variant === "private" ? openEdit : undefined}
                 onToggleStatus={
                     variant === "private"
@@ -549,6 +632,7 @@ export function DocumentsPage({
                                         setTab(item.value);
                                         setSearchInput("");
                                         setAppliedSearch("");
+                                        setSelectedExportIds([]);
                                         closeSidebar();
                                     }}
                                 >
@@ -569,13 +653,26 @@ export function DocumentsPage({
                                 </Button>
                             ))}
                         </div>
-                        <Button
-                            onClick={() => {
-                                openCreate();
-                            }}
-                        >
-                            Создать документ
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant="secondary"
+                                disabled={selectedExportIds.length === 0 || exportSelectedMutation.isPending}
+                                onClick={() => {
+                                    void exportSelectedMutation.mutateAsync(selectedExportIds);
+                                }}
+                            >
+                                {exportSelectedMutation.isPending
+                                    ? "Экспортируем..."
+                                    : `Экспорт выбранных (${selectedExportIds.length})`}
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    openCreate();
+                                }}
+                            >
+                                Создать документ
+                            </Button>
+                        </div>
                     </div>
 
                     <form

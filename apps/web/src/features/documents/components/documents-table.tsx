@@ -13,6 +13,7 @@ const columnHelper = createColumnHelper<DocumentListItem>();
 type DocumentsTableProps = {
   documents: DocumentListItem[];
   selectedDocumentId: number | null;
+  selectedExportIds?: number[];
   currentUser: { id: number; role: UserRole } | null;
   publicView?: boolean;
   emptyStateTitle: string;
@@ -23,11 +24,14 @@ type DocumentsTableProps = {
   onEdit?: (document: DocumentListItem) => void;
   onToggleStatus?: (document: DocumentListItem) => void;
   onDelete?: (document: DocumentListItem) => void;
+  onToggleExportSelect?: (documentId: number, checked: boolean) => void;
+  onToggleExportSelectAll?: (checked: boolean) => void;
 };
 
 export function DocumentsTable({
   documents,
   selectedDocumentId,
+  selectedExportIds = [],
   currentUser,
   publicView = false,
   emptyStateTitle,
@@ -38,8 +42,34 @@ export function DocumentsTable({
   onEdit,
   onToggleStatus,
   onDelete,
+  onToggleExportSelect,
+  onToggleExportSelectAll,
 }: DocumentsTableProps) {
   const columns = [
+    ...(publicView || !onToggleExportSelect
+      ? []
+      : [
+          columnHelper.display({
+            id: "select",
+            header: () => (
+              <input
+                type="checkbox"
+                aria-label="Выбрать все документы"
+                checked={documents.length > 0 && selectedExportIds.length === documents.length}
+                onChange={(event) => onToggleExportSelectAll?.(event.target.checked)}
+              />
+            ),
+            cell: ({ row }) => (
+              <input
+                type="checkbox"
+                aria-label={`Выбрать документ ${row.original.registrationNumber}`}
+                checked={selectedExportIds.includes(row.original.id)}
+                onChange={(event) => onToggleExportSelect?.(row.original.id, event.target.checked)}
+                onClick={(event) => event.stopPropagation()}
+              />
+            ),
+          }),
+        ]),
     columnHelper.accessor("registrationNumber", {
       header: "Документ",
       cell: (info) => {

@@ -20,6 +20,7 @@ import { SearchDocumentsQueryDto } from './dto/search-documents-query.dto';
 import { ReassignDocumentDto } from './dto/reassign-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { UpdateDocumentStatusDto } from './dto/update-document-status.dto';
+import { RestoreDocumentDto } from './dto/restore-document.dto';
 import { CreateResolutionDto } from './dto/create-resolution.dto';
 import { UpdateResolutionDto } from './dto/update-resolution.dto';
 import { DocumentsService } from './documents.service';
@@ -157,8 +158,9 @@ export class DocumentsController {
   restore(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: RestoreDocumentDto,
   ) {
-    return this.documentsService.restore(id, user);
+    return this.documentsService.restore(id, user, dto);
   }
 
   @Roles(UserRole.ROOT)

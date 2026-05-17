@@ -74,7 +74,11 @@ export function canEditDocument(
     return false;
   }
 
-  return user.role === UserRole.ROOT || doc.ownerId === user.id;
+  return (
+    user.role === UserRole.ROOT ||
+    doc.ownerId === user.id ||
+    doc.executorId === user.id
+  );
 }
 
 export function canDeleteDocument(

@@ -58,16 +58,8 @@ export function RootDeletedDocumentsPage() {
     };
 
     const restoreMutation = useMutation({
-        mutationFn: documentsApi.restore,
-        onSuccess: async () => {
-            closeSidebar();
-            await refresh();
-        },
-    });
-
-    const reassignMutation = useMutation({
         mutationFn: ({ id, ownerId }: { id: number; ownerId: number }) =>
-            documentsApi.reassignOwner(id, ownerId),
+            documentsApi.restore(id, ownerId),
         onSuccess: async (document) => {
             setSelectedId(document.id);
             await refresh();
@@ -83,9 +75,7 @@ export function RootDeletedDocumentsPage() {
     });
 
     const actionError =
-        restoreMutation.error ??
-        reassignMutation.error ??
-        hardDeleteMutation.error;
+        restoreMutation.error ?? hardDeleteMutation.error;
 
     if (auth.user?.role !== UserRole.ROOT) {
         return (
@@ -166,16 +156,11 @@ export function RootDeletedDocumentsPage() {
                 <DeletedDocumentPanel
                     document={selectedDocument}
                     isRestoring={restoreMutation.isPending}
-                    isReassigning={reassignMutation.isPending}
                     isHardDeleting={hardDeleteMutation.isPending}
                     users={usersQuery.data?.users ?? []}
-                    onRestore={() => {
+                    onRestore={(ownerId) => {
                         if (!selectedDocument) return;
-                        restoreMutation.mutate(selectedDocument.id);
-                    }}
-                    onReassign={(ownerId) => {
-                        if (!selectedDocument) return;
-                        reassignMutation.mutate({
+                        restoreMutation.mutate({
                             id: selectedDocument.id,
                             ownerId,
                         });

@@ -19,22 +19,18 @@ const reassignSchema = z.object({
 type DeletedDocumentPanelProps = {
   document: DocumentDetails | null;
   isRestoring: boolean;
-  isReassigning: boolean;
   isHardDeleting: boolean;
   users: AuthenticatedUser[];
-  onRestore: () => void;
-  onReassign: (ownerId: number) => void;
+  onRestore: (ownerId: number) => void;
   onHardDelete: () => void;
 };
 
 export function DeletedDocumentPanel({
   document,
   isRestoring,
-  isReassigning,
   isHardDeleting,
   users,
   onRestore,
-  onReassign,
   onHardDelete,
 }: DeletedDocumentPanelProps) {
   const form = useForm<z.infer<typeof reassignSchema>>({
@@ -55,7 +51,7 @@ export function DeletedDocumentPanel({
     );
   }
 
-  const submit = form.handleSubmit((values) => onReassign(Number(values.ownerId)));
+  const submit = form.handleSubmit((values) => onRestore(Number(values.ownerId)));
 
   return (
     <Card className="space-y-6" id="details">
@@ -87,8 +83,8 @@ export function DeletedDocumentPanel({
 
       <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-950">Переназначить владельца</h3>
-          <p className="text-sm text-zinc-600">Выберите нового владельца и сохраните изменение.</p>
+          <h3 className="text-sm font-semibold text-zinc-950">Восстановить с назначением владельца</h3>
+          <p className="text-sm text-zinc-600">Выберите владельца и восстановите документ одним действием.</p>
         </div>
         <form className="flex flex-wrap items-end gap-3" onSubmit={submit}>
           <FormField
@@ -107,16 +103,13 @@ export function DeletedDocumentPanel({
               ))}
             </Select>
           </FormField>
-          <Button type="submit" disabled={isReassigning}>
-            {isReassigning ? "Сохраняем..." : "Переназначить"}
+          <Button type="submit" disabled={isRestoring}>
+            {isRestoring ? "Восстанавливаем..." : "Восстановить"}
           </Button>
         </form>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={onRestore} disabled={isRestoring}>
-          {isRestoring ? "Восстанавливаем..." : "Восстановить"}
-        </Button>
         <Button
           variant="danger"
           onClick={onHardDelete}

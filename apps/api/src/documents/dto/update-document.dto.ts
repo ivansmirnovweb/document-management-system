@@ -27,6 +27,7 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
+  @MinLength(1)
   about1?: string;
 
   @IsOptional()
@@ -47,11 +48,12 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
-  outgoingNumber?: string | null;
+  @MinLength(1)
+  outgoingNumber?: string;
 
   @IsOptional()
   @IsDateString()
-  outgoingDate?: string | null;
+  outgoingDate?: string;
 
   @IsOptional()
   @IsInt()

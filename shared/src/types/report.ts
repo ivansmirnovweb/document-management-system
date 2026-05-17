@@ -10,6 +10,7 @@ export type ReportFilterInput = {
   employerId?: number;
   status?: DocumentStatus;
   includeDeleted?: boolean;
+  selectedIds?: number[];
 };
 
 export type ExecutorStatistics = {
