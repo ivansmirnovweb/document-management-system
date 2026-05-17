@@ -4,13 +4,14 @@ import type { ReactNode } from "react";
 import { useAuth } from "@/features/auth/auth.provider";
 import { ChangePasswordForm } from "@/features/auth/components/change-password-form";
 import { StateCard } from "@/shared/ui/state-card";
+import { LoadingStateCard } from "@/shared/ui/loading-state-card";
 
 export function ProtectedView({ children }: { children: ReactNode }) {
   const auth = useAuth();
 
   if (auth.isLoading) {
     return (
-      <StateCard
+      <LoadingStateCard
         title="Загрузка защищённого раздела"
         description="Проверяем сессию перед показом приватного контента."
       />

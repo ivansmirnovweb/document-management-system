@@ -66,7 +66,7 @@ export function DeletedDocumentPanel({
           <div className="flex flex-wrap gap-2">
             <Badge tone="danger">Удалён</Badge>
             <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
-            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
+            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState, document.dueDate)}</Badge>
           </div>
         </div>
         <p className="text-sm text-zinc-600">{document.description || "Описание отсутствует."}</p>
@@ -109,7 +109,13 @@ export function DeletedDocumentPanel({
         </form>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+        <div className="mb-2 text-sm font-semibold text-red-800">
+          Опасная зона
+        </div>
+        <p className="mb-3 text-sm text-red-700">
+          Полное удаление необратимо и удаляет запись из системы навсегда.
+        </p>
         <Button
           variant="danger"
           onClick={onHardDelete}

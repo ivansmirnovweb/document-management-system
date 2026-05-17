@@ -158,6 +158,10 @@ export function DocumentFormPanel({
                 className="space-y-4"
                 onSubmit={submit}
             >
+                <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                        Регистрация
+                    </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
                         label="Регистрационный номер"
@@ -219,7 +223,15 @@ export function DocumentFormPanel({
                             <option value="OUTGOING">Исходящий</option>
                         </Select>
                     </FormField>
-                    <FormField
+                </div>
+                </section>
+
+                <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                        Ответственные и сроки
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <FormField
                         label="Срок"
                         required
                         error={form.formState.errors.dueDate?.message}
@@ -261,7 +273,15 @@ export function DocumentFormPanel({
                     ) : (
                         <input type="hidden" {...form.register("ownerId")} />
                     )}
-                    <FormField
+                    </div>
+                </section>
+
+                <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                        Контрагент и отправка
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <FormField
                         label="Работодатель"
                         required
                         helperText="Выберите контрагента по документу."
@@ -282,26 +302,6 @@ export function DocumentFormPanel({
                             ))}
                         </Select>
                     </FormField>
-                </div>
-
-                <FormField
-                    label="Описание"
-                    optional
-                    helperText="Необязательное пояснение к документу."
-                    error={form.formState.errors.description?.message}
-                >
-                    <Textarea
-                        disabled={isCloseOutOnlyEditor}
-                        {...form.register("description", {
-                            setValueAs: (value) =>
-                                String(value).trim() === ""
-                                    ? null
-                                    : String(value),
-                        })}
-                    />
-                </FormField>
-
-                <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
                         label="Входящий номер"
                         optional
@@ -314,6 +314,7 @@ export function DocumentFormPanel({
                                         ? null
                                         : String(value),
                             })}
+                            disabled={isCloseOutOnlyEditor}
                         />
                     </FormField>
                     <FormField
@@ -339,10 +340,34 @@ export function DocumentFormPanel({
                         <Input
                             type="date"
                             aria-required="true"
+                            disabled={isCloseOutOnlyEditor}
                             {...form.register("outgoingDate")}
                         />
                     </FormField>
                 </div>
+                </section>
+
+                <section className="space-y-3">
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                        Дополнительно
+                    </h3>
+                <FormField
+                    label="Описание"
+                    optional
+                    helperText="Необязательное пояснение к документу."
+                    error={form.formState.errors.description?.message}
+                >
+                    <Textarea
+                        disabled={isCloseOutOnlyEditor}
+                        {...form.register("description", {
+                            setValueAs: (value) =>
+                                String(value).trim() === ""
+                                    ? null
+                                    : String(value),
+                        })}
+                    />
+                </FormField>
+                </section>
 
                 <div className="flex flex-wrap gap-2">
                     <Button

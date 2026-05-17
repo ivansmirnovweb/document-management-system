@@ -3,7 +3,6 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import type { DocumentListItem, UserRole } from "@document-flow/shared";
 import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
 import { StateCard } from "@/shared/ui/state-card";
 import { cn } from "@/lib/cn";
 import { canCompleteDocument, canDeleteDocument, canEditDocument, deadlineLabel, deadlineTone, formatDate, kindLabel, statusLabel } from "../document-utils";
@@ -76,8 +75,8 @@ export function DocumentsTable({
         const document = info.row.original;
         return (
           <div className="space-y-2">
+            <div className="font-semibold text-zinc-950">{document.title}</div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-zinc-950">{document.title}</span>
               {document.isControl ? <Badge tone="warning">Контроль</Badge> : null}
               <Badge tone="info">{kindLabel(document.kind)}</Badge>
               <Badge tone={document.status === "DONE" ? "success" : "neutral"}>{statusLabel(document.status)}</Badge>
@@ -95,7 +94,7 @@ export function DocumentsTable({
         const document = row.original;
         return (
           <div className="space-y-2 text-sm">
-            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
+            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState, document.dueDate)}</Badge>
             <div className="text-zinc-600">До {formatDate(document.dueDate)}</div>
           </div>
         );
@@ -118,82 +117,61 @@ export function DocumentsTable({
         );
       },
     }),
-    columnHelper.display({
-      id: "actions",
-      header: "Действия",
-      cell: ({ row }) => {
-        const document = row.original;
-        if (publicView) {
-          return (
-            <Button
-              variant="ghost"
-              className="h-9 px-3"
-              onClick={(event) => {
-                event.stopPropagation();
-                onSelect(document);
-              }}
-            >
-              Открыть
-            </Button>
-          );
-        }
+    ...(publicView
+      ? []
+      : [
+          columnHelper.display({
+            id: "actions",
+            header: "Действия",
+            cell: ({ row }: { row: { original: DocumentListItem } }) => {
+              const document = row.original;
+              const canEdit = canEditDocument(currentUser, document);
+              const canDelete = canDeleteDocument(currentUser, document);
+              const canComplete = canCompleteDocument(currentUser, document);
 
-        const canEdit = canEditDocument(currentUser, document);
-        const canDelete = canDeleteDocument(currentUser, document);
-        const canComplete = canCompleteDocument(currentUser, document);
-
-        return (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="secondary"
-              className="h-9 px-3"
-              onClick={(event) => {
-                event.stopPropagation();
-                onSelect(document);
-              }}
-            >
-              Открыть
-            </Button>
-            {canEdit && onEdit ? (
-              <Button
-                variant="ghost"
-                className="h-9 px-3"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onEdit(document);
-                }}
-              >
-                Редактировать
-              </Button>
-            ) : null}
-            {canComplete && onToggleStatus ? (
-              <Button
-                variant="secondary"
-                className="h-9 px-3"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onToggleStatus(document);
-                }}
-              >
-                Завершить
-              </Button>
-            ) : null}
-            {canDelete && onDelete ? (
-              <Button
-                variant="danger"
-                className="h-9 px-3"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onDelete(document);
-                }}
-              >
-                Удалить
-              </Button>
-            ) : null}
-          </div>
-        );
-      },
-    }),
+              return (
+                <div className="flex flex-wrap gap-2">
+                  {canEdit && onEdit ? (
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center justify-center rounded-xl bg-transparent px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onEdit(document);
+                      }}
+                    >
+                      Редактировать
+                    </button>
+                  ) : null}
+                  {canComplete && onToggleStatus ? (
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center justify-center rounded-xl bg-zinc-100 px-3 text-sm font-medium text-zinc-900 transition hover:bg-zinc-200"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onToggleStatus(document);
+                      }}
+                    >
+                      Завершить
+                    </button>
+                  ) : null}
+                  {canDelete && onDelete ? (
+                    <button
+                      type="button"
+                      className="inline-flex h-9 items-center justify-center rounded-xl bg-red-600 px-3 text-sm font-medium text-white transition hover:bg-red-500"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(document);
+                      }}
+                    >
+                      Удалить
+                    </button>
+                  ) : null}
+                </div>
+              );
+            },
+          }),
+        ]),
   ];
 
   const table = useReactTable({
@@ -214,8 +192,8 @@ export function DocumentsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-      <table className="w-full border-collapse text-left text-sm">
+    <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <table className="min-w-[980px] w-full border-collapse text-left text-sm">
         <thead className="bg-zinc-50 text-xs uppercase tracking-[0.15em] text-zinc-500">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -231,18 +209,7 @@ export function DocumentsTable({
           {table.getRowModel().rows.map((row) => {
             const document = row.original;
             const selected = selectedDocumentId === document.id;
-            const rowTone =
-              document.deadlineState === "GREEN"
-                ? "bg-emerald-50"
-                : document.deadlineState === "YELLOW"
-                  ? "bg-amber-50"
-                  : document.deadlineState === "RED"
-                    ? "bg-red-50"
-                    : document.deadlineState === "COMPLETED"
-                      ? "bg-zinc-50"
-                      : document.isControl
-                        ? "bg-sky-50"
-                        : "";
+            const rowTone = "";
             return (
               <tr
                 key={row.id}

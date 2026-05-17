@@ -10,6 +10,7 @@ import { documentsKeys } from "@/features/documents/documents.keys";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { SlideOver } from "@/shared/ui/slide-over";
 import { StateCard } from "@/shared/ui/state-card";
+import { LoadingStateCard } from "@/shared/ui/loading-state-card";
 import { DeletedDocumentPanel } from "./deleted-document-panel";
 import { DeletedDocumentsTable } from "./deleted-documents-table";
 
@@ -105,7 +106,7 @@ export function RootDeletedDocumentsPage() {
             </Card>
 
             {isLoading ? (
-                <StateCard
+                <LoadingStateCard
                     title="Загрузка удалённых записей"
                     description="Получаем root-очередь."
                 />
@@ -148,7 +149,7 @@ export function RootDeletedDocumentsPage() {
                 {selectedDocumentQuery.isPending &&
                 selectedDocument === null &&
                 selectedId !== null ? (
-                    <StateCard
+                    <LoadingStateCard
                         title="Загрузка записи"
                         description="Получаем выбранный удалённый документ."
                     />

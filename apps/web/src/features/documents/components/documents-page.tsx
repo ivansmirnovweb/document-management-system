@@ -15,6 +15,7 @@ import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { SlideOver } from "@/shared/ui/slide-over";
 import { StateCard } from "@/shared/ui/state-card";
+import { LoadingStateCard } from "@/shared/ui/loading-state-card";
 import { documentsApi } from "../documents.api";
 import { documentsKeys } from "../documents.keys";
 import { statusLabel } from "../document-utils";
@@ -353,7 +354,7 @@ export function DocumentsPage({
 
             if (!selectedDocument) {
                 return (
-                    <StateCard
+                    <LoadingStateCard
                         title="Загрузка документа"
                         description="Ждём загрузки выбранного документа."
                     />
@@ -396,7 +397,7 @@ export function DocumentsPage({
             !selectedDocument
         ) {
             return (
-                <StateCard
+                <LoadingStateCard
                     title="Загрузка документа"
                     description="Получаем выбранную запись."
                 />
@@ -507,7 +508,9 @@ export function DocumentsPage({
                         variant === "private"
                             ? (checked) => {
                                   setSelectedExportIds(
-                                      checked ? list.map((item) => item.id) : [],
+                                      checked
+                                          ? list.map((item) => item.id)
+                                          : [],
                                   );
                               }
                             : undefined
@@ -536,7 +539,9 @@ export function DocumentsPage({
                               setSelectedExportIds((current) =>
                                   checked
                                       ? [...new Set([...current, documentId])]
-                                      : current.filter((id) => id !== documentId),
+                                      : current.filter(
+                                            (id) => id !== documentId,
+                                        ),
                               );
                           }
                         : undefined
@@ -596,7 +601,7 @@ export function DocumentsPage({
                 ? `Изменение записи №${selectedDocument.registrationNumber}.`
                 : "Изменение выбранной записи.";
         }
-        return "Просмотр выбранной записи.";
+        return undefined;
     })();
 
     return (
@@ -610,8 +615,8 @@ export function DocumentsPage({
                     </CardTitle>
                     <CardDescription className="max-w-3xl text-zinc-700">
                         {variant === "public"
-                            ? "Активные записи доступны без входа."
-                            : "Просматривайте, ищите, создавайте, редактируйте и завершайте документы в одном месте."}
+                            ? undefined
+                            : "Просматривайте, ищите, создавайте, редактируйте и завершайте документы."}
                     </CardDescription>
                 </div>
             </Card>
@@ -656,9 +661,14 @@ export function DocumentsPage({
                         <div className="flex flex-wrap gap-2">
                             <Button
                                 variant="secondary"
-                                disabled={selectedExportIds.length === 0 || exportSelectedMutation.isPending}
+                                disabled={
+                                    selectedExportIds.length === 0 ||
+                                    exportSelectedMutation.isPending
+                                }
                                 onClick={() => {
-                                    void exportSelectedMutation.mutateAsync(selectedExportIds);
+                                    void exportSelectedMutation.mutateAsync(
+                                        selectedExportIds,
+                                    );
                                 }}
                             >
                                 {exportSelectedMutation.isPending
@@ -676,41 +686,60 @@ export function DocumentsPage({
                     </div>
 
                     <form
-                        className="flex flex-wrap gap-3"
+                        className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 pt-3"
                         onSubmit={(event) => {
                             event.preventDefault();
                             setAppliedSearch(searchInput.trim());
                             closeSidebar();
                         }}
                     >
-                        <Input
-                            className="max-w-md"
-                            placeholder="Поиск по рег. номеру, названию, датам, исполнителям и контрагентам"
-                            value={searchInput}
-                            onChange={(event) =>
-                                setSearchInput(event.target.value)
-                            }
-                        />
-                        <Button type="submit">Найти</Button>
-                        {appliedSearch ? (
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={() => {
-                                    setSearchInput("");
-                                    setAppliedSearch("");
-                                    closeSidebar();
-                                }}
-                            >
-                                Очистить
-                            </Button>
-                        ) : null}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Input
+                                className="max-w-md"
+                                placeholder="Поиск по рег. номеру, названию, датам, исполнителям и контрагентам"
+                                value={searchInput}
+                                onChange={(event) =>
+                                    setSearchInput(event.target.value)
+                                }
+                            />
+                            <Button type="submit">Найти</Button>
+                            {appliedSearch ? (
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={() => {
+                                        setSearchInput("");
+                                        setAppliedSearch("");
+                                        closeSidebar();
+                                    }}
+                                >
+                                    Очистить
+                                </Button>
+                            ) : null}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm text-zinc-600">
+                                Выбрано:{" "}
+                                <span className="font-semibold text-zinc-900">
+                                    {selectedExportIds.length}
+                                </span>
+                            </span>
+                            {selectedExportIds.length > 0 ? (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => setSelectedExportIds([])}
+                                >
+                                    Сбросить выбор
+                                </Button>
+                            ) : null}
+                        </div>
                     </form>
                 </div>
             ) : null}
 
             {isLoading ? (
-                <StateCard
+                <LoadingStateCard
                     title="Загрузка документов"
                     description="Получаем актуальные записи."
                 />

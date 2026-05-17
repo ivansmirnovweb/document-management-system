@@ -63,13 +63,14 @@ export function DocumentDetailsPanel({
             <Badge tone={document.isControl ? "warning" : "neutral"}>{document.isControl ? "Контроль" : "Обычный"}</Badge>
             <Badge tone="info">{kindLabel(document.kind)}</Badge>
             <Badge tone={document.status === "DONE" ? "success" : "info"}>{statusLabel(document.status)}</Badge>
-            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState)}</Badge>
+            <Badge tone={deadlineTone(document.deadlineState)}>{deadlineLabel(document.deadlineState, document.dueDate)}</Badge>
           </div>
         </div>
         <p className="text-sm text-zinc-600">{document.description || "Описание отсутствует."}</p>
       </div>
 
       <dl className="grid gap-4 text-sm sm:grid-cols-2">
+        <Detail label="Статус" value={statusLabel(document.status)} />
         <Detail label="Срок" value={formatDate(document.dueDate)} />
         <Detail label="Завершён" value={document.completedAt ? formatDateTime(document.completedAt) : "—"} />
         <Detail label="Владелец" value={`${document.owner.displayName} (@${document.owner.username}) · ${document.owner.unit}`} />
@@ -119,7 +120,8 @@ export function DocumentDetailsPanel({
       </div>
 
       {!publicView ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="sticky bottom-0 z-10 -mx-1 rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
+          <div className="flex flex-wrap gap-2">
           {editAllowed && onEdit ? <Button onClick={onEdit}>Редактировать</Button> : null}
           {completeAllowed && onToggleStatus ? <Button variant="secondary" onClick={onToggleStatus}>Завершить</Button> : null}
           {reopenAllowed && document.status === "DONE" && onToggleStatus ? (
@@ -127,6 +129,7 @@ export function DocumentDetailsPanel({
           ) : null}
           {writeOffAllowed && onWriteOff ? <Button variant="secondary" onClick={() => void onWriteOff()}>Списать в дело</Button> : null}
           {deleteAllowed && onDelete ? <Button variant="danger" onClick={onDelete}>Удалить</Button> : null}
+          </div>
         </div>
       ) : null}
     </Card>

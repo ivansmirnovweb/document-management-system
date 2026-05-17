@@ -16,6 +16,7 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardTitle } from "@/shared/ui/card";
 import { FormField } from "@/shared/ui/form-field";
 import { Input } from "@/shared/ui/input";
+import { LoadingStateCard } from "@/shared/ui/loading-state-card";
 import { StateCard } from "@/shared/ui/state-card";
 
 const reportRangeSchema = reportFilterInputSchema.pick({
@@ -183,7 +184,7 @@ export function ReportsPage() {
             ) : null}
 
             {statisticsQuery.isPending ? (
-                <StateCard
+                <LoadingStateCard
                     title="Загрузка отчёта"
                     description="Получаем статистику исполнителей."
                 />

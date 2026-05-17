@@ -33,14 +33,30 @@ export function deadlineTone(
   }
 }
 
-export function deadlineLabel(state: DocumentDeadlineState): string {
+export function deadlineLabel(
+  state: DocumentDeadlineState,
+  dueDate?: string,
+): string {
   switch (state) {
     case DocumentDeadlineState.GREEN:
       return "7–4 дня";
     case DocumentDeadlineState.YELLOW:
-      return "3–1 дня";
+      return "1–3 дня";
     case DocumentDeadlineState.RED:
-      return "Сегодня / просрочено";
+      if (!dueDate) {
+        return "Сегодня";
+      }
+      {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const deadline = new Date(dueDate);
+        const due = new Date(
+          deadline.getFullYear(),
+          deadline.getMonth(),
+          deadline.getDate(),
+        );
+        return due.getTime() < today.getTime() ? "Просрочено" : "Сегодня";
+      }
     case DocumentDeadlineState.NEUTRAL:
       return "Без выделения";
     case DocumentDeadlineState.COMPLETED:
